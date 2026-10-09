@@ -13,3 +13,5 @@ smtp:
     mittente: Genitore <@EMAIL_REDACTED>
     destinatari:
         - @EMAIL_REDACTED
+file_html:
+    path: .

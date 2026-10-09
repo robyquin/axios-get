@@ -8,6 +8,7 @@ Gestore di Notifiche.
 
 """
 
+import os
 from datetime import datetime
 
 import smtplib
@@ -27,14 +28,45 @@ class Notifica():
         with open(path_config, "r", encoding="utf-8") as file:
             self.config = yaml.load(file, Loader=yaml.FullLoader)
 
-    def send_notifica(self, html: str) -> None:
+    def send_notifica(self, html: str, alunno: str) -> None:
         """
         Definisce il mezzo della notifica
         
         :param html: corpo del messaggio di notifica
         :type html: str
+        :param alunno: nome dell'alunno/a
+        :type alunno: str
         """
         pass
+
+class NotificaFileHTML(Notifica):
+    """
+    Classe di definizione delle Notifiche FileHTML
+
+    Questa classe eredita da :class:`Notifica` e ne estende le funzionalità 
+    salvando il file nel absolute_path specifico.
+    """
+    def send_notifica(self, html: str, alunno: str) -> None:
+        # 1. Configurazione dei parametri di collocazione
+        path_file = self.config['file_html']['path']
+        absolute_path = os.path.join(path_file,"compiti_"+alunno+".html")
+
+        # 2. Salvataggio del contenuto
+        try:
+            # 'with' assicura che il file venga chiuso automaticamente alla fine,
+            # anche se si verifica un errore durante la scrittura.
+            with open(absolute_path, "w", encoding="utf-8") as file:
+                file.write(html)
+            print("Scrittura completata con successo!\n---")
+
+        except PermissionError:
+            print(f"Errore: Non hai i permessi necessari per scrivere nel file '{absolute_path}'.\n---")
+
+        except FileNotFoundError:
+            print(f"Errore: La cartella specificata per il file '{absolute_path}' non esiste.\n---")
+
+        except Exception as e:
+            print(f"Si è verificato un errore imprevisto: {e}")
 
 class NotificaMail(Notifica):
     """
@@ -43,7 +75,7 @@ class NotificaMail(Notifica):
     Questa classe eredita da :class:`Notifica` e ne estende le funzionalità 
     configurando il client SMTP.
     """
-    def send_notifica(self, html: str) -> None:
+    def send_notifica(self, html: str, alunno: str) -> None:
         oggi = datetime.strftime(datetime.now(), "%d/%m/%Y")
 
         # 1. Configurazione dei parametri del server e delle credenziali

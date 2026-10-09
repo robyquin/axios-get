@@ -31,6 +31,8 @@ axios:
     alunni:
         - Nome_Alunno_1             # Lista di nomi come indicato nella Home di `Axios Registro Elettronico FAMIGLIA`
         - Nome_Alunno_2
+file:
+    path: ./pathfile # percorso relativo o assoluto della cartella di destinazione
 smtp:
     smtp_server: STRING_REDACTED           # indirizzo server SMTP
     smtp_port: 465                         # porta SMTP
