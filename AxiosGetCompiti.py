@@ -8,6 +8,7 @@ AxiosGetCompiti.
 
 """
 
+import sys
 import os
 from pathlib import Path
 
@@ -16,7 +17,12 @@ import yaml
 from LibAxiosFamiglia import LibAxiosFamiglia
 import notifica
 
-DIR=str(Path(os.path.dirname(__file__)).absolute())+os.path.sep
+if getattr(sys, 'frozen', False):
+    # Se l'applicazione è compilata con PyInstaller
+    DIR=str(os.path.dirname(sys.executable))+os.path.sep
+else:
+    DIR=str(Path(os.path.dirname(__file__)).absolute())+os.path.sep
+
 
 if __name__ == "__main__":
 

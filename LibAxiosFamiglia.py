@@ -8,6 +8,7 @@ Gestore di acquisizione dati da Axios.
 
 """
 
+import sys
 from datetime import datetime
 import os
 import re
@@ -42,7 +43,11 @@ DOW_Tr = {
     'Sun': 'Dom'
 }
 
-DIR=str(Path(os.path.dirname(__file__)).absolute())+os.path.sep
+if getattr(sys, 'frozen', False):
+    # Se l'applicazione è compilata con PyInstaller
+    DIR=str(os.path.dirname(sys.executable))+os.path.sep
+else:
+    DIR=str(Path(os.path.dirname(__file__)).absolute())+os.path.sep
 
 class LibAxiosFamiglia():
     """
