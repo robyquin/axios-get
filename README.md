@@ -45,9 +45,9 @@ smtp:
         - @EMAIL_REDACTED2
 ```
 
-Tipologie di notifiche:
+### Tipologie di notifiche
 
-- **file**: salva un file HTML per Studente/Studentessa in un percorso **path** specifico (`NotificaFileHTML`)
+- **file_html**: salva un file HTML per Studente/Studentessa in un percorso **path** specifico (`NotificaFileHTML`)
 - **smtp**: invia una mail per Studente/Studentessa agli indirizzi **destinatari** specificati (`NotificaMail`)
 
 ## Usage
