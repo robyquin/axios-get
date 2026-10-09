@@ -32,6 +32,16 @@ class UrlIdType(IntEnum):
     type_data = 5
     redirect = 6
 
+DOW_Tr = { 
+    'Mon': 'Lun',
+    'Tue': 'Mar',
+    'Wed': 'Mer',
+    'Thu': 'Gio',
+    'Fri': 'Ven',
+    'Sat': 'Sab',
+    'Sun': 'Dom'
+}
+
 DIR=str(Path(os.path.dirname(__file__)).absolute())+os.path.sep
 
 class LibAxiosFamiglia():
@@ -153,11 +163,12 @@ class LibAxiosFamiglia():
         giorno_app = ""
         for c in range(len(new_compiti)-1, -1, -1):
             giorno = new_compiti[c]["giorno"]
+            DayOfWeek = datetime.strptime(giorno, "%d/%m/%Y").strftime("%a")
             if(c == (len(new_compiti)-1)):
-                linee_notifica.append(f"\n<hr>\n<h2>{giorno}</h2>")
+                linee_notifica.append(f"\n<hr>\n<h2>{DOW_Tr[DayOfWeek]}, {giorno}</h2>")
             else:
                 if(giorno != giorno_app):
-                    linee_notifica.append(f"\n<hr>\n<h2>{giorno}</h2>")
+                    linee_notifica.append(f"\n<hr>\n<h2>{DOW_Tr[DayOfWeek]}, {giorno}</h2>")
             giorno_app = giorno
 
             testo_email = []
