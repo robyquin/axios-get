@@ -63,7 +63,7 @@ Description=Servizio per Axios-Compiti
 
 [Service]
 Type=oneshot
-ExecStart=/__absolute_path__/AxiosGetCompiti.py
+ExecStart=python /__absolute_path__/AxiosGetCompiti.py
 User=root
 Group=root
 
@@ -84,4 +84,12 @@ Unit=axios-compiti.service
 
 [Install]
 WantedBy=timers.target
+```
+
+### Settings
+
+```bash
+systemctl daemon-reload
+systemctl enable axios-compiti.timer
+systemctl start axios-compiti.timer
 ```
