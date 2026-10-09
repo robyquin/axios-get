@@ -5,6 +5,9 @@ axios:
         password: STRING_REDACTED
     alunni:
         - STRING_REDACTED
+tipo_notifica: file_html
+file_html:
+    path: .
 smtp:
     smtp_server: STRING_REDACTED
     smtp_port: 465
@@ -13,5 +16,3 @@ smtp:
     mittente: Genitore <@EMAIL_REDACTED>
     destinatari:
         - @EMAIL_REDACTED
-file_html:
-    path: .
