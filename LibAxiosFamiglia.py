@@ -77,11 +77,12 @@ class LibAxiosFamiglia():
 
     def __get_session(self, Alunno, link_sequence, prefix):
         for link in link_sequence:
+            registo_compiti_alunno = os.path.join(DIR, prefix+Alunno, link[UrlIdType.filename])
             if (link[UrlIdType.method] == 'GET'):
                 res = self.session.get(link[UrlIdType.url], params=link[UrlIdType.params], allow_redirects=True)
                 if ('Action' in link[UrlIdType.params].keys()):
                     if (link[UrlIdType.params]['Action'] == 'DashboardLoad'):
-                        self.__get_alunni(res.text, Alunno)
+                        self.__get_alunni(res.text, Alunno, prefix)
             else:
                 if (link[UrlIdType.type_data]=='json'):
                     res = self.session.post(link[UrlIdType.url], json=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content-Type': 'application/x-www-form-urlencoded'})
@@ -91,8 +92,8 @@ class LibAxiosFamiglia():
                     if (link[UrlIdType.params]['Action'] == 'FAMILY_REGISTRO_CLASSE_COMPITI_LISTA'):
                         sha1_hash = hashlib.sha1(res.text.encode('utf-8')).hexdigest()
                         sha1_hash_old = ""
-                        if(os.path.exists(DIR+prefix+link[UrlIdType.filename])):
-                            with open(DIR+prefix+link[UrlIdType.filename], "rb") as f:
+                        if(os.path.exists(registo_compiti_alunno)):
+                            with open(registo_compiti_alunno, "rb") as f:
                                 sha1_hash_old = hashlib.file_digest(f, "sha1").hexdigest()
                         if (sha1_hash != sha1_hash_old):
                             self.notifica.send_notifica(self.elaborazione_json(json.loads(res.text), Alunno), Alunno)
@@ -108,17 +109,20 @@ class LibAxiosFamiglia():
             print(res.request.headers) # Gli header di quella specifica chiamata
             print("---")
             if (prefix is not None and link[UrlIdType.filename] is not None):
-                with open(DIR+prefix+link[UrlIdType.filename], 'w', encoding='utf-8') as fp:
+                dir_registro_alunno = os.path.join(DIR, prefix+Alunno)
+                if (not os.path.exists(dir_registro_alunno)):
+                    os.makedirs(dir_registro_alunno)
+                with open(registo_compiti_alunno, 'w', encoding='utf-8') as fp:
                     fp.write(res.text)
                     fp.close()
 
-    def __get_alunni(self, text, Alunno):
+    def __get_alunni(self, text, Alunno, prefix):
         m = re.search(r"<a.*data-action='FAMILY_CHANGE_ALUNNO'.*?data-others='(.*?)'.*?<b>(.*?)</b>.*?</a>", text)
         if (len(m.groups()) > 0):
             self.alunni[m.group(2)] = m.group(1)
         if (Alunno in self.alunni.keys()):
             link=['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_CHANGE_ALUNNO'}, '03_FAMILY_CHANGE_ALUNNO.json', {"alunnoId": self.alunni[Alunno]}, 'json', False ]
-            self.__get_session(Alunno, [link], None)
+            self.__get_session(Alunno, [link], prefix)
 
     def elaborazione_json(self, compiti: dict, Alunno: str) -> str:
         """
