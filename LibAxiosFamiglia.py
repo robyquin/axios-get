@@ -88,19 +88,24 @@ class LibAxiosFamiglia():
                     res = self.session.post(link[UrlIdType.url], json=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content-Type': 'application/x-www-form-urlencoded'})
                 else:
                     res = self.session.post(link[UrlIdType.url], data=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content-Type': 'application/x-www-form-urlencoded'})
-                if ('Action' in link[UrlIdType.params].keys()):
-                    if (link[UrlIdType.params]['Action'] == 'FAMILY_REGISTRO_CLASSE_COMPITI_LISTA'):
-                        sha1_hash = hashlib.sha1(res.text.encode('utf-8')).hexdigest()
-                        sha1_hash_old = ""
-                        if(os.path.exists(registo_compiti_alunno)):
-                            with open(registo_compiti_alunno, "rb") as f:
-                                sha1_hash_old = hashlib.file_digest(f, "sha1").hexdigest()
-                        if (sha1_hash != sha1_hash_old):
-                            self.notifica.send_notifica(self.elaborazione_json(json.loads(res.text), Alunno), Alunno)
-                            print(sha1_hash, sha1_hash_old)
-                            print("---")
-                        else:
-                            print("Nessuna notifica: non ci sono modifiche!\n---")
+                get_error = re.search(r"SweetMessage.error\('(.*)'\);", res.text)
+                if (get_error == None):
+                    if ('Action' in link[UrlIdType.params].keys()):
+                        if (link[UrlIdType.params]['Action'] == 'FAMILY_REGISTRO_CLASSE_COMPITI_LISTA'):
+                            sha1_hash = hashlib.sha1(res.text.encode('utf-8')).hexdigest()
+                            sha1_hash_old = ""
+                            if(os.path.exists(registo_compiti_alunno)):
+                                with open(registo_compiti_alunno, "rb") as f:
+                                    sha1_hash_old = hashlib.file_digest(f, "sha1").hexdigest()
+                            if (sha1_hash != sha1_hash_old):
+                                self.notifica.send_notifica(self.elaborazione_json(json.loads(res.text), Alunno), Alunno)
+                                print(sha1_hash, sha1_hash_old)
+                                print("---")
+                            else:
+                                print("Nessuna notifica: non ci sono modifiche!\n---")
+                else:
+                    print("{}\n---".format(get_error.group(1)))
+                    break
 
             # DEBUG
             print(res.request.method, res.request.url)     # L'URL finale
