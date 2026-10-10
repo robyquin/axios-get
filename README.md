@@ -32,7 +32,9 @@ cd axios-get
 
 ## Configuration
 
-- Per la prima configurazione occorre creare un file, se non esiste, con il nome `credenziali.yml` nella stessa cartella di **AxiosGetCompiti**.
+Per la prima configurazione occorre creare un file, se non esiste, con il nome `credenziali.yml` nella stessa cartella di **AxiosGetCompiti**.
+
+- Al primo avvio, se il file di configurazione non esiste, riceverete un messaggio di errore con la conseguente creazione di `credenziali_default.yml`, rinominatelo in `credenziali.yml`, sarà un ottimo punto di partenza per la compilazione.
 
 - Compila i campi del file come suggerito in fondo a questo paragrafo.
 
@@ -63,12 +65,12 @@ smtp:
 
 ### Tipologie di notifiche
 
-- **file_html**: salva un file HTML per Studente/Studentessa in un percorso **path** specifico (`NotificaFileHTML`)
-- **smtp**: invia una mail per Studente/Studentessa agli indirizzi **destinatari** specificati (`NotificaMail`)
+- **file_html**: salva un file HTML per Studente/Studentessa in un percorso **path** specifico
+- **smtp**: invia una mail per Studente/Studentessa agli indirizzi **destinatari** specificati
 
 ### Configurazione minima richiesta
 
-Il minimo richiesto per il corretto funzionamentoLa riguarda le sezione:
+Il minimo richiesto per il corretto funzionamento riguarda le sezione:
 
 - `axios`: include tutte le credenziali per l'accesso al portale del registro elettronico,
 - `tipo_notifica`: si deve indicare il nome della sezione di notifica desiderata, es. `file_html`, o `smtp`,
