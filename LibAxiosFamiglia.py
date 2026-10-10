@@ -63,7 +63,10 @@ class LibAxiosFamiglia():
         self.alunni = {}
         self.notifica = class_notifica
 
-        self.session = requests.session()
+        if(self.customerid != '' and self.username != '' and self.password != '' ):
+            self.session = requests.session()
+        else:
+            raise Exception("Controlla il file di configurazione: una delle credenziali di Axios è vuota")
 
     def __delete__(self, instance):
         self.session.close()
@@ -119,8 +122,7 @@ class LibAxiosFamiglia():
                             else:
                                 print("Nessuna notifica: non ci sono modifiche!\n---")
                 else:
-                    print("{}\n---".format(get_error.group(1)))
-                    break
+                    raise Exception("{}".format(get_error.group(1)))
 
             # DEBUG
             print(res.request.method, res.request.url)     # L'URL finale
@@ -138,11 +140,13 @@ class LibAxiosFamiglia():
 
     def __get_alunni(self, text, Alunno, prefix):
         m = re.search(r"<a.*data-action='FAMILY_CHANGE_ALUNNO'.*?data-others='(.*?)'.*?<b>(.*?)</b>.*?</a>", text)
-        if (len(m.groups()) > 0):
+        if (m is not None):
             self.alunni[m.group(2)] = m.group(1)
         if (Alunno in self.alunni.keys()):
             link=['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_CHANGE_ALUNNO'}, '03_FAMILY_CHANGE_ALUNNO.json', {"alunnoId": self.alunni[Alunno]}, 'json', False ]
             self.__get_session(Alunno, [link], prefix)
+        else:
+            print(f"Warning! Il nome dell'alunno, {Alunno}, non trovato! Verifica e controlla la corrispondenza nel file di configurazione.", file=sys.stderr)
 
     def elaborazione_json(self, compiti: dict, Alunno: str) -> str:
         """
