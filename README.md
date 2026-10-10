@@ -13,14 +13,30 @@ Notifica ai tuoi figli/e i compiti loro assegnati sul registro elettronico.
 
 ## Installation
 
+### Installation from source
+
 ```bash
 git clone https://github.com/robyquin/axios-get.git
 cd axios-get
 ```
 
+- Passa alla *configurazione*
+
+### Installation from binary
+
+**Windows Users**:
+
+- Fai il [download dell'ultima release](https://github.com/robyquin/axios-get/releases/latest)
+- Estrai l'archivio in una cartella
+- Passa alla *configurazione*
+
 ## Configuration
 
-Compila i campi nel file di configurazione *YAML*
+- Per la prima configurazione occorre creare un file, se non esiste, con il nome `credenziali.yml` nella stessa cartella di **AxiosGetCompiti**.
+
+- Compila i campi del file come suggerito in fondo a questo paragrafo.
+
+**NOTA**: il file configurazione (tipo *YAML*) è fortemente **sensibile all'indentazione**, questo gli consente di creare una struttura gerarchica dell'informazioni.
 
 ```yaml
 axios:
@@ -50,7 +66,17 @@ smtp:
 - **file_html**: salva un file HTML per Studente/Studentessa in un percorso **path** specifico (`NotificaFileHTML`)
 - **smtp**: invia una mail per Studente/Studentessa agli indirizzi **destinatari** specificati (`NotificaMail`)
 
+### Configurazione minima richiesta
+
+Il minimo richiesto per il corretto funzionamentoLa riguarda le sezione:
+
+- `axios`: include tutte le credenziali per l'accesso al portale del registro elettronico,
+- `tipo_notifica`: si deve indicare il nome della sezione di notifica desiderata, es. `file_html`, o `smtp`,
+- *nome della tipologia_notifica*: include i parametri per rendere possibile la tipologia di notifica desiderata.
+
 ## Usage
+
+### Unix Like
 
 ```bash
 python /__absolute_path__/AxiosGetCompiti.py
@@ -58,9 +84,17 @@ python /__absolute_path__/AxiosGetCompiti.py
 
 **NOTA**: L'utente che lancia lo script deve avere permessi di scrittura su `__absolute_path__`
 
-## Integrazione con Systemd
+### Windows Like
 
-### axios-compiti.service
+Semplicemente doppio click su `AxiosGetCompiti.exe`
+
+## Integrazione con schedulatori
+
+### Unix Like (Systemd)
+
+Crea i file di servizio `axios-compiti.service` e `axios-compiti.timer`
+
+#### axios-compiti.service
 
 ```bash
 # /etc/systemd/system/axios-compiti.service
@@ -77,7 +111,7 @@ Group=root
 WantedBy=multi-user.target
 ```
 
-### axios-compiti.timer
+#### axios-compiti.timer
 
 ```bash
 # /etc/systemd/system/axios-compiti.timer
@@ -99,3 +133,13 @@ systemctl daemon-reload
 systemctl enable axios-compiti.timer
 systemctl start axios-compiti.timer
 ```
+
+### Windows Like
+
+- Premi i tasti `Win + R`, scrivi `taskschd.msc run` e premi Invio.
+
+oppure
+
+- Clicca sul pulsante **Start**, digita **Utilità di pianificazione** e seleziona il risultato.
+
+Per la configurazione di questo schedulatore, ti chiedo gentilmente di seguire le informazioni che trovi in rete.
