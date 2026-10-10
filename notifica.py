@@ -8,6 +8,7 @@ Gestore di Notifiche.
 
 """
 
+import sys
 import os
 from datetime import datetime
 
@@ -60,13 +61,13 @@ class NotificaFileHTML(Notifica):
             print("Scrittura completata con successo!\n---")
 
         except PermissionError:
-            print(f"Errore: Non hai i permessi necessari per scrivere nel file '{absolute_path}'.\n---")
+            print(f"Errore: Non hai i permessi necessari per scrivere nel file '{absolute_path}'.", file=sys.stderr)
 
         except FileNotFoundError:
-            print(f"Errore: La cartella specificata per il file '{absolute_path}' non esiste.\n---")
+            print(f"Errore: La cartella specificata per il file '{absolute_path}' non esiste.", file=sys.stderr)
 
         except Exception as e:
-            print(f"Si è verificato un errore imprevisto: {e}")
+            print(f"Si è verificato un errore imprevisto: {e}", file=sys.stderr)
 
 class NotificaMail(Notifica):
     """
@@ -105,4 +106,4 @@ class NotificaMail(Notifica):
                 server.send_message(msg)
             print("Email inviata con successo!\n---")
         except Exception as e:
-            print(f"Si è verificato un errore durante l'invio: {e}\n---")
+            print(f"Si è verificato un errore durante l'invio: {e}", file=sys.stderr)
