@@ -66,7 +66,7 @@ smtp:
 ### Tipologie di notifiche
 
 - **file_html**: salva un file HTML per Studente/Studentessa in un percorso **path** specifico
-- **smtp**: invia una mail per Studente/Studentessa agli indirizzi **destinatari** specificati
+- **smtp**: invia una mail per Studente/Studentessa agli indirizzi **destinatari** specificati. Consulta il documento [SMTP server](./docs/SMTP_server.md) per verificare i parametri dei provider supportati.
 
 ### Configurazione minima richiesta
 
