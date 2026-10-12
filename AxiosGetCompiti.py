@@ -49,7 +49,6 @@ def file_config_default():
             'smtp_port': 465,
             'smtp_username': 'Username',
             'smtp_password': 'PaSsWoRd',
-            'mittente': 'Genitore <genitore1@example.it>',
             'destinatari': [
                 'genitore1@example.it',
                 'Alunno1@example.it'

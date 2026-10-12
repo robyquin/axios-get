@@ -90,13 +90,12 @@ class NotificaMail(Notifica):
         else:
             starttls = False
 
-        sender_email = self.config['smtp']['mittente']
         receiver_email = self.config['smtp']['destinatari']
 
         # 2. Creazione del contenuto dell'email
         msg = EmailMessage()
         msg["Subject"] = "Diario Axios - "+oggi
-        msg["From"] = sender_email
+        msg["From"] = f"Axios-Get <{username}>"
         msg["To"] = ", ".join(receiver_email)
         msg.set_content(html, subtype='html')
 
