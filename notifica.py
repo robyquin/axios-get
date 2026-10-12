@@ -85,6 +85,11 @@ class NotificaMail(Notifica):
         username = self.config['smtp']['smtp_username']
         password = self.config['smtp']['smtp_password']
 
+        if (port == 587):
+            starttls = True
+        else:
+            starttls = False
+
         sender_email = self.config['smtp']['mittente']
         receiver_email = self.config['smtp']['destinatari']
 
@@ -101,9 +106,20 @@ class NotificaMail(Notifica):
 
         # 4. Connessione al server e invio del messaggio
         try:
-            with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-                server.login(username, password)
-                server.send_message(msg)
+            if (not starttls):
+                with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+                    server.login(username, password)
+                    server.send_message(msg)
+            else:
+                # Stabilisce una connessione in chiaro sulla porta 587
+                with smtplib.SMTP(smtp_server, port, timeout=10) as server:
+                    server.ehlo()  # Identifica il client presso il server SMTP
+                    server.starttls(context=context) # Aggiorna la connessione a TLS in modo sicuro
+                    server.ehlo()  # Re-identifica il client all'interno della connessione crittografata
+
+                    server.login(username, password)
+                    server.send_message(msg)
+
             print("Email inviata con successo!\n---")
         except Exception as e:
             print(f"Si è verificato un errore durante l'invio: {e}", file=sys.stderr)
