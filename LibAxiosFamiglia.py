@@ -86,12 +86,36 @@ class LibAxiosFamiglia():
             ['POST','https://registrofamiglie.axioscloud.it/Pages/SD/SD_Login.aspx', {}, '01_login.html', {'customerid': self.customerid, 'username': self.username, 'password': self.password, 'customeridSpid': '' }, '', False],
             ['GET','https://registrofamiglie.axioscloud.it/Pages/SD/SD_Dashboard.aspx', {}, '02_dashboard.html'],
             ['GET','https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'DashboardLoad'}, '03_load_dashboard.html'],
+            ['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_CHANGE_ALUNNO'}, '03_FAMILY_CHANGE_ALUNNO.json', 'set_in_session', 'json', False ],
             ['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_COMPITI_LISTA'}, '04_action.json', {"draw":1,"columns":{},"order":[],"start":0,"length":50,"search":{"value":"","regex":False},"iMatId":""}, 'json', True],
             ['GET','https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_NOTE', 'Others': 2}, '05_annotazioni.json'],
             ['GET', 'https://registrofamiglie.axioscloud.it/Pages/SD/SD_Logout.aspx', {}, '06_logout.html']
         ]
 
         self.__get_session(Alunno, link_registrofamiglie, "registrofamiglie_")
+
+    def get_session_collabora(self, Alunno: str) -> None:
+        """
+        Gestisce una sessione di Collabora per l'alunno specificato
+
+        :param Alunno: Nome dell'alunno
+        :type Alunno: str
+        """
+        self.session.headers['User-Agent'] = self.DefaultUserAgent
+        self.session.headers['Referer'] = "https://collabora.axioscloud.it/"
+        link_collabora = [
+            ['GET','https://collabora.axioscloud.it/', {}, '00_home.html'],
+            ['POST', 'https://collabora.axioscloud.it/Pages/SD/SD_Login.aspx', {}, '01_login.html', {'customerid': self.customerid, 'username': self.username, 'password': self.password, 'customeridSpid': '' }, '', False],
+            ['GET','https://collabora.axioscloud.it/Pages/SD/SD_Dashboard.aspx', {}, '02_dashboard.html'],
+            ['GET','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'DashboardLoad'}, '03_load_dashboard.html'],
+            ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_CONDIVISO_ALUNNO'}, '04_condiviso.json', 'set_in_session', '', False],
+            ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_FOLDERS_SHARED'}, '05_Folder_condiviso.json', 'set_in_session', '', True],
+            ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_CONDIVISO_CON_ME_DETAIL'}, '06_materiale_condiviso.json', 'set_in_session', 'json', False],
+            ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'}, '07_collabora.json', 'set_in_session', 'json', False],
+            ['GET', 'https://collabora.axioscloud.it/Pages/SD/SD_Logout.aspx', {}, '08_logout.html']
+        ]
+
+        self.__get_session(Alunno, link_collabora, "collabora_")
 
     def __get_session(self, Alunno, link_sequence, prefix):
         for link in link_sequence:
@@ -100,8 +124,38 @@ class LibAxiosFamiglia():
                 res = self.session.get(link[UrlIdType.url], params=link[UrlIdType.params], allow_redirects=True)
                 if ('Action' in link[UrlIdType.params].keys()):
                     if (link[UrlIdType.params]['Action'] == 'DashboardLoad'):
-                        self.__get_alunni(res.text, Alunno, prefix)
+                        text = res.text
+                        if (prefix == "registrofamiglie_"):
+                            m = re.search(r"<a.*data-action='FAMILY_CHANGE_ALUNNO'.*?data-others='(.*?)'.*?<b>(.*?)</b>.*?</a>", text)
+                            if (m is not None):
+                                self.alunni[m.group(2)] = m.group(1)
+                        elif (prefix == "collabora_"):
+                            m = re.search(r"<button.*?utId = '(.*?)'>.*?<div class='details'><div class='desc'>(.*?)</div></div></button>", text)
+                            if (m is not None):
+                                if (Alunno in m.group(2)):
+                                    self.alunni[Alunno] = m.group(1)
+                        if (not Alunno in self.alunni.keys()):
+                            print(f"Warning! Il nome dell'alunno, {Alunno}, non trovato! Verifica e controlla la corrispondenza nel file di configurazione.", file=sys.stderr)
             else:
+                if ('Action' in link[UrlIdType.params].keys()):
+                    if (link[UrlIdType.params]['Action'] == 'MATERIALE_CONDIVISO_ALUNNO'):
+                        link[UrlIdType.data] = {"fiAlunno": self.alunni[Alunno], "fuiAlunno":""}
+                    elif (link[UrlIdType.params]['Action'] == 'FAMILY_CHANGE_ALUNNO'):
+                        link[UrlIdType.data] = {"alunnoId": self.alunni[Alunno]}
+                    elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_FOLDERS_SHARED'):
+                        jj = json.loads(res_text_old)
+                        text = jj['html']
+                        m = re.search(r"'userList' value = '(.*?)'", text)
+                        link[UrlIdType.data] = m.group(1)
+                    elif (link[UrlIdType.params]['Action'] == 'MATERIALE_CONDIVISO_CON_ME_DETAIL'):
+                        jj = json.loads(json.loads(res_text_old)['json'])  # è un array
+                        text = str(jj[0]['id']).split("|")
+                        link[UrlIdType.data] = {"fiDocId": str(text[0]),"fnId": str(text[1])}
+                    elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'):
+                        jj = json.loads(res_text_old)
+                        text = jj['html']
+                        m = re.search(r"data-nrow='(.*?)' data-others='(.*?)'", text) # potrebbe essere un array
+                        link[UrlIdType.data] = {"folderId": str(m.group(2)),"nRow":str(m.group(1)),"uteCanWrite":""}
                 if (link[UrlIdType.type_data]=='json'):
                     res = self.session.post(link[UrlIdType.url], json=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content-Type': 'application/x-www-form-urlencoded'})
                 else:
@@ -121,6 +175,14 @@ class LibAxiosFamiglia():
                                 print("---")
                             else:
                                 print("Nessuna notifica: non ci sono modifiche!\n---")
+                        # elif (link[UrlIdType.params]['Action'] == 'MATERIALE_CONDIVISO_CON_ME_DETAIL'):
+                        #     jj = json.loads(res.text)
+                        #     text = jj['html']
+                        #     print(text)
+                        # elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'):
+                        #     jj = json.loads(res.text)
+                        #     text = jj['html']
+                        #     print(text)
                 else:
                     raise Exception("{}".format(get_error.group(1)))
 
@@ -137,16 +199,7 @@ class LibAxiosFamiglia():
                 with open(registo_compiti_alunno, 'w', encoding='utf-8') as fp:
                     fp.write(res.text)
                     fp.close()
-
-    def __get_alunni(self, text, Alunno, prefix):
-        m = re.search(r"<a.*data-action='FAMILY_CHANGE_ALUNNO'.*?data-others='(.*?)'.*?<b>(.*?)</b>.*?</a>", text)
-        if (m is not None):
-            self.alunni[m.group(2)] = m.group(1)
-        if (Alunno in self.alunni.keys()):
-            link=['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_CHANGE_ALUNNO'}, '03_FAMILY_CHANGE_ALUNNO.json', {"alunnoId": self.alunni[Alunno]}, 'json', False ]
-            self.__get_session(Alunno, [link], prefix)
-        else:
-            print(f"Warning! Il nome dell'alunno, {Alunno}, non trovato! Verifica e controlla la corrispondenza nel file di configurazione.", file=sys.stderr)
+            res_text_old = res.text
 
     def elaborazione_json(self, compiti: dict, Alunno: str) -> str:
         """
