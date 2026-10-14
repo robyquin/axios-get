@@ -66,6 +66,7 @@ class LibAxiosFamiglia():
         self.MATERIALE_DIDATTICO_FOLDERS_SHARED = {}
         self.MATERIALE_DIDATTICO_CONDIVISO_CONTENT = []
         self.notifica = class_notifica
+        self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES = []
         self.idx_folder = 0
         self.idx_file = 0
 
@@ -182,6 +183,7 @@ class LibAxiosFamiglia():
                                 m = re.search(r"'userList' value = '(.*?)'", text)
                                 self. MATERIALE_CONDIVISO_ALUNNO = m.group(1)
                                 m = re.search(r"<legend.*?>(.*?)</legend>", text)
+                                self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<h2>{m.group(1)}</h2>")
                                 f.write(f"<h2>{m.group(1)}</h2>\n")
                         elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_FOLDERS_SHARED'):
                             with open(os.path.join(DIR, prefix+Alunno, 'materiale-didattico.html'), "a") as f:
@@ -202,17 +204,22 @@ class LibAxiosFamiglia():
                                 if (self.MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF != self.MATERIALE_DIDATTICO_FOLDERS_SHARED[self.idx_folder]['text']):
                                     m1 = re.findall('(.*?)<div.*?<span.*?>(.*?)</span>', self.MATERIALE_DIDATTICO_FOLDERS_SHARED[self.idx_folder]['text'])
                                     self.MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF = f"{m1[0][0]} ({str(m1[0][1])})"
+                                    self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<h3>{self.MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF}</h3>")
                                     f.write(f"<h3>{self.MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF}</h3>\n")
                                 for ll in m:
+                                    self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<h4>{ll}</h4>")
                                     f.write(f"<h4>{ll}</h4>\n")
                         elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'):
                             with open(os.path.join(DIR, prefix+Alunno, 'materiale-didattico.html'), "a") as f:
                                 jj = json.loads(res.text)
                                 text = jj['html']
                                 m = re.findall('<td.*?>(.*?)<div.*?<button.*?data-source-filename=\'(.*?)\'.*?</button>.*?<small>(.*?)</small>.*?</td>', text)
+                                self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append("<ul>")
                                 f.write("<ul>")
                                 for ll in m:
+                                    self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<li><b>{ll[0]}</b><div>{ll[1]} - {ll[2]}</div></li>")
                                     f.write(f"<li><b>{ll[0]}</b><div>{ll[1]} - {ll[2]}</div></li>\n")
+                                self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append("</ul>")
                                 f.write("</ul>\n")
                             if(len(self.MATERIALE_DIDATTICO_CONDIVISO_CONTENT)-1 > self.idx_file):
                                 new_link_collabora = [
@@ -246,7 +253,6 @@ class LibAxiosFamiglia():
                 with open(registo_compiti_alunno, 'w', encoding='utf-8') as fp:
                     fp.write(res.text)
                     fp.close()
-        print(json.dumps(self.MATERIALE_DIDATTICO_FOLDERS_SHARED, indent=2))
 
     def elaborazione_json(self, compiti: dict, Alunno: str) -> str:
         """
@@ -286,6 +292,11 @@ class LibAxiosFamiglia():
             elif(new_compiti[c]["verifica"] != ""):
                 testo_email.append("<b>Verifica</b>: "+new_compiti[c]["verifica"])
             linee_notifica.append(f"<h3>{new_compiti[c]["materia"]}</h3><ul><li>{"</li><li>".join(testo_email)}</li></ul>")
+
+        linee_notifica.append("<hr>")
+        if (len(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES) == 0):
+            self.get_session_collabora(Alunno)
+        linee_notifica.extend(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES)
 
         linee_notifica.append(f"\n<hr>\n<p>Questo è un aggiornamento del {oggi_long}</p>")
         linee_notifica.append("</body>")
