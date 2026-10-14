@@ -109,7 +109,7 @@ class LibAxiosFamiglia():
             ['GET','https://collabora.axioscloud.it/Pages/SD/SD_Dashboard.aspx', {}, '02_dashboard.html'],
             ['GET','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'DashboardLoad'}, '03_load_dashboard.html'],
             ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_CONDIVISO_ALUNNO'}, '04_condiviso.json', 'set_in_session', '', False],
-            ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_FOLDERS_SHARED'}, '05_Folder_condiviso.json', 'set_in_session', '', True],
+            ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_FOLDERS_SHARED'}, '05_Folder_condiviso.json', 'set_in_session', '', False],
             ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_CONDIVISO_CON_ME_DETAIL'}, '06_materiale_condiviso.json', 'set_in_session', 'json', False],
             ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'}, '07_collabora.json', 'set_in_session', 'json', False],
             ['GET', 'https://collabora.axioscloud.it/Pages/SD/SD_Logout.aspx', {}, '08_logout.html']
@@ -175,14 +175,34 @@ class LibAxiosFamiglia():
                                 print("---")
                             else:
                                 print("Nessuna notifica: non ci sono modifiche!\n---")
-                        # elif (link[UrlIdType.params]['Action'] == 'MATERIALE_CONDIVISO_CON_ME_DETAIL'):
-                        #     jj = json.loads(res.text)
-                        #     text = jj['html']
-                        #     print(text)
-                        # elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'):
-                        #     jj = json.loads(res.text)
-                        #     text = jj['html']
-                        #     print(text)
+                        elif (link[UrlIdType.params]['Action'] == 'MATERIALE_CONDIVISO_ALUNNO'):
+                            with open(os.path.join(DIR, prefix+Alunno, 'materiale-didattico.html'), "w") as f:
+                                jj = json.loads(res.text)
+                                text = jj['html']
+                                f.write(text)
+                                f.write('\n\n')
+                        elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_FOLDERS_SHARED'):
+                            with open(os.path.join(DIR, prefix+Alunno, 'materiale-didattico.html'), "a") as f:
+                                jj = json.loads(json.loads(res.text)['json'])
+                                f.write('<ul>')
+                                for prof in jj:
+                                    cassetto_prof = str(prof['id']).split("|") # "fiDocId|fnId" Codice cassetto del professore
+                                    text = prof['text']
+                                    f.write(f'<li>{text}</li>\n')
+                                f.write('</ul>')
+                                f.write('\n\n')
+                        elif (link[UrlIdType.params]['Action'] == 'MATERIALE_CONDIVISO_CON_ME_DETAIL'):
+                            with open(os.path.join(DIR, prefix+Alunno, 'materiale-didattico.html'), "a") as f:
+                                jj = json.loads(res.text)
+                                text = jj['html']
+                                f.write(text)
+                                f.write('\n\n')
+                        elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'):
+                            with open(os.path.join(DIR, prefix+Alunno, 'materiale-didattico.html'), "a") as f:
+                                jj = json.loads(res.text)
+                                text = jj['html']
+                                f.write(text)
+                                f.write('\n\n')
                 else:
                     raise Exception("{}".format(get_error.group(1)))
 
