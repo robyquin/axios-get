@@ -79,6 +79,7 @@ if __name__ == "__main__":
             try:
                 axios = LibAxiosFamiglia(config['axios']['credenziali'], tipo_notifica)
                 for alunno in config['axios']['alunni']:
+                    axios.get_session_collabora(alunno)
                     axios.get_session_registrofamiglie(alunno)
             except Exception as e:
                 print(f"Si è verificato un errore imprevisto: {e}", file=sys.stderr)
