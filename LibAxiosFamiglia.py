@@ -62,9 +62,12 @@ class LibAxiosFamiglia():
         self.password = str(credenziali['password'])
         self.alunni = {}
         self.MATERIALE_CONDIVISO_ALUNNO = ""
+        self.MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF = ""
         self.MATERIALE_DIDATTICO_FOLDERS_SHARED = {}
         self.MATERIALE_DIDATTICO_CONDIVISO_CONTENT = []
         self.notifica = class_notifica
+        self.idx_folder = 0
+        self.idx_file = 0
 
         if(self.customerid != '' and self.username != '' and self.password != '' ):
             self.session = requests.session()
@@ -148,9 +151,9 @@ class LibAxiosFamiglia():
                     elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_FOLDERS_SHARED'):
                         link[UrlIdType.data] = self. MATERIALE_CONDIVISO_ALUNNO
                     elif (link[UrlIdType.params]['Action'] == 'MATERIALE_CONDIVISO_CON_ME_DETAIL'):
-                        link[UrlIdType.data] = self.MATERIALE_DIDATTICO_FOLDERS_SHARED[0]['MATERIALE_CONDIVISO_CON_ME_DETAIL']
+                        link[UrlIdType.data] = self.MATERIALE_DIDATTICO_FOLDERS_SHARED[self.idx_folder]['MATERIALE_CONDIVISO_CON_ME_DETAIL'] # richiede iterazione
                     elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'):
-                        link[UrlIdType.data] = self.MATERIALE_DIDATTICO_CONDIVISO_CONTENT[0]
+                        link[UrlIdType.data] = self.MATERIALE_DIDATTICO_CONDIVISO_CONTENT[self.idx_file] # richiede iterazione
 
                 if (link[UrlIdType.type_data]=='json'):
                     res = self.session.post(link[UrlIdType.url], json=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content-Type': 'application/x-www-form-urlencoded'})
@@ -179,8 +182,7 @@ class LibAxiosFamiglia():
                                 m = re.search(r"'userList' value = '(.*?)'", text)
                                 self. MATERIALE_CONDIVISO_ALUNNO = m.group(1)
                                 m = re.search(r"<legend.*?>(.*?)</legend>", text)
-                                f.write(f"<h2>{m.group(1)}</h2>")
-                                f.write('\n\n')
+                                f.write(f"<h2>{m.group(1)}</h2>\n")
                         elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_FOLDERS_SHARED'):
                             with open(os.path.join(DIR, prefix+Alunno, 'materiale-didattico.html'), "a") as f:
                                 self.MATERIALE_DIDATTICO_FOLDERS_SHARED = json.loads(json.loads(res.text)['json'])
@@ -189,12 +191,6 @@ class LibAxiosFamiglia():
                                     self.MATERIALE_DIDATTICO_FOLDERS_SHARED[folder]['MATERIALE_CONDIVISO_CON_ME_DETAIL'] = {}
                                     self.MATERIALE_DIDATTICO_FOLDERS_SHARED[folder]['MATERIALE_CONDIVISO_CON_ME_DETAIL']['fiDocId'] = FOLDERS_SHARED[0]
                                     self.MATERIALE_DIDATTICO_FOLDERS_SHARED[folder]['MATERIALE_CONDIVISO_CON_ME_DETAIL']['fnId'] = FOLDERS_SHARED[1]
-                                f.write('<ul>')
-                                for prof in self.MATERIALE_DIDATTICO_FOLDERS_SHARED:
-                                    text = prof['text']
-                                    f.write(f'<li>{text}</li>\n')
-                                f.write('</ul>')
-                                f.write('\n\n')
                         elif (link[UrlIdType.params]['Action'] == 'MATERIALE_CONDIVISO_CON_ME_DETAIL'):
                             with open(os.path.join(DIR, prefix+Alunno, 'materiale-didattico.html'), "a") as f:
                                 jj = json.loads(res.text)
@@ -203,9 +199,12 @@ class LibAxiosFamiglia():
                                 for ll in m:
                                     self.MATERIALE_DIDATTICO_CONDIVISO_CONTENT.append({"folderId": str(ll[1]),"nRow":str(ll[0]),"uteCanWrite":""})
                                 m = re.findall('<a.*?>(.*?)</a>', text)
+                                if (self.MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF != self.MATERIALE_DIDATTICO_FOLDERS_SHARED[self.idx_folder]['text']):
+                                    m1 = re.findall('(.*?)<div.*?<span.*?>(.*?)</span>', self.MATERIALE_DIDATTICO_FOLDERS_SHARED[self.idx_folder]['text'])
+                                    self.MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF = f"{m1[0][0]} ({str(m1[0][1])})"
+                                    f.write(f"<h3>{self.MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF}</h3>\n")
                                 for ll in m:
-                                    f.write(f"<h4>{ll}</h4>")
-                                f.write('\n\n')
+                                    f.write(f"<h4>{ll}</h4>\n")
                         elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'):
                             with open(os.path.join(DIR, prefix+Alunno, 'materiale-didattico.html'), "a") as f:
                                 jj = json.loads(res.text)
@@ -213,9 +212,24 @@ class LibAxiosFamiglia():
                                 m = re.findall('<td.*?>(.*?)<div.*?<button.*?data-source-filename=\'(.*?)\'.*?</button>.*?<small>(.*?)</small>.*?</td>', text)
                                 f.write("<ul>")
                                 for ll in m:
-                                    f.write(f"<li><i>{ll[2]}</i> <b>{ll[0]}</b> [{ll[1]}]</li>")
-                                f.write("</ul>")
-                                f.write('\n\n')
+                                    f.write(f"<li><b>{ll[0]}</b><div>{ll[1]} - {ll[2]}</div></li>\n")
+                                f.write("</ul>\n")
+                            if(len(self.MATERIALE_DIDATTICO_CONDIVISO_CONTENT)-1 > self.idx_file):
+                                new_link_collabora = [
+                                        ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'}, '07_MATERIALE_DIDATTICO_CONDIVISO_CONTENT.json', 'set_in_session', 'json', False]
+                                    ]
+                                self.idx_file +=1
+                                self.__get_session(Alunno, new_link_collabora, prefix)
+                            if(len(self.MATERIALE_DIDATTICO_FOLDERS_SHARED)-1 > self.idx_folder):
+                                new_link_collabora = [
+                                        ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_CONDIVISO_CON_ME_DETAIL'}, '06_MATERIALE_CONDIVISO_CON_ME_DETAIL.json', 'set_in_session', 'json', False],
+                                        ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'}, '07_MATERIALE_DIDATTICO_CONDIVISO_CONTENT.json', 'set_in_session', 'json', False]
+                                    ]
+                                self.idx_folder +=1
+                                self.idx_file = 0
+                                self.MATERIALE_DIDATTICO_CONDIVISO_CONTENT = []
+                                self.__get_session(Alunno, new_link_collabora, prefix)
+
                 else:
                     raise Exception("{}".format(get_error.group(1)))
 
