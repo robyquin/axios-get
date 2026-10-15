@@ -59,7 +59,6 @@ smtp:
     smtp_port: 465                         # porta SMTP
     smtp_username: STRING_REDACTED         # username per il login SMTP
     smtp_password: STRING_REDACTED         # password per il login SMTP
-    mittente: Genitore <@EMAIL_REDACTED>   # Utilizzato solo per il campo `From:` della mail
     destinatari:
         - @EMAIL_REDACTED1                  # Lista dei destinatari (genitori + studenti)
         - @EMAIL_REDACTED2
