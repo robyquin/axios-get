@@ -4,6 +4,8 @@ Notifica ai tuoi figli/e i compiti loro assegnati sul registro elettronico.
 
 **AxiosGetCompiti.py** è pensata per quegli studenti/studentesse a cui non è permesso, per legge o per burocrazia, di avere un account *Axios Registro Elettronico ALUNNI*.
 
+![Axios-Get](./icon/Axios-Get.svg)
+
 ## Requirements
 
 - Python 3.13 or later
