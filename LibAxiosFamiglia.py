@@ -218,7 +218,7 @@ class LibAxiosFamiglia():
                             if (self.MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF != self.MATERIALE_DIDATTICO_FOLDERS_SHARED[self.idx_folder]['text']):
                                 m1 = re.findall('(.*?)<div.*?<span.*?>(.*?)</span>', self.MATERIALE_DIDATTICO_FOLDERS_SHARED[self.idx_folder]['text'])
                                 self.MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF = f"{m1[0][0]} ({str(m1[0][1])})"
-                                self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<h3>{self.MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF}</h3>")
+                                self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<h3 class='professore'>📂 {self.MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF}</h3>")
                             for ll in m:
                                 self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<h4>{ll}</h4>")
                         elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'):
@@ -227,7 +227,7 @@ class LibAxiosFamiglia():
                             m = re.findall('<td.*?>(.*?)<div.*?<button.*?data-source-filename=\'(.*?)\'.*?</button>.*?<small>(.*?)</small>.*?</td>', text)
                             self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append("<ul>")
                             for ll in m:
-                                self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<li><b>{ll[0]}</b><div>{ll[1]} - {ll[2]}</div></li>")
+                                self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<li class='file'><b>{ll[0]}</b><div>{ll[1]} - {ll[2]}</div></li>")
                             self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append("</ul>")
                             if(len(self.MATERIALE_DIDATTICO_CONDIVISO_CONTENT)-1 > self.idx_file):
                                 new_link_collabora = [
@@ -282,34 +282,37 @@ class LibAxiosFamiglia():
             if (dt > datetime.now()):
                 new_compiti.append(c)
 
-        linee_notifica = ["<html>", "<body>", f"<h1>Compiti per {Alunno}</h1>", f"<p>Ciao <i>{Alunno}</i>,<br>\nricorda sempre di verificare e integrare questi compiti con quelli scritti in classe sul tuo diario cartaceo.</p>", "<p>Buon lavoro</p>"]
+        linee_notifica = ["<html>", "<head><style> hr { border: 0; border-top: 1px solid #e1e4e8; margin: 30px 0 15px 0;} h2 { background-color: beige; border: 1px solid #e1e4e8; text-align: center; } li.compiti {list-style-type: '💬 ';} li.verifica {list-style-type: '💥 ';} li.file {list-style-type: '🔗 ';}</style></head>", "<body>", f"<h1>Compiti per {Alunno}</h1>", f"<p>Ciao <i>{Alunno}</i>,<br>\nricorda sempre di verificare e integrare questi compiti con quelli scritti in classe sul tuo diario cartaceo.</p>", "<p>Buon lavoro</p>"]
         giorno_app = ""
         for c in range(len(new_compiti)-1, -1, -1):
             giorno = new_compiti[c]["giorno"]
             DayOfWeek = datetime.strptime(giorno, "%d/%m/%Y").strftime("%a")
             if(c == (len(new_compiti)-1)):
-                linee_notifica.append(f"\n<hr>\n<h2>{DOW_Tr[DayOfWeek]}, {giorno}</h2>")
+                linee_notifica.append(f"\n<h2 class='diario'>📰 {DOW_Tr[DayOfWeek]}, {giorno}</h2>")
             else:
                 if(giorno != giorno_app):
-                    linee_notifica.append(f"\n<hr>\n<h2>{DOW_Tr[DayOfWeek]}, {giorno}</h2>")
+                    linee_notifica.append(f"\n<h2 class='diario'>📰 {DOW_Tr[DayOfWeek]}, {giorno}</h2>")
             giorno_app = giorno
 
             testo_email = []
             if (new_compiti[c]["testo"] != ""):
-                testo_email.append(new_compiti[c]["testo"])
+                testo_email.append(f"<li class='compiti'>{new_compiti[c]["testo"]}</li>")
             elif(new_compiti[c]["verifica"] != ""):
-                testo_email.append("<b>Verifica</b>: "+new_compiti[c]["verifica"])
-            linee_notifica.append(f"<h3>{new_compiti[c]["materia"]}</h3><ul><li>{"</li><li>".join(testo_email)}</li></ul>")
+                testo_email.append(f"<li class='verifica'><b>Verifica</b>: {new_compiti[c]["verifica"]}</li>")
+            linee_notifica.append(f"<h3>{new_compiti[c]["materia"]}</h3><ul>{"\n".join(testo_email)}</ul>")
 
         if (len(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES) > 0):
             linee_notifica.append("<hr>")
             linee_notifica.extend(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES)
 
-        linee_notifica.append(f"\n<hr>\n<p>Questo è un aggiornamento del {oggi_long}</p>")
+        modifiche = []
         if (self.sha1_REGISTRO != self.sha1_REGISTRO_old):
-            linee_notifica.append(f"<p>Modifiche/aggiornamenti apportati sui <i>Compiti</i></p>")
+            modifiche.append("<i>Compiti</i>")
         if (self.sha1_MD != self.sha1_MD_old):
-            linee_notifica.append(f"<p>Modifiche/aggiornamenti apportati sul <i>Materiale Didattico</i></p>")
+            modifiche.append("<i>Materiale Didattico</i>")
+
+        linee_notifica.append(f"\n<hr>\n<p style=\"font-size: 11px\">Aggiornamento del {oggi_long} con modifiche su {" e su ".join(modifiche)}</p>")
+        linee_notifica.append("<hr><p style=\"font-size: 11px; text-align: center\">⚡ Generato automaticamente da <a href='https://github.com/robyquin/axios-get'>Axios-Get</a> - Open Source (MIT)</p>")
         linee_notifica.append("</body>")
         linee_notifica.append("</html>")
 
