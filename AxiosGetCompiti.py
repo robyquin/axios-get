@@ -53,6 +53,10 @@ def file_config_default():
                 'genitore1@example.it',
                 'Alunno1@example.it'
                 ]
+        },
+        'telegram': {
+            'BOT_TOKEN': 'TOKEN',
+            'CHAT_ID': 'ID'
         }
     }
     try:

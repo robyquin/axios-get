@@ -10,7 +10,10 @@ Gestore di Notifiche.
 
 import sys
 import os
+import re
 from datetime import datetime
+
+import requests
 
 import smtplib
 import ssl
@@ -122,3 +125,50 @@ class NotificaMail(Notifica):
             print("Email inviata con successo!\n---")
         except Exception as e:
             print(f"Si è verificato un errore durante l'invio: {e}", file=sys.stderr)
+
+class NotificaTelegram(Notifica):
+    """
+    Classe di definizione delle Notifiche Telegram
+
+    Questa classe eredita da :class:`Notifica` e ne estende le funzionalità 
+    inviando il messaggio in una chat di Telegram.
+    """
+    def send_notifica(self, html: str, alunno: str) -> None:
+
+        # 1. Configurazione dei parametri del server e delle credenziali
+        BOT_TOKEN = self.config['telegram']['BOT_TOKEN']
+        CHAT_ID = self.config['telegram']['CHAT_ID']
+
+        # 2. Trasfomazione HTML in messaggio Telegram
+        html = re.sub("<head>(.*?)</head>","",html)
+        html = re.sub("<.{0,1}html>","",html)
+        html = re.sub("<.{0,1}body>","",html)
+        html = re.sub("<h1.*?>(.*?)</h1>\n+",r"<u><b>\g<1></b></u>\n\n",html, flags=re.DOTALL)
+        html = re.sub("<h2.*?>(.*?)</h2>\n*",r"<u><b>\g<1></b></u>\n\n",html, flags=re.DOTALL)
+        html = re.sub("<h3.*?>(.*?)</h3>\n*",r"<u><b>\g<1></b></u>\n\n",html, flags=re.DOTALL)
+        html = re.sub("<h4.*?>(.*?)</h4>\n*",r"<u><b>\g<1></b></u>\n\n",html, flags=re.DOTALL)
+        html = re.sub("<hr>","\n---\n",html)
+        # html = re.sub("<a.*?href='(.*?)'.*?>(.*?)</a>",r" \g<2> \g<1>",html)
+        html = re.sub(r'<li.*?>(.*?)</li>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
+        html = re.sub(r'<div.*?>(.*?)</div>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
+        html = re.sub(r'<p.*?>(.*?)</p>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
+        html = re.sub("<li.*?class='compiti'.*?>(.*?)</li>\n*",r"💬 \g<1>\n",html)
+        html = re.sub("<li.*?class='verifica'.*?>(.*?)</li>\n*",r"💥 \g<1>\n",html)
+        html = re.sub("<li.*?class='file'.*?>(.*?)</li>\n*",r"🔗 \g<1>\n",html)
+        html = re.sub("<div>(.*?)</div>\n*",r"\n\g<1>\n\n",html)
+        html = re.sub("<.{0,1}ul>", "\n", html)
+        html = re.sub("<p.*?>(.*?)</p>",r"\n\g<1>",html)
+        html = re.sub("<br>", "", html)
+        html = re.sub("\n{3,}", "\n\n", html, flags=re.DOTALL)
+
+        link = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+
+        parametri={
+            "chat_id": str(CHAT_ID),
+            "parse_mode": "HTML",
+            "text": html,
+            "disable_notification": True
+        }
+
+        print(requests.get(link, params=parametri).json())
+        print("---")
