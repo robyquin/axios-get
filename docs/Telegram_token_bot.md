@@ -39,6 +39,4 @@ Se hai appena creato un bot con BotFather e hai bisogno della chat_id per inviar
 (Nota: Ricordati di mantenere la parola bot prima del codice del token).
 3. Premi Invio. Ti apparirà una pagina di testo in formato JSON.
 
-```
-Suggerimento: Se la pagina del browser mostra il risultato {"ok":true,"result":[]}, significa che il bot non ha ricevuto messaggi recenti. Torna su Telegram, invia un nuovo messaggio al bot e aggiorna la pagina del browser.
-```
+Se la pagina del browser mostra il risultato {"ok":true,"result":[]}, significa che il bot non ha ricevuto messaggi recenti. Torna su Telegram, invia un nuovo messaggio al bot e aggiorna la pagina del browser.
