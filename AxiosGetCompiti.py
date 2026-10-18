@@ -78,6 +78,8 @@ if __name__ == "__main__":
                 tipo_notifica = notifica.NotificaFileHTML(DIR+"credenziali.yml")
             elif (config['tipo_notifica'] == 'smtp'):
                 tipo_notifica = notifica.NotificaMail(DIR+"credenziali.yml")
+            elif (config['tipo_notifica'] == 'telegram'):
+                tipo_notifica = notifica.NotificaTelegram(DIR+"credenziali.yml")
 
         if (tipo_notifica is not None):
             try:
