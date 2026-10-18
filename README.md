@@ -62,12 +62,16 @@ smtp:
     destinatari:
         - @EMAIL_REDACTED1                  # Lista dei destinatari (genitori + studenti)
         - @EMAIL_REDACTED2
+telegram:
+    BOT_TOKEN: "TOKEN"
+    CHAT_ID: "ID"
 ```
 
 ### Tipologie di notifiche
 
 - **file_html**: salva un file HTML per Studente/Studentessa in un percorso **path** specifico
 - **smtp**: invia una mail per Studente/Studentessa agli indirizzi **destinatari** specificati. Consulta il documento [SMTP server](./docs/SMTP_server.md) per verificare i parametri dei provider supportati.
+- **telegram**: invia un messaggio in una chat di Telegram. Consulta il documento [Telegram_token_bot](./docs/Telegram_token_bot.md).
 
 ### Configurazione minima richiesta
 
