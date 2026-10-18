@@ -26,6 +26,7 @@ Se hai bisogno di trovare al volo la tua chat_id personale o quella di un gruppo
 1. Cerca il bot `@userinfobot` (o in alternativa `@RawDataBot`) nella barra di ricerca di Telegram.
 2. Avvia la chat cliccando su Avvia (o inviando /start).
 3. Il bot ti risponderà immediatamente mostrando i tuoi dati. Il numero contrassegnato come Id: corrisponde esattamente alla tua chat_id.
+
 Se cerchi la chat_id di un gruppo: Aggiungi temporaneamente uno di questi bot all'interno del gruppo. Non appena entrerà o riceverà un comando, il bot scriverà nel gruppo l'ID della chat (i codici dei gruppi iniziano sempre con un meno, ad esempio -100123456789).
 
 ### Metodo 2: Tramite API (Se stai sviluppando un Bot)
@@ -37,8 +38,7 @@ Se hai appena creato un bot con BotFather e hai bisogno della chat_id per inviar
 <https://api.telegram.org/bot{token}/getUpdates>
 (Nota: Ricordati di mantenere la parola bot prima del codice del token).
 3. Premi Invio. Ti apparirà una pagina di testo in formato JSON.
+
+```
 Suggerimento: Se la pagina del browser mostra il risultato {"ok":true,"result":[]}, significa che il bot non ha ricevuto messaggi recenti. Torna su Telegram, invia un nuovo messaggio al bot e aggiorna la pagina del browser.
-Quale tipo di chat_id stai cercando di recuperare nello specifico?
-• Il tuo ID utente personale
-• L'ID di un gruppo o di un canale
-Se riscontri problemi con il formato JSON del browser, posso mostrarti come fare una richiesta rapida per estrarlo via Python o cURL.
+```
