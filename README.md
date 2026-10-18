@@ -71,7 +71,7 @@ telegram:
 
 - **file_html**: salva un file HTML per Studente/Studentessa in un percorso **path** specifico
 - **smtp**: invia una mail per Studente/Studentessa agli indirizzi **destinatari** specificati. Consulta il documento [SMTP server](./docs/SMTP_server.md) per verificare i parametri dei provider supportati.
-- **telegram**: invia un messaggio in una chat di Telegram.
+- **telegram**: invia un messaggio in una chat di Telegram. Consulta il documento [Telegram_token_bot](./docs/Telegram_token_bot.md).
 
 ### Configurazione minima richiesta
 
