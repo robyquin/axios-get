@@ -65,6 +65,8 @@ smtp:
 telegram:
     BOT_TOKEN: "TOKEN"
     CHAT_ID: "ID"
+screenshot:
+    path: ./pathfile # percorso relativo o assoluto della cartella di destinazione
 ```
 
 ### Tipologie di notifiche
