@@ -216,8 +216,8 @@ class LibAxiosFamiglia():
                                 self.MATERIALE_DIDATTICO_CONDIVISO_CONTENT.append({"folderId": str(ll[1]),"nRow":str(ll[0]),"uteCanWrite":""})
                             m = re.findall('<a.*?>(.*?)</a>', text)
                             if (self.MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF != self.MATERIALE_DIDATTICO_FOLDERS_SHARED[self.idx_folder]['text']):
-                                m1 = re.findall('(.*?)<div.*?<span.*?>(.*?)</span>', self.MATERIALE_DIDATTICO_FOLDERS_SHARED[self.idx_folder]['text'])
-                                self.MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF = f"{m1[0][0]} ({str(m1[0][1])})"
+                                m1 = re.findall('(.*?)(<|$)', self.MATERIALE_DIDATTICO_FOLDERS_SHARED[self.idx_folder]['text'])
+                                self.MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF = f"{m1[0][0]}"
                                 self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<h3 class='professore'>📂 {self.MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF}</h3>")
                             for ll in m:
                                 self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<h4>{ll}</h4>")
