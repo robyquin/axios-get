@@ -152,7 +152,7 @@ class NotificaTelegram(Notifica):
         html = re.sub(r'<li.*?>(.*?)</li>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
         html = re.sub(r'<div.*?>(.*?)</div>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
         html = re.sub(r'<p.*?>(.*?)</p>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
-        html = re.sub("<li.*?class='compiti'.*?>(.*?)</li>\n*",r"💬 \g<1>\n",html)
+        html = re.sub("<li.*?class='compiti'.*?>(.*?)</li>\n*",r"📗 \g<1>\n",html)
         html = re.sub("<li.*?class='verifica'.*?>(.*?)</li>\n*",r"💥 \g<1>\n",html)
         html = re.sub("<li.*?class='file'.*?>(.*?)</li>\n*",r"🔗 \g<1>\n",html)
         html = re.sub("<div>(.*?)</div>\n*",r"\n\g<1>\n\n",html)
