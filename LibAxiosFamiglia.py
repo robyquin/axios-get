@@ -299,10 +299,10 @@ class LibAxiosFamiglia():
                 testo_email.append(f"<li class='compiti'>{new_compiti[c]["testo"]}</li>")
             elif(new_compiti[c]["verifica"] != ""):
                 testo_email.append(f"<li class='verifica'><b>Verifica</b>: {new_compiti[c]["verifica"]}</li>")
-            linee_notifica.append(f"<h3>{new_compiti[c]["materia"]}</h3><ul>{"\n".join(testo_email)}</ul>")
+            linee_notifica.append(f"<h3>{new_compiti[c]["materia"].capitalize()}</h3><ul>{"\n".join(testo_email)}</ul>")
 
         if (len(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES) > 0):
-            linee_notifica.append("<hr>")
+            linee_notifica.append("\n<hr>\n")
             linee_notifica.extend(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES)
 
         modifiche = []
