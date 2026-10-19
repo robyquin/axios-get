@@ -282,8 +282,10 @@ class LibAxiosFamiglia():
             if (dt > datetime.now()):
                 new_compiti.append(c)
 
-        linee_notifica = ["<html>", "<head><style> hr { border: 0; border-top: 1px solid #e1e4e8; margin: 30px 0 15px 0;} h2 { background-color: beige; border: 1px solid #e1e4e8; text-align: center; } li.compiti {list-style-type: '💬 ';} li.verifica {list-style-type: '💥 ';} li.file {list-style-type: '🔗 ';}</style></head>", "<body>", f"<h1>Compiti per {Alunno}</h1>", f"<p>Ciao <i>{Alunno}</i>,<br>\nricorda sempre di verificare e integrare questi compiti con quelli scritti in classe sul tuo diario cartaceo.</p>", "<p>Buon lavoro</p>"]
+        linee_notifica = ["<html>", "<head><style> hr { border: 0; border-top: 1px solid #e1e4e8; margin: 30px 0 15px 0;} h2 { background-color: beige; border: 1px solid #e1e4e8; text-align: center; } li.compiti {list-style-type: '👁️ '; margin-bottom:10px;} li.verifica {list-style-type: '💥 '; margin-bottom:10px;} li.file {list-style-type: '🔗 ';}</style></head>", "<body>", f"<h1>Compiti per {Alunno}</h1>", f"<p>Ciao <i>{Alunno}</i>,<br>\nricorda sempre di verificare e integrare questi compiti con quelli scritti in classe sul tuo diario cartaceo.</p>", "<p>Buon lavoro</p>"]
         giorno_app = ""
+        materia = ""
+        testo_list = []
         for c in range(len(new_compiti)-1, -1, -1):
             giorno = new_compiti[c]["giorno"]
             DayOfWeek = datetime.strptime(giorno, "%d/%m/%Y").strftime("%a")
@@ -291,15 +293,29 @@ class LibAxiosFamiglia():
                 linee_notifica.append(f"\n<h2 class='diario'>📰 {DOW_Tr[DayOfWeek]}, {giorno}</h2>")
             else:
                 if(giorno != giorno_app):
+                    materia = ""
+                    if (len(testo_list)>0):
+                        linee_notifica.append(f"<ul>\n{"\n".join(testo_list)}\n</ul>")
+                        testo_list = []
                     linee_notifica.append(f"\n<h2 class='diario'>📰 {DOW_Tr[DayOfWeek]}, {giorno}</h2>")
             giorno_app = giorno
 
-            testo_email = []
+            if (materia != new_compiti[c]["materia"]):
+                if (len(testo_list)>0):
+                    linee_notifica.append(f"<ul>\n{"\n".join(testo_list)}\n</ul>")
+                    testo_list = []
+                linee_notifica.append(f"<h3>{new_compiti[c]["materia"].capitalize()}</h3>")
+
             if (new_compiti[c]["testo"] != ""):
-                testo_email.append(f"<li class='compiti'>{new_compiti[c]["testo"]}</li>")
-            elif(new_compiti[c]["verifica"] != ""):
-                testo_email.append(f"<li class='verifica'><b>Verifica</b>: {new_compiti[c]["verifica"]}</li>")
-            linee_notifica.append(f"<h3>{new_compiti[c]["materia"].capitalize()}</h3><ul>{"\n".join(testo_email)}</ul>")
+                testo_list.append(f"<li class='compiti'>{new_compiti[c]["testo"].replace('\n', ' ')}</li>")
+            if(new_compiti[c]["verifica"] != ""):
+                testo_list.append(f"<li class='verifica'><b>Verifica</b>: {new_compiti[c]["verifica"].replace('\n', ' ')}</li>")
+
+            materia = new_compiti[c]["materia"]
+
+        if (len(testo_list)>0):
+            linee_notifica.append(f"<ul>\n{"\n".join(testo_list)}\n</ul>")
+            testo_list = []
 
         if (len(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES) > 0):
             linee_notifica.append("\n<hr>\n")
@@ -307,7 +323,7 @@ class LibAxiosFamiglia():
 
         modifiche = []
         if (self.sha1_REGISTRO != self.sha1_REGISTRO_old):
-            modifiche.append("<i>Compiti</i>")
+            modifiche.append(f"<i>Compiti</i> ({len(new_compiti)})")
         if (self.sha1_MD != self.sha1_MD_old):
             modifiche.append("<i>Materiale Didattico</i>")
 
