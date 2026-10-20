@@ -247,10 +247,11 @@ class NotificaScreenShot(Notifica):
                     m = re.search(r"<h2.*?>(.*?)</h2>", l0)
                     font = font_h2
                     l0 = m.group(1)
+                    data_l0 = l0
                     if (len(l0.split(", ")) > 1):
-                        l0 = l0.split(", ")[1]
+                        data_l0 = l0.split(", ")[1]
                     try:
-                        dt = datetime.strptime(l0, "%d/%m/%Y")
+                        dt = datetime.strptime(data_l0, "%d/%m/%Y")
                         filename = datetime.strftime(dt, "%Y-%m-%d")
                     except Exception as e:
                         print(f"{e}")
