@@ -10,6 +10,7 @@ Gestore di Notifiche.
 
 import sys
 import os
+from pathlib import Path
 import re
 import textwrap
 from html import unescape as html_unescape
@@ -23,6 +24,14 @@ import requests
 from PIL import Image, ImageDraw, ImageFont
 
 import yaml
+
+if getattr(sys, 'frozen', False):
+    # Se l'applicazione è compilata con PyInstaller
+    DIR=str(os.path.dirname(sys.executable))+os.path.sep
+    sys.stderr = open("errori.txt", "w", encoding="utf-8")
+    sys.stdout = open("log.txt", "w", encoding="utf-8")
+else:
+    DIR=str(Path(os.path.dirname(__file__)).absolute())+os.path.sep
 
 class Notifica():
     """
@@ -224,10 +233,11 @@ class NotificaScreenShot(Notifica):
             html = re.sub("\n{2,}", "\n", html, flags=re.DOTALL)
 
             try:
-                font_h2 = ImageFont.truetype("./assets/fonts/OpenSansEmoji.ttf", size=64)
-                font_h3 = ImageFont.truetype("./assets/fonts/OpenSansEmoji.ttf", size=48)
-                font_text = ImageFont.truetype("./assets/fonts/OpenSansEmoji.ttf", size=32)
-                font_credit = ImageFont.truetype("./assets/fonts/OpenSansEmoji.ttf", size=16)
+                path_font = os.path.join(DIR, "assets", "fonts", "OpenSansEmoji.ttf")
+                font_h2 = ImageFont.truetype(path_font, size=64)
+                font_h3 = ImageFont.truetype(path_font, size=48)
+                font_text = ImageFont.truetype(path_font, size=32)
+                font_credit = ImageFont.truetype(path_font, size=16)
             except IOError:
                 font_h2 = ImageFont.load_default(size=64)
                 font_h3 = ImageFont.load_default(size=48)
