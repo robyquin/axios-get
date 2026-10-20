@@ -229,7 +229,10 @@ class NotificaScreenShot(Notifica):
                 font_text = ImageFont.truetype("OpenSansEmoji.ttf", size=32)
                 font_credit = ImageFont.truetype("OpenSansEmoji.ttf", size=16)
             except IOError:
-                font = ImageFont.load_default()
+                font_h2 = ImageFont.load_default(size=64)
+                font_h3 = ImageFont.load_default(size=48)
+                font_text = ImageFont.load_default(size=32)
+                font_credit = ImageFont.load_default(size=16)
 
             lines = html.split('\n')
             lines.append("<credit>⚡ Generato automaticamente con Axios-Get</credit>")
