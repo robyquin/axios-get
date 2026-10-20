@@ -226,14 +226,19 @@ class NotificaScreenShot(Notifica):
                 font_h2 = ImageFont.truetype("OpenSansEmoji.ttf", size=64)
                 font_h3 = ImageFont.truetype("OpenSansEmoji.ttf", size=48)
                 font_text = ImageFont.truetype("OpenSansEmoji.ttf", size=32)
+                font_credit = ImageFont.truetype("OpenSansEmoji.ttf", size=16)
             except IOError:
                 font = ImageFont.load_default()
 
             lines = html.split('\n')
+            lines.append("<credit>⚡ Generato automaticamente con Axios-Get</credit>")
+            lines.append("<credit>🔗 https://github.com/robyquin/axios-get - Open Source (MIT)</credit>")
             y_app = 50
             filename = f"{i}_testo_formattato_{alunno}"
             for l0 in lines:
                 width_wrap = 82
+                align_text = "left"
+                space_lines = 10
                 if(re.search(r"<h2.*?>(.*?)</h2>", l0) is not None):
                     m = re.search(r"<h2.*?>(.*?)</h2>", l0)
                     font = font_h2
@@ -258,24 +263,34 @@ class NotificaScreenShot(Notifica):
                     font = font_h3
                     l0 = "  "+m.group(1)
                     sw = 0.5
+                elif(re.search(r"<credit.*?>(.*?)</credit>", l0) is not None):
+                    m = re.search(r"<credit.*?>(.*?)</credit>", l0)
+                    font = font_credit
+                    l0 = "  "+m.group(1)
+                    sw = 0.25
+                    align_text = "center"
+                    space_lines = 2
                 else:
                     l0 = "        "+l0
                     sw = 0
                     font = font_text
 
-                bbox = draw.textbbox((0, 0), textwrap.fill(l0, width=width_wrap, subsequent_indent='        '), font=font, align="center", stroke_width=sw, spacing=10)
+                bbox = draw.textbbox((0, 0), textwrap.fill(l0, width=width_wrap, subsequent_indent='        '), font=font, align=align_text, stroke_width=sw, spacing=space_lines)
                 # text_width = (bbox[2] - bbox[0])
                 text_height = (bbox[3] - bbox[1])
-                x = 50
+                if (align_text=="center"):
+                    x = LARGHEZZA_FISSA // 2 - (bbox[2] - bbox[0]) // 2
+                else:
+                    x = 50
                 y = y_app
-                y_app = y + text_height + 30
+                y_app = y + text_height + space_lines*3
                 draw.text(
                     (x, y),
                     textwrap.fill(l0, width=width_wrap, subsequent_indent='        '),
                     font=font,
                     fill=(0, 0, 0),
-                    align="left",
-                    spacing=10,
+                    align=align_text,
+                    spacing=space_lines,
                     stroke_width=sw,
                 )
 
