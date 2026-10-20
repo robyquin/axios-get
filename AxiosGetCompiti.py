@@ -57,6 +57,9 @@ def file_config_default():
         'telegram': {
             'BOT_TOKEN': 'TOKEN',
             'CHAT_ID': 'ID'
+        },
+        'screenshot': {
+            'path': '.'
         }
     }
     try:
@@ -80,6 +83,8 @@ if __name__ == "__main__":
                 tipo_notifica = notifica.NotificaMail(DIR+"credenziali.yml")
             elif (config['tipo_notifica'] == 'telegram'):
                 tipo_notifica = notifica.NotificaTelegram(DIR+"credenziali.yml")
+            elif (config['tipo_notifica'] == 'screenshot'):
+                tipo_notifica = notifica.NotificaScreenShot(DIR+"credenziali.yml")
 
         if (tipo_notifica is not None):
             try:

@@ -31,6 +31,7 @@ stateDiagram
     GMD: Preleva dati<br>dal <b>Materiale Didattico</b>
     GRF: Preleva dati<br>dai <b>Compiti</b>
     Nfile: <i>Salvataggio</i>
+    Nscreenshot: <i>Salvataggio</i>
     Nemail: <i>Invio</i>
     Ntelegram: <i>Invio</i>
     BNotifica: Costruisce<br><b>Notifica</b>
@@ -56,10 +57,12 @@ stateDiagram
         if_state_notifica --> Nfile : <b>File</b>
         if_state_notifica --> Nemail : <b>Email</b>
         if_state_notifica --> Ntelegram : <b>Telegram</b>
+        if_state_notifica --> Nscreenshot : <b>Screenshot</b>
 
         Nfile --> Notificato
         Nemail --> Notificato
         Ntelegram --> Notificato
+        Nscreenshot --> Notificato
 
         Notificato --> SAlunno : Ciclo per ogni<br>alunno/a
         NessunaNotifica --> SAlunno : Ciclo per ogni<br>alunno/a

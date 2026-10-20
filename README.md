@@ -12,6 +12,7 @@ Notifica ai tuoi figli/e i compiti loro assegnati sul registro elettronico.
 - Moduli:
   - `yaml`
   - `requests`
+  - `pillow`
 
 ## Installation
 
@@ -65,6 +66,8 @@ smtp:
 telegram:
     BOT_TOKEN: "TOKEN"
     CHAT_ID: "ID"
+screenshot:
+    path: ./pathfile # percorso relativo o assoluto della cartella di destinazione
 ```
 
 ### Tipologie di notifiche
@@ -72,6 +75,7 @@ telegram:
 - **file_html**: salva un file HTML per Studente/Studentessa in un percorso **path** specifico
 - **smtp**: invia una mail per Studente/Studentessa agli indirizzi **destinatari** specificati. Consulta il documento [SMTP server](./docs/SMTP_server.md) per verificare i parametri dei provider supportati.
 - **telegram**: invia un messaggio in una chat di Telegram. Consulta il documento [Telegram_token_bot](./docs/Telegram_token_bot.md).
+- **screenshot**: salva la serie di screenshot (pagine del diario) per Studente/Studentessa in un percorso **path** specifico.
 
 ### Configurazione minima richiesta
 
@@ -150,3 +154,14 @@ oppure
 - Clicca sul pulsante **Start**, digita **Utilità di pianificazione** e seleziona il risultato.
 
 Per la configurazione di questo schedulatore, ti chiedo gentilmente di seguire le informazioni che trovi in rete.
+
+## Licenza
+
+Questo progetto è concesso in licenza nei termini della licenza **MIT** (vedi il file `LICENSE` per i dettagli).
+
+### Componenti di terze parti
+
+Il font incluso nella cartella `assets/fonts/` è distribuito sotto licenza **Apache License 2.0**.
+
+- **OpenSansEmoji.ttf** - Copyright (c) [2013] [Merten Peetz].
+- Il testo della licenza del font è disponibile in `assets/fonts/LICENSE-FONT.txt`.
