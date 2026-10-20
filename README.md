@@ -63,6 +63,7 @@ smtp:
     destinatari:
         - @EMAIL_REDACTED1                  # Lista dei destinatari (genitori + studenti)
         - @EMAIL_REDACTED2
+    n_allegati: 0                           # numero di allegati desiderati per invio (screenshot pagina diario)
 telegram:
     BOT_TOKEN: "TOKEN"
     CHAT_ID: "ID"

@@ -52,7 +52,8 @@ def file_config_default():
             'destinatari': [
                 'genitore1@example.it',
                 'Alunno1@example.it'
-                ]
+                ],
+            'n_allegati': 0
         },
         'telegram': {
             'BOT_TOKEN': 'TOKEN',
