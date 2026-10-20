@@ -67,6 +67,7 @@ smtp:
 telegram:
     BOT_TOKEN: "TOKEN"
     CHAT_ID: "ID"
+    n_allegati: 0                          # numero di immagini desiderate per invio (screenshot pagina diario)
 screenshot:
     path: ./pathfile # percorso relativo o assoluto della cartella di destinazione
 ```

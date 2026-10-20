@@ -57,7 +57,8 @@ def file_config_default():
         },
         'telegram': {
             'BOT_TOKEN': 'TOKEN',
-            'CHAT_ID': 'ID'
+            'CHAT_ID': 'ID',
+            'n_allegati': 0
         },
         'screenshot': {
             'path': '.'

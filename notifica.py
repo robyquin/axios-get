@@ -174,6 +174,13 @@ class NotificaTelegram(Notifica):
         # 1. Configurazione dei parametri del server e delle credenziali
         BOT_TOKEN = self.config['telegram']['BOT_TOKEN']
         CHAT_ID = self.config['telegram']['CHAT_ID']
+        n_screenshot = 0
+        if ('n_allegati' in self.config['telegram'].keys()):
+            if (isinstance(self.config['telegram']['n_allegati'], int)):
+                n_screenshot = self.config['telegram']['n_allegati']
+            else:
+                print("Warning: n_allegati non è un intero, [default: 0]")
+        m_html = re.findall(r"<h2.*?</ul>\n\n", html, re.DOTALL)
 
         # 2. Trasfomazione HTML in messaggio Telegram
         html = re.sub("<head>(.*?)</head>","",html)
@@ -198,6 +205,7 @@ class NotificaTelegram(Notifica):
         html = re.sub("\n{3,}", "\n\n", html, flags=re.DOTALL)
 
         link = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+        link_screenshot = f'https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto'
 
         parametri={
             "chat_id": str(CHAT_ID),
@@ -207,6 +215,30 @@ class NotificaTelegram(Notifica):
         }
 
         print(requests.get(link, params=parametri).json())
+
+        for i, diario in enumerate(m_html):
+            if (i < n_screenshot):
+                dati_bytesio, filename = ScreenShot().diario2image(diario)
+                YY, MM, DD = filename.split("-")
+                payload = {
+                    'chat_id': str(CHAT_ID),
+                    'caption': f'Pagina diario {DD}/{MM}/{YY}'
+                }
+                files = {
+                    'photo': (filename, dati_bytesio.getvalue(), 'image/png')
+                }
+                print(requests.post(link_screenshot, data=payload, files=files).json())
+            elif (i == len(m_html)-1 and n_screenshot != 0):
+                dati_bytesio, filename = ScreenShot().diario2image(diario)
+                payload = {
+                    'chat_id': str(CHAT_ID),
+                    'caption': f'Pagina diario {filename}'
+                }
+                files = {
+                    'photo': (filename, dati_bytesio.getvalue(), 'image/png')
+                }
+                print(requests.post(link_screenshot, data=payload, files=files).json())
+
         print("---")
 
 class NotificaScreenShot(Notifica):
