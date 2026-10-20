@@ -224,10 +224,10 @@ class NotificaScreenShot(Notifica):
             html = re.sub("\n{2,}", "\n", html, flags=re.DOTALL)
 
             try:
-                font_h2 = ImageFont.truetype("OpenSansEmoji.ttf", size=64)
-                font_h3 = ImageFont.truetype("OpenSansEmoji.ttf", size=48)
-                font_text = ImageFont.truetype("OpenSansEmoji.ttf", size=32)
-                font_credit = ImageFont.truetype("OpenSansEmoji.ttf", size=16)
+                font_h2 = ImageFont.truetype("./assets/fonts/OpenSansEmoji.ttf", size=64)
+                font_h3 = ImageFont.truetype("./assets/fonts/OpenSansEmoji.ttf", size=48)
+                font_text = ImageFont.truetype("./assets/fonts/OpenSansEmoji.ttf", size=32)
+                font_credit = ImageFont.truetype("./assets/fonts/OpenSansEmoji.ttf", size=16)
             except IOError:
                 font_h2 = ImageFont.load_default(size=64)
                 font_h3 = ImageFont.load_default(size=48)

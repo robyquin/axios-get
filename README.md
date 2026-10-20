@@ -152,3 +152,14 @@ oppure
 - Clicca sul pulsante **Start**, digita **Utilità di pianificazione** e seleziona il risultato.
 
 Per la configurazione di questo schedulatore, ti chiedo gentilmente di seguire le informazioni che trovi in rete.
+
+## Licenza
+
+Questo progetto è concesso in licenza nei termini della licenza **MIT** (vedi il file `LICENSE` per i dettagli).
+
+### Componenti di terze parti
+
+Il font incluso nella cartella `assets/fonts/` è distribuito sotto licenza **Apache License 2.0**.
+
+- **OpenSansEmoji.ttf** - Copyright (c) [2013] [Merten Peetz].
+- Il testo della licenza del font è disponibile in `assets/fonts/LICENSE-FONT.txt`.
