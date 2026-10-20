@@ -12,6 +12,7 @@ Notifica ai tuoi figli/e i compiti loro assegnati sul registro elettronico.
 - Moduli:
   - `yaml`
   - `requests`
+  - `pillow`
 
 ## Installation
 
