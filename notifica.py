@@ -187,7 +187,7 @@ class NotificaScreenShot(Notifica):
         path_screenshot = self.config['screenshot']['path']
         if (not os.path.exists(os.path.join(path_screenshot,f"screenshot_{alunno}"))):
             os.makedirs(os.path.join(path_screenshot,f"screenshot_{alunno}"))
-            path_screenshot = os.path.join(path_screenshot,f"screenshot_{alunno}")
+        path_screenshot = os.path.join(path_screenshot,f"screenshot_{alunno}")
 
         LARGHEZZA_FISSA = 1300
         ALTEZZA_MASSIMA_STIMATA = 10000
@@ -233,14 +233,19 @@ class NotificaScreenShot(Notifica):
             y_app = 50
             filename = f"{i}_testo_formattato_{alunno}"
             for l0 in lines:
+                width_wrap = 82
                 if(re.search(r"<h2.*?>(.*?)</h2>", l0) is not None):
                     m = re.search(r"<h2.*?>(.*?)</h2>", l0)
                     font = font_h2
                     l0 = m.group(1)
+                    if (len(l0.split(", ")) > 1):
+                        l0 = l0.split(", ")[1]
                     try:
-                        dt = datetime.strptime(l0[7:], "%d/%m/%Y")
+                        dt = datetime.strptime(l0, "%d/%m/%Y")
                         filename = datetime.strftime(dt, "%Y-%m-%d")
                     except Exception as e:
+                        print(f"{e}")
+                        width_wrap = 40
                         filename = "Materiale_didattico"
                     sw = 0.75
                 elif(re.search(r"<h3.*?>(.*?)</h3>", l0) is not None):
@@ -258,7 +263,7 @@ class NotificaScreenShot(Notifica):
                     sw = 0
                     font = font_text
 
-                bbox = draw.textbbox((0, 0), textwrap.fill(l0, width=82, subsequent_indent='        '), font=font, align="center", stroke_width=sw, spacing=10)
+                bbox = draw.textbbox((0, 0), textwrap.fill(l0, width=width_wrap, subsequent_indent='        '), font=font, align="center", stroke_width=sw, spacing=10)
                 # text_width = (bbox[2] - bbox[0])
                 text_height = (bbox[3] - bbox[1])
                 x = 50
@@ -266,7 +271,7 @@ class NotificaScreenShot(Notifica):
                 y_app = y + text_height + 30
                 draw.text(
                     (x, y),
-                    textwrap.fill(l0, width=82, subsequent_indent='        '),
+                    textwrap.fill(l0, width=width_wrap, subsequent_indent='        '),
                     font=font,
                     fill=(0, 0, 0),
                     align="left",
