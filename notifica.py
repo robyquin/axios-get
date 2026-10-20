@@ -101,6 +101,8 @@ class NotificaMail(Notifica):
         if ('n_allegati' in self.config['smtp'].keys()):
             if (isinstance(self.config['smtp']['n_allegati'], int)):
                 n_screenshot = self.config['smtp']['n_allegati']
+            else:
+                print("Warning: n_allegati non è un intero, [default: 0]")
 
         if (port == 587):
             starttls = True
