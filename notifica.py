@@ -208,7 +208,7 @@ class NotificaScreenShot(Notifica):
             html = re.sub("<h3.*?>(.*?)</h3>\n*",r"<h3>\g<1></h3>\n\n",html, flags=re.DOTALL)
             html = re.sub("<h4.*?>(.*?)</h4>\n*",r"<h4>\g<1></h4>\n\n",html, flags=re.DOTALL)
             html = re.sub("<hr>","\n---\n",html)
-            # html = re.sub("<a.*?href='(.*?)'.*?>(.*?)</a>",r" \g<2> \g<1>",html)
+            html = re.sub("<a.*?href='(.*?)'.*?>(.*?)</a>",r" \g<1>",html)
             html = re.sub(r'<li.*?>(.*?)</li>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
             html = re.sub(r'<div.*?>(.*?)</div>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
             html = re.sub(r'<p.*?>(.*?)</p>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
