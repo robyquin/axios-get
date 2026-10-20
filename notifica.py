@@ -12,6 +12,7 @@ import sys
 import os
 import re
 import textwrap
+from html import unescape as html_unescape
 from datetime import datetime
 
 import smtplib
@@ -275,7 +276,7 @@ class NotificaScreenShot(Notifica):
                     sw = 0
                     font = font_text
 
-                bbox = draw.textbbox((0, 0), textwrap.fill(l0, width=width_wrap, subsequent_indent='        '), font=font, align=align_text, stroke_width=sw, spacing=space_lines)
+                bbox = draw.textbbox((0, 0), textwrap.fill(html_unescape(l0), width=width_wrap, subsequent_indent='        '), font=font, align=align_text, stroke_width=sw, spacing=space_lines)
                 # text_width = (bbox[2] - bbox[0])
                 text_height = (bbox[3] - bbox[1])
                 if (align_text=="center"):
@@ -286,7 +287,7 @@ class NotificaScreenShot(Notifica):
                 y_app = y + text_height + space_lines*3
                 draw.text(
                     (x, y),
-                    textwrap.fill(l0, width=width_wrap, subsequent_indent='        '),
+                    textwrap.fill(html_unescape(l0), width=width_wrap, subsequent_indent='        '),
                     font=font,
                     fill=(0, 0, 0),
                     align=align_text,
