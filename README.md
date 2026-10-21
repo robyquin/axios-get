@@ -37,55 +37,9 @@ cd axios-get
 
 Per la prima configurazione occorre creare un file, se non esiste, con il nome `credenziali.yml` nella stessa cartella di **AxiosGetCompiti**.
 
-- Al primo avvio, se il file di configurazione non esiste, riceverete un messaggio di errore con la conseguente creazione di `credenziali_default.yml`, rinominatelo in `credenziali.yml`, sarà un ottimo punto di partenza per la compilazione.
+- Se al primo avvio, il file non esiste, riceverete un messaggio di errore con la conseguente creazione di `credenziali_default.yml`, rinominatelo in `credenziali.yml`, sarà un ottimo punto di partenza per la compilazione.
 
-- Compila i campi del file come suggerito in fondo a questo paragrafo.
-
-**NOTA**: il file configurazione (tipo *YAML*) è fortemente **sensibile all'indentazione**, questo gli consente di creare una struttura gerarchica dell'informazioni.
-
-```yaml
-axios:
-    credenziali: 
-        customerid: STRING_REDACTED # Inserire CF Istituto/Cliente
-        username: STRING_REDACTED   # Codice Utente o mail personale
-        password: STRING_REDACTED   # password di accesso ad `Axios Registro Elettronico FAMIGLIA`
-    alunni:
-        - Nome_Alunno_1             # Lista di nomi come indicato nella Home di `Axios Registro Elettronico FAMIGLIA`
-        - Nome_Alunno_2
-tipo_notifica: file_html # tipo di notifica da utilizzare
-file_html:
-    path: ./pathfile # percorso relativo o assoluto della cartella di destinazione
-smtp:
-    smtp_server: STRING_REDACTED           # indirizzo server SMTP
-    smtp_port: 465                         # porta SMTP
-    smtp_username: STRING_REDACTED         # username per il login SMTP
-    smtp_password: STRING_REDACTED         # password per il login SMTP
-    destinatari:
-        - @EMAIL_REDACTED1                  # Lista dei destinatari (genitori + studenti)
-        - @EMAIL_REDACTED2
-    n_allegati: 0                           # numero di allegati desiderati per invio (screenshot pagina diario)
-telegram:
-    BOT_TOKEN: "TOKEN"
-    CHAT_ID: "ID"
-    n_allegati: 0                          # numero di immagini desiderate per invio (screenshot pagina diario)
-screenshot:
-    path: ./pathfile # percorso relativo o assoluto della cartella di destinazione
-```
-
-### Tipologie di notifiche
-
-- **file_html**: salva un file HTML per Studente/Studentessa in un percorso **path** specifico
-- **smtp**: invia una mail per Studente/Studentessa agli indirizzi **destinatari** specificati. Consulta il documento [SMTP server](./docs/SMTP_server.md) per verificare i parametri dei provider supportati.
-- **telegram**: invia un messaggio in una chat di Telegram. Consulta il documento [Telegram_token_bot](./docs/Telegram_token_bot.md).
-- **screenshot**: salva la serie di screenshot (pagine del diario) per Studente/Studentessa in un percorso **path** specifico.
-
-### Configurazione minima richiesta
-
-Il minimo richiesto per il corretto funzionamento riguarda le sezione:
-
-- `axios`: include tutte le credenziali per l'accesso al portale del registro elettronico,
-- `tipo_notifica`: si deve indicare il nome della sezione di notifica desiderata, es. `file_html`, o `smtp`,
-- *nome della tipologia_notifica*: include i parametri per rendere possibile la tipologia di notifica desiderata.
+- Per la compilazione dei campi del file e per conoscere tutte le tipologie di notifiche disponibili, segui le indicazioni nel documento [CONFIGURAZIONE](./docs/Configurazione.md)
 
 ## Usage
 
