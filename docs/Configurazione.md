@@ -8,7 +8,7 @@ Il file di configurazione si chiama `credenziali.yml` e deve essere collocato ne
 
 Il file è scritto in *YAML*: formato basato sull'indentazione e progettato per file di configurazione.
 
-In brevemente, il linguaggio YAML può gestire tre tipi di dato: scalari (valori singoli), sequenze (liste) e dizionari (corrispondenza chiave-valore). Tutto il resto si può ottenere con l'indentazione e l'utilizzo di combinazioni di questi tre tipi.
+In breve, il linguaggio YAML può gestire tre tipi di dato: scalari (valori singoli), sequenze (liste) e dizionari (corrispondenza chiave-valore). Tutto il resto si può ottenere con l'indentazione e l'utilizzo di combinazioni di questi tre tipi.
 
 Al primo avvio di `AxiosGetCompiti` un file di configurazione di default `credenziali_default.yml` viene creato se `credenziali.yml` non esiste.
 
