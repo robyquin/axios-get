@@ -10,18 +10,18 @@ Il file è scritto in *YAML*: formato basato sull'indentazione e progettato per 
 
 In breve, il linguaggio YAML può gestire tre tipi di dato: scalari (valori singoli), sequenze (liste) e dizionari (corrispondenza chiave-valore). Tutto il resto si può ottenere con l'indentazione e l'utilizzo di combinazioni di questi tre tipi.
 
-Al primo avvio di `AxiosGetCompiti` un file di configurazione di default `credenziali_default.yml` viene creato se `credenziali.yml` non esiste.
+Se `credenziali.yml` non esiste, al primo avvio di `AxiosGetCompiti` viene creato un file di configurazione di default `credenziali_default.yml`.
 
 Per funzionare, `credenziali_default.yml` deve essere rinominato in `credenziali.yml` e editato, modificando opportunamente i valori delle impostazioni presenti.
 
-## Convezioni del documento
+## Convenzioni del documento
 
 Si indicherà con **RF**: *Axios Registro Elettronico FAMIGLIA*
 
-Inoltre si userà questa convenzione per descrivere la struttura del file di configurazione:
+Inoltre si userà la seguente convenzione per descrivere la struttura adottata in `credenziali.yml`:
 
-- `Sezione1.Sottosezione2.Chiave: Valore_0` dove il punto sta ad indicare una nuova linea e un'indentazione nel file di configurazione,
-- `Sezione1.NomeLista.[]` dove le parentesi quadre stanno a rappresentare il valore dell'elemento della lista, rappresentato nel file con `- Valore_1`
+- `Sezione1.Sottosezione2.Chiave: Valore_0` dove il punto sta ad indicare una nuova linea e un'indentazione nel file,
+- `Sezione1.NomeLista.[]` dove le parentesi quadre stanno a rappresentare il valore dell'elemento della lista (`- Valore_1`)
 
 ```yaml
 Sezione1:
@@ -62,7 +62,7 @@ La configurazione minima richiesta per il corretto funzionamento riguarda la com
 
 ## Configurazione di notifica
 
-Scegli la tipologia di notifica che preferisci tra quelle descritte di seguito e inseriscila nel file di configurazione.
+Scegli la tipologia di notifica che preferisci tra quelle descritte di seguito e inseriscila nel file `credenziali.yml`.
 
 ### Notifica File
 
@@ -75,7 +75,7 @@ Scegli la tipologia di notifica che preferisci tra quelle descritte di seguito e
 
 ### Notifica Screenshot
 
-**Obiettivo del tipo di notifica**: salvare in locale la lista dei compiti del registro in immagini organizzati per giorno.
+**Obiettivo del tipo di notifica**: salvare in locale la lista dei compiti del registro in immagini organizzate per giorno.
 
 | Path              | Tipo dato | Valore | Descrizione                                                 |
 | ----------------- | --------- | ------ | ----------------------------------------------------------- |
@@ -84,7 +84,7 @@ Scegli la tipologia di notifica che preferisci tra quelle descritte di seguito e
 
 ### Notifica Email
 
-**Obiettivo del tipo di notifica**: inviare in una email la lista dei compiti del registro, e se richiesto allegare screenshot delle pagine diario.
+**Obiettivo del tipo di notifica**: inviare in una email la lista dei compiti del registro, e se richiesto, allegare screenshot delle pagine diario.
 
 | Path                   | Tipo dato      | Valore | Descrizione                                                        |
 | ---------------------- | -------------- | ------ | ------------------------------------------------------------------ |
@@ -103,7 +103,7 @@ Consulta il documento [SMTP server](./SMTP_server.md) per verificare i parametri
 
 ### Notifica Telegram
 
-**Obiettivo del tipo di notifica**: inviare messaggio in chat con la lista dei compiti del registro, e se richiesto allegare screenshot delle pagine diario.
+**Obiettivo del tipo di notifica**: inviare messaggio in chat con la lista dei compiti del registro, e se richiesto, allegare screenshot delle pagine diario.
 
 | Path                  | Tipo dato | Valore | Descrizione                                                        |
 | --------------------- | --------- | ------ | ------------------------------------------------------------------ |
