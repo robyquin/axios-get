@@ -103,13 +103,107 @@ systemctl start axios-compiti.timer
 
 ### Windows Like
 
-- Premi i tasti `Win + R`, scrivi `taskschd.msc run` e premi Invio.
+- Premi i tasti `Win + R`, scrivi `taskschd.msc run` e premi Invio, oppure clicca sul pulsante **Start**, digita **Utilità di pianificazione** e seleziona il risultato.
+- **Crea un'attività** inserendo tutti i parametri richiesti per la pianificazione dell'esecuzione automatica di AxiosGetCompiti.
 
-oppure
+**NOTA**: Per la configurazione di questo schedulatore, ti chiedo gentilmente di seguire le informazioni che trovi in rete.
 
-- Clicca sul pulsante **Start**, digita **Utilità di pianificazione** e seleziona il risultato.
+Un alternativa alla creazione manuale della pianificazione, ti suggerisco i passi per l'**Importazione attività**:
 
-Per la configurazione di questo schedulatore, ti chiedo gentilmente di seguire le informazioni che trovi in rete.
+- Copia il codice che trovi nella sezione `Configurazione attività`,
+- Incollalo in un file chiamato `schedula_axios-get.xml`,
+- Sostituisci `__absolute_path__` con il percorso reale di dove hai installato *AxiosGetCompiti.exe* (es. `C:\axios-get_v1.0.5`). Per le release più recenti (`>= v1.0.6`), nella cartella di prima installazione troverai già il template del file (`schedula_axios-get.xml_tmp`); al primo avvio verrà sostituito in automatico il valore corretto di `__absolute_path__`, e il file verrà rinominato in `schedula_axios-get.xml`.
+- In **Utilità di pianificazione**, *Importa attività*, ti verrà richiesto di selezionare `schedula_axios-get.xml`
+
+Il seguente file di configurazione imposta 5 attivazioni giornaliere di *AxiosGetCompiti.exe*:
+
+- Ogni giorno alle 14:30
+- Ogni giorno alle 15:30
+- Ogni giorno alle 16:30
+- Ogni giorno alle 17:30
+- Ogni giorno alle 18:30
+
+#### Configurazione attività
+
+```xml
+<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Date>2026-10-21T18:00:00</Date>
+    <Author>Axios-Get</Author>
+    <Description>Schedulazione di Axios-Get</Description>
+    <URI>\Axios-get</URI>
+  </RegistrationInfo>
+  <Triggers>
+    <CalendarTrigger>
+      <StartBoundary>2026-10-21T14:30:00</StartBoundary>
+      <Enabled>true</Enabled>
+      <ScheduleByDay>
+        <DaysInterval>1</DaysInterval>
+      </ScheduleByDay>
+    </CalendarTrigger>
+    <CalendarTrigger>
+      <StartBoundary>2026-10-21T15:30:00</StartBoundary>
+      <Enabled>true</Enabled>
+      <ScheduleByDay>
+        <DaysInterval>1</DaysInterval>
+      </ScheduleByDay>
+    </CalendarTrigger>
+    <CalendarTrigger>
+      <StartBoundary>2026-10-21T16:30:00</StartBoundary>
+      <Enabled>true</Enabled>
+      <ScheduleByDay>
+        <DaysInterval>1</DaysInterval>
+      </ScheduleByDay>
+    </CalendarTrigger>
+    <CalendarTrigger>
+      <StartBoundary>2026-10-21T17:30:00</StartBoundary>
+      <Enabled>true</Enabled>
+      <ScheduleByDay>
+        <DaysInterval>1</DaysInterval>
+      </ScheduleByDay>
+    </CalendarTrigger>
+    <CalendarTrigger>
+      <StartBoundary>2026-10-21T18:30:00</StartBoundary>
+      <Enabled>true</Enabled>
+      <ScheduleByDay>
+        <DaysInterval>1</DaysInterval>
+      </ScheduleByDay>
+    </CalendarTrigger>
+  </Triggers>
+  <Principals>
+    <Principal id="Author">
+      <UserId>NT AUTHORITY\SYSTEM</UserId>
+      <RunLevel>HighestAvailable</RunLevel>
+    </Principal>
+  </Principals>
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>true</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>true</StopIfGoingOnBatteries>
+    <AllowHardTerminate>true</AllowHardTerminate>
+    <StartWhenAvailable>false</StartWhenAvailable>
+    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>
+    <IdleSettings>
+      <StopOnIdleEnd>true</StopOnIdleEnd>
+      <RestartOnIdle>false</RestartOnIdle>
+    </IdleSettings>
+    <AllowStartOnDemand>true</AllowStartOnDemand>
+    <Enabled>true</Enabled>
+    <Hidden>false</Hidden>
+    <RunOnlyIfIdle>false</RunOnlyIfIdle>
+    <WakeToRun>false</WakeToRun>
+    <ExecutionTimeLimit>PT72H</ExecutionTimeLimit>
+    <Priority>7</Priority>
+  </Settings>
+  <Actions Context="Author">
+    <Exec>
+      <Command>__absolute_path__\AxiosGetCompiti.exe</Command>
+      <WorkingDirectory>__absolute_path__</WorkingDirectory>
+    </Exec>
+  </Actions>
+</Task>
+```
 
 ## Licenza
 

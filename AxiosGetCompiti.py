@@ -65,6 +65,15 @@ def file_config_default():
         }
     }
     try:
+        if (os.path.exists(DIR+"schedula_axios-get.xml_tmp") and getattr(sys, 'frozen', False)):
+            content = ""
+            with open(DIR+"schedula_axios-get.xml_tmp", "r", encoding="utf-16") as file_schedule:
+                content = file_schedule.read()
+            content = content.replace("<Command>Axios-Get</Command>", f"<Command>{str(os.path.abspath(sys.executable))}</Command>")
+            content = content.replace("<WorkingDirectory>Axios-Get</WorkingDirectory>", f"<WorkingDirectory>{str(os.path.dirname(sys.executable))}</WorkingDirectory>")
+            with open(DIR+"schedula_axios-get.xml", "w", encoding="utf-16") as file_schedule:
+                content = file_schedule.write(content)
+                os.remove(DIR+"schedula_axios-get.xml_tmp")
         with open(DIR+"credenziali_default.yml", "w", encoding="utf-8") as file_config:
             file_config.write(yaml.dump(config_default, sort_keys=False))
     except Exception as e:
