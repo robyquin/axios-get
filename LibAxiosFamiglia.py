@@ -236,12 +236,18 @@ class LibAxiosFamiglia():
                     fp.write(res.text)
                     fp.close()
 
-    def __debug(self, res):
-        # DEBUG
-        print(res.request.method, res.request.url)     # L'URL finale
+    def __debug(self, res: requests.Response) -> None:
+        """
+        Stampare input e output di una richiesta
+
+        :param res: Risposta
+        :type res: requests.Response
+        """
+
+        print(res.request.method, res.request.url)
         if (res.request.method == 'POST'):
-            print(res.request.body)    # I dati inviati (es: test=123)
-        print(res.request.headers) # Gli header di quella specifica chiamata
+            print(res.request.body)
+        print(res.request.headers)
         print("---")
 
     def elaborazione_json(self, compiti: dict, Alunno: str) -> str:
