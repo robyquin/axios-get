@@ -176,6 +176,8 @@ class LibAxiosFamiglia():
                 else:
                     res = self.session.post(link[UrlIdType.url], data=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content-Type': 'application/x-www-form-urlencoded'})
 
+                self.__debug(res)
+
                 get_error = re.search(r"SweetMessage.error\('(.*)'\);", res.text)
                 if (get_error == None):
                     if ('Action' in link[UrlIdType.params].keys()):
@@ -233,12 +235,6 @@ class LibAxiosFamiglia():
                 else:
                     raise Exception("{}".format(get_error.group(1)))
 
-            # DEBUG
-            print(res.request.method, res.request.url)     # L'URL finale
-            if (res.request.method == 'POST'):
-                print(res.request.body)    # I dati inviati (es: test=123)
-            print(res.request.headers) # Gli header di quella specifica chiamata
-            print("---")
             if (prefix is not None and link[UrlIdType.filename] is not None):
                 dir_registro_alunno = os.path.join(DIR, prefix+Alunno)
                 if (not os.path.exists(dir_registro_alunno)):
@@ -246,6 +242,14 @@ class LibAxiosFamiglia():
                 with open(registo_compiti_alunno, 'w', encoding='utf-8') as fp:
                     fp.write(res.text)
                     fp.close()
+
+    def __debug(self, res):
+        # DEBUG
+        print(res.request.method, res.request.url)     # L'URL finale
+        if (res.request.method == 'POST'):
+            print(res.request.body)    # I dati inviati (es: test=123)
+        print(res.request.headers) # Gli header di quella specifica chiamata
+        print("---")
 
     def elaborazione_json(self, compiti: dict, Alunno: str) -> str:
         """
