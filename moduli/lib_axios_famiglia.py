@@ -50,6 +50,10 @@ class LibAxiosFamiglia():
 
     def __init__(self, DIR: str, credenziali: dict, class_notifica: lib_notifica.Notifica):
         self.DIR = DIR
+        if getattr(sys, 'frozen', False):
+            # Se l'applicazione è compilata con PyInstaller
+            sys.stderr = open(os.path.join(self.DIR, "errori.txt"), "a", encoding="utf-8")
+            sys.stdout = open(os.path.join(self.DIR, "log.txt"), "a", encoding="utf-8")
         self.DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:156.0) Gecko/20100101 Firefox/156.0"
 
         self.customerid = str(credenziali['customerid'])
@@ -97,11 +101,11 @@ class LibAxiosFamiglia():
         # Notifica qui
         if (self.sha1_REGISTRO != self.sha1_REGISTRO_old or self.sha1_MD != self.sha1_MD_old and self.COMPITI != {}):
             self.notifica.send_notifica(self.elaborazione_json(self.COMPITI, Alunno), Alunno)
-            print("Registro", self.sha1_REGISTRO, self.sha1_REGISTRO_old)
-            print("Materiale-Dit", self.sha1_MD, self.sha1_MD_old)
-            print("---")
+            print("Registro", self.sha1_REGISTRO, self.sha1_REGISTRO_old, file=sys.stdout)
+            print("Materiale-Dit", self.sha1_MD, self.sha1_MD_old, file=sys.stdout)
+            print("---", file=sys.stdout)
         else:
-            print("Nessuna notifica: non ci sono modifiche!\n---")
+            print("Nessuna notifica: non ci sono modifiche!\n---", file=sys.stdout)
 
     def get_session_collabora(self, Alunno: str) -> None:
         """
@@ -239,11 +243,11 @@ class LibAxiosFamiglia():
         :type res: requests.Response
         """
 
-        print(res.request.method, res.request.url)
+        print(res.request.method, res.request.url, file=sys.stdout)
         if (res.request.method == 'POST'):
-            print(res.request.body)
-        print(res.request.headers)
-        print("---")
+            print(res.request.body, file=sys.stdout)
+        print(res.request.headers, file=sys.stdout)
+        print("---", file=sys.stdout)
 
     def elaborazione_json(self, compiti: dict, Alunno: str) -> str:
         """

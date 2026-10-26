@@ -17,13 +17,6 @@ import yaml
 from moduli.lib_axios_famiglia import LibAxiosFamiglia
 import moduli.lib_notifica as notifica
 
-if getattr(sys, 'frozen', False):
-    # Se l'applicazione è compilata con PyInstaller
-    DIR=str(os.path.dirname(sys.executable))+os.path.sep
-    sys.stderr = open("errori.txt", "w", encoding="utf-8")
-    sys.stdout = open("log.txt", "w", encoding="utf-8")
-else:
-    DIR=str(Path(os.path.dirname(__file__)).absolute())+os.path.sep
 
 def file_config_default():
     """
@@ -82,6 +75,18 @@ def file_config_default():
 
 if __name__ == "__main__":
 
+    if getattr(sys, 'frozen', False):
+        # Se l'applicazione è compilata con PyInstaller
+        DIR=str(os.path.dirname(sys.executable))+os.path.sep
+        if(os.path.exists(os.path.join(DIR, "errori.txt"))):
+            os.remove(os.path.join(DIR, "errori.txt"))
+        if(os.path.exists(os.path.join(DIR, "log.txt"))):
+            os.remove(os.path.join(DIR, "log.txt"))
+        sys.stderr = open(os.path.join(DIR, "errori.txt"), "a", encoding="utf-8")
+        sys.stdout = open(os.path.join(DIR, "log.txt"), "a", encoding="utf-8")
+    else:
+        DIR=str(Path(os.path.dirname(__file__)).absolute())+os.path.sep
+
     if (os.path.exists(DIR+"credenziali.yml")):
         with open(DIR+"credenziali.yml", "r", encoding="utf-8") as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
@@ -106,7 +111,7 @@ if __name__ == "__main__":
             except Exception as e:
                 print(f"Si è verificato un errore imprevisto: {e}", file=sys.stderr)
         else:
-            print("Error: occorre configurare e selezionare un tipo di notifica")
+            print("Error: occorre configurare e selezionare un tipo di notifica", file=sys.stderr)
     else:
         try:
             file_config_default()
