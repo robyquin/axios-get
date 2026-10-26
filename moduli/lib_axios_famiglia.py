@@ -18,7 +18,7 @@ import hashlib
 
 import requests
 
-import moduli.lib_notifica as lib_notifica
+from . import lib_notifica
 
 class UrlIdType(IntEnum):
     """

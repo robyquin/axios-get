@@ -20,8 +20,7 @@ from email.message import EmailMessage
 import requests
 import yaml
 
-from moduli.lib_screenshot import ScreenShot
-
+from .lib_screenshot import ScreenShot
 
 class Notifica():
     """

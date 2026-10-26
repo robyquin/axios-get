@@ -8,7 +8,6 @@ Gestore di Screenshot.
 
 """
 
-
 import sys
 import io
 import os
@@ -18,7 +17,6 @@ from html import unescape as html_unescape
 from datetime import datetime
 
 from PIL import Image, ImageDraw, ImageFont
-
 
 class ScreenShot():
     """
