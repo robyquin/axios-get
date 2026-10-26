@@ -12,7 +12,6 @@ import sys
 from datetime import datetime
 import os
 import re
-from pathlib import Path
 import json
 from enum import IntEnum
 import hashlib
@@ -45,10 +44,18 @@ DOW_Tr = {
 
 class LibAxiosFamiglia():
     """
-    Classe che permette l'acquisizione di dati da Axios. 
-    """
+    Classe che permette l'acquisizione di dati da Axios.
 
-    def __init__(self, DIR: str, credenziali: dict, class_notifica: lib_notifica.Notifica):
+    :param DIR: percorso di salvataggio log e error
+    :type DIR: str
+    :param credenziali: dizionario di configurazione
+    :type credenziali: dict
+    :param class_notifica: percorso di salvataggio log e error
+    :type class_notifica: lib_notifica.Notifica
+
+    :raises Exception: credenziali vuote.
+    """
+    def __init__(self, DIR: str, credenziali: dict, class_notifica: lib_notifica.Notifica) -> None:
         self.DIR = DIR
         if getattr(sys, 'frozen', False):
             # Se l'applicazione è compilata con PyInstaller

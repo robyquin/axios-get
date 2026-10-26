@@ -27,6 +27,8 @@ class Notifica():
     """
     Classe di definizione delle Notifiche
 
+    :param DIR: percorso di salvataggio log e error
+    :type DIR: str
     :param path_config: percorso al file di configurazione YAML
     :type path_config: str
     """
