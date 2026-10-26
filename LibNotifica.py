@@ -21,7 +21,7 @@ from email.message import EmailMessage
 import requests
 import yaml
 
-from screenshot import ScreenShot
+from LibScreenshot import ScreenShot
 
 if getattr(sys, 'frozen', False):
     # Se l'applicazione è compilata con PyInstaller

@@ -19,7 +19,7 @@ import hashlib
 
 import requests
 
-import notifica
+import LibNotifica
 
 class UrlIdType(IntEnum):
     """
@@ -54,7 +54,7 @@ class LibAxiosFamiglia():
     Classe che permette l'acquisizione di dati da Axios. 
     """
 
-    def __init__(self, credenziali: dict, class_notifica: notifica.Notifica):
+    def __init__(self, credenziali: dict, class_notifica: LibNotifica.Notifica):
         self.DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:156.0) Gecko/20100101 Firefox/156.0"
 
         self.customerid = str(credenziali['customerid'])

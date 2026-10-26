@@ -15,7 +15,7 @@ from pathlib import Path
 import yaml
 
 from LibAxiosFamiglia import LibAxiosFamiglia
-import notifica
+import LibNotifica as notifica
 
 if getattr(sys, 'frozen', False):
     # Se l'applicazione è compilata con PyInstaller
