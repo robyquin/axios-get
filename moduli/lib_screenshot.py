@@ -12,7 +12,6 @@ Gestore di Screenshot.
 import sys
 import io
 import os
-from pathlib import Path
 import textwrap
 import re
 from html import unescape as html_unescape
@@ -20,15 +19,15 @@ from datetime import datetime
 
 from PIL import Image, ImageDraw, ImageFont
 
-if getattr(sys, 'frozen', False):
-    # Se l'applicazione è compilata con PyInstaller
-    DIR=str(os.path.dirname(sys.executable))+os.path.sep
-    sys.stderr = open("errori.txt", "w", encoding="utf-8")
-    sys.stdout = open("log.txt", "w", encoding="utf-8")
-else:
-    DIR=str(Path(os.path.dirname(__file__)).absolute())+os.path.sep
 
 class ScreenShot():
+    
+    def __init__(self, DIR: str):
+        self.DIR = DIR
+        if getattr(sys, 'frozen', False):
+            # Se l'applicazione è compilata con PyInstaller
+            sys.stderr = open(os.path.join(self.DIR, "errori.txt"), "w", encoding="utf-8")
+            sys.stdout = open(os.path.join(self.DIR, "log.txt"), "w", encoding="utf-8")
 
     def diario2image(self, html: str) -> tuple[io.BytesIO, str]:
 
@@ -65,7 +64,7 @@ class ScreenShot():
         html = re.sub("\n{2,}", "\n", html, flags=re.DOTALL)
 
         try:
-            path_font = os.path.join(DIR, "assets", "fonts", "OpenSansEmoji.ttf")
+            path_font = os.path.join(self.DIR, "assets", "fonts", "OpenSansEmoji.ttf")
             font_h2 = ImageFont.truetype(path_font, size=64)
             font_h3 = ImageFont.truetype(path_font, size=48)
             font_text = ImageFont.truetype(path_font, size=32)

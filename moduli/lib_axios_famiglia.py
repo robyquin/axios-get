@@ -19,7 +19,7 @@ import hashlib
 
 import requests
 
-import LibNotifica
+import moduli.lib_notifica as lib_notifica
 
 class UrlIdType(IntEnum):
     """
@@ -43,18 +43,13 @@ DOW_Tr = {
     'Sun': 'Dom'
 }
 
-if getattr(sys, 'frozen', False):
-    # Se l'applicazione è compilata con PyInstaller
-    DIR=str(os.path.dirname(sys.executable))+os.path.sep
-else:
-    DIR=str(Path(os.path.dirname(__file__)).absolute())+os.path.sep
-
 class LibAxiosFamiglia():
     """
     Classe che permette l'acquisizione di dati da Axios. 
     """
 
-    def __init__(self, credenziali: dict, class_notifica: LibNotifica.Notifica):
+    def __init__(self, DIR: str, credenziali: dict, class_notifica: lib_notifica.Notifica):
+        self.DIR = DIR
         self.DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:156.0) Gecko/20100101 Firefox/156.0"
 
         self.customerid = str(credenziali['customerid'])
@@ -128,7 +123,7 @@ class LibAxiosFamiglia():
 
         self.__get_session(Alunno, link_collabora, "collabora_")
         if (len(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES) > 0):
-            matdit_compiti_alunno = os.path.join(DIR, "collabora_"+Alunno, 'materiale-didattico.html')
+            matdit_compiti_alunno = os.path.join(self.DIR, "collabora_"+Alunno, 'materiale-didattico.html')
             text_MD = "\n".join(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES)
             self.sha1_MD = hashlib.sha1(text_MD.encode('utf-8')).hexdigest()
             if(os.path.exists(matdit_compiti_alunno)):
@@ -140,7 +135,7 @@ class LibAxiosFamiglia():
 
     def __get_session(self, Alunno, link_sequence, prefix):
         for link in link_sequence:
-            registo_compiti_alunno = os.path.join(DIR, prefix+Alunno, link[UrlIdType.filename])
+            registo_compiti_alunno = os.path.join(self.DIR, prefix+Alunno, link[UrlIdType.filename])
             if (link[UrlIdType.method] == 'GET'):
                 res = self.session.get(link[UrlIdType.url], params=link[UrlIdType.params], allow_redirects=True)
                 if ('Action' in link[UrlIdType.params].keys()):
@@ -229,7 +224,7 @@ class LibAxiosFamiglia():
                     raise Exception("{}".format(get_error.group(1)))
 
             if (prefix is not None and link[UrlIdType.filename] is not None):
-                dir_registro_alunno = os.path.join(DIR, prefix+Alunno)
+                dir_registro_alunno = os.path.join(self.DIR, prefix+Alunno)
                 if (not os.path.exists(dir_registro_alunno)):
                     os.makedirs(dir_registro_alunno)
                 with open(registo_compiti_alunno, 'w', encoding='utf-8') as fp:

@@ -14,8 +14,8 @@ from pathlib import Path
 
 import yaml
 
-from LibAxiosFamiglia import LibAxiosFamiglia
-import LibNotifica as notifica
+from moduli.lib_axios_famiglia import LibAxiosFamiglia
+import moduli.lib_notifica as notifica
 
 if getattr(sys, 'frozen', False):
     # Se l'applicazione è compilata con PyInstaller
@@ -89,17 +89,17 @@ if __name__ == "__main__":
         tipo_notifica = None
         if('tipo_notifica' in config.keys()):
             if (config['tipo_notifica'] == 'file_html'):
-                tipo_notifica = notifica.NotificaFileHTML(DIR+"credenziali.yml")
+                tipo_notifica = notifica.NotificaFileHTML(DIR, DIR+"credenziali.yml")
             elif (config['tipo_notifica'] == 'smtp'):
-                tipo_notifica = notifica.NotificaMail(DIR+"credenziali.yml")
+                tipo_notifica = notifica.NotificaMail(DIR, DIR+"credenziali.yml")
             elif (config['tipo_notifica'] == 'telegram'):
-                tipo_notifica = notifica.NotificaTelegram(DIR+"credenziali.yml")
+                tipo_notifica = notifica.NotificaTelegram(DIR, DIR+"credenziali.yml")
             elif (config['tipo_notifica'] == 'screenshot'):
-                tipo_notifica = notifica.NotificaScreenShot(DIR+"credenziali.yml")
+                tipo_notifica = notifica.NotificaScreenShot(DIR, DIR+"credenziali.yml")
 
         if (tipo_notifica is not None):
             try:
-                axios = LibAxiosFamiglia(config['axios']['credenziali'], tipo_notifica)
+                axios = LibAxiosFamiglia(DIR, config['axios']['credenziali'], tipo_notifica)
                 for alunno in config['axios']['alunni']:
                     axios.get_session_collabora(alunno)
                     axios.get_session_registrofamiglie(alunno)
