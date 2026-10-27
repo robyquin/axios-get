@@ -10,7 +10,6 @@ Gestore di Notifiche.
 
 import sys
 import os
-from pathlib import Path
 import re
 from datetime import datetime
 
@@ -21,24 +20,23 @@ from email.message import EmailMessage
 import requests
 import yaml
 
-from screenshot import ScreenShot
-
-if getattr(sys, 'frozen', False):
-    # Se l'applicazione è compilata con PyInstaller
-    DIR=str(os.path.dirname(sys.executable))+os.path.sep
-    sys.stderr = open("errori.txt", "w", encoding="utf-8")
-    sys.stdout = open("log.txt", "w", encoding="utf-8")
-else:
-    DIR=str(Path(os.path.dirname(__file__)).absolute())+os.path.sep
+from .lib_screenshot import ScreenShot
 
 class Notifica():
     """
     Classe di definizione delle Notifiche
 
+    :param DIR: percorso di salvataggio log e error
+    :type DIR: str
     :param path_config: percorso al file di configurazione YAML
     :type path_config: str
     """
-    def __init__(self, path_config: str) -> None:
+    def __init__(self, DIR: str, path_config: str) -> None:
+        self.DIR = DIR
+        if getattr(sys, 'frozen', False):
+            # Se l'applicazione è compilata con PyInstaller
+            sys.stderr = open(os.path.join(self.DIR, "errori.txt"), "a", encoding="utf-8")
+            sys.stdout = open(os.path.join(self.DIR, "log.txt"), "a", encoding="utf-8")
         with open(path_config, "r", encoding="utf-8") as file:
             self.config = yaml.load(file, Loader=yaml.FullLoader)
 
@@ -71,7 +69,7 @@ class NotificaFileHTML(Notifica):
             # anche se si verifica un errore durante la scrittura.
             with open(absolute_path, "w", encoding="utf-8") as file:
                 file.write(html)
-            print("Scrittura completata con successo!\n---")
+            print("Scrittura completata con successo!\n---", file=sys.stdout)
 
         except PermissionError:
             print(f"Errore: Non hai i permessi necessari per scrivere nel file '{absolute_path}'.", file=sys.stderr)
@@ -102,7 +100,7 @@ class NotificaMail(Notifica):
             if (isinstance(self.config['smtp']['n_allegati'], int)):
                 n_screenshot = self.config['smtp']['n_allegati']
             else:
-                print("Warning: n_allegati non è un intero, [default: 0]")
+                print("Warning: n_allegati non è un intero, [default: 0]", file=sys.stdout)
 
         if (port == 587):
             starttls = True
@@ -126,7 +124,7 @@ class NotificaMail(Notifica):
 
         for i, diario in enumerate(m_html):
             if (i < n_screenshot):
-                dati_bytesio, filename = ScreenShot().diario2image(diario)
+                dati_bytesio, filename = ScreenShot(self.DIR).diario2image(diario)
                 msg.add_attachment(
                     dati_bytesio.getvalue(),
                     maintype='image',
@@ -134,7 +132,7 @@ class NotificaMail(Notifica):
                     filename=filename+".png"
                 )
             elif (i == len(m_html)-1 and n_screenshot != 0):
-                dati_bytesio, filename = ScreenShot().diario2image(diario)
+                dati_bytesio, filename = ScreenShot(self.DIR).diario2image(diario)
                 msg.add_attachment(
                     dati_bytesio.getvalue(),
                     maintype='image',
@@ -158,7 +156,7 @@ class NotificaMail(Notifica):
                     server.login(username, password)
                     server.send_message(msg)
 
-            print("Email inviata con successo!\n---")
+            print("Email inviata con successo!\n---", file=sys.stdout)
         except Exception as e:
             print(f"Si è verificato un errore durante l'invio: {e}", file=sys.stderr)
 
@@ -179,7 +177,7 @@ class NotificaTelegram(Notifica):
             if (isinstance(self.config['telegram']['n_allegati'], int)):
                 n_screenshot = self.config['telegram']['n_allegati']
             else:
-                print("Warning: n_allegati non è un intero, [default: 0]")
+                print("Warning: n_allegati non è un intero, [default: 0]", file=sys.stdout)
         m_html = re.findall(r"<h2.*?</ul>\n\n", html, re.DOTALL)
 
         # 2. Trasfomazione HTML in messaggio Telegram
@@ -214,11 +212,11 @@ class NotificaTelegram(Notifica):
             "disable_notification": True
         }
 
-        print(requests.get(link, params=parametri).json())
+        print(requests.get(link, params=parametri).json(), file=sys.stdout)
 
         for i, diario in enumerate(m_html):
             if (i < n_screenshot):
-                dati_bytesio, filename = ScreenShot().diario2image(diario)
+                dati_bytesio, filename = ScreenShot(self.DIR).diario2image(diario)
                 YY, MM, DD = filename.split("-")
                 payload = {
                     'chat_id': str(CHAT_ID),
@@ -227,9 +225,9 @@ class NotificaTelegram(Notifica):
                 files = {
                     'photo': (filename, dati_bytesio.getvalue(), 'image/png')
                 }
-                print(requests.post(link_screenshot, data=payload, files=files).json())
+                print(requests.post(link_screenshot, data=payload, files=files).json(), file=sys.stdout)
             elif (i == len(m_html)-1 and n_screenshot != 0):
-                dati_bytesio, filename = ScreenShot().diario2image(diario)
+                dati_bytesio, filename = ScreenShot(self.DIR).diario2image(diario)
                 payload = {
                     'chat_id': str(CHAT_ID),
                     'caption': f'Pagina diario {filename}'
@@ -237,9 +235,9 @@ class NotificaTelegram(Notifica):
                 files = {
                     'photo': (filename, dati_bytesio.getvalue(), 'image/png')
                 }
-                print(requests.post(link_screenshot, data=payload, files=files).json())
+                print(requests.post(link_screenshot, data=payload, files=files).json(), file=sys.stdout)
 
-        print("---")
+        print("---", file=sys.stdout)
 
 class NotificaScreenShot(Notifica):
     """
@@ -258,6 +256,6 @@ class NotificaScreenShot(Notifica):
         m_html = re.findall(r"<h2.*?</ul>\n\n", html, re.DOTALL)
 
         for _, html in enumerate(m_html):
-            dati_bytesio, filename = ScreenShot().diario2image(html)
+            dati_bytesio, filename = ScreenShot(self.DIR).diario2image(html)
             with open(os.path.join(path_screenshot,filename+".png"), "wb") as f:
                 f.write(dati_bytesio.getvalue())
