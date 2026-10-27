@@ -64,16 +64,20 @@ class ScreenShot():
         html = re.sub(r'<li.*?>(.*?)</li>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
         html = re.sub(r'<div.*?>(.*?)</div>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
         html = re.sub(r'<p.*?>(.*?)</p>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
-        html = re.sub("<li.*?class='compiti'.*?>(.*?)</li>\n*",r"📖 \g<1>\n",html)
-        html = re.sub("<li.*?class='verifica'.*?>(.*?)</li>\n*",r"💥 \g<1>\n",html)
+        html = re.sub("<li.*?class='compiti'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*",r"\g<2>📖 \g<3>\n",html)
+        html = re.sub("<li.*?class='verifica'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*",r"\g<2>💥 \g<3>\n",html)
         html = re.sub("<li.*?class='file'.*?>(.*?)</li>\n*",r"🔗 \g<1>\n",html)
         html = re.sub("<div>(.*?)</div>\n*",r"\n\g<1>\n\n",html)
-        html = re.sub("<.{0,1}ul>", "\n", html)
+        html = re.sub("<.{0,1}ul.*?>", "\n", html)
         html = re.sub("<p.*?>(.*?)</p>",r"\n\g<1>",html)
         html = re.sub("<b.*?>(.*?)</b>",r"\g<1>",html)
         html = re.sub("<i.*?>(.*?)</i>",r"\g<1>",html)
         html = re.sub("<br>", "", html)
         html = re.sub("\n{2,}", "\n", html, flags=re.DOTALL)
+
+        orange = "orange"
+        green = "green"
+        black = "black"
 
         try:
             path_font = os.path.join(self.DIR, "assets", "fonts", "OpenSansEmoji.ttf")
@@ -93,9 +97,20 @@ class ScreenShot():
         y_app = 50
         filename = "testo_formattato"
         for l0 in lines:
+            color = black
             width_wrap = 82
             align_text = "left"
             space_lines = 10
+
+            if (l0.startswith("green")):
+                l0 = re.sub("^green","", l0)
+                color = green
+            elif (l0.startswith("orange")):
+                l0 = re.sub("^orange","", l0)
+                color = orange
+            else:
+                color = black
+
             if(re.search(r"<h2.*?>(.*?)</h2>", l0) is not None):
                 m = re.search(r"<h2.*?>(.*?)</h2>", l0)
                 font = font_h2
@@ -146,7 +161,7 @@ class ScreenShot():
                 (x, y),
                 textwrap.fill(html_unescape(l0), width=width_wrap, subsequent_indent='        '),
                 font=font,
-                fill=(0, 0, 0),
+                fill=color,
                 align=align_text,
                 spacing=space_lines,
                 stroke_width=sw,
