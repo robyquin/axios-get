@@ -350,7 +350,17 @@ class LibAxiosFamiglia():
 
         return "\n".join(linee_notifica)
 
-    def evidenzia_cambiamenti(self, linee_file_old, linee_file_new) -> list:
+    def evidenzia_cambiamenti(self, linee_file_old: list, linee_file_new: list) -> list:
+        """
+        Mette in evidenza i cambiamenti: inserimenti e modifiche
+
+        :param linee_file_old: contenuto dell'ultima notifica
+        :type linee_file_old: list
+        :param linee_file_new: contenuto dell'attuale notifica
+        :type linee_file_new: list
+        :return: contenuto con evidenziazione dei cambiamenti
+        :rtype: list
+        """
         output = []
 
         start_new = 0
