@@ -64,8 +64,8 @@ class ScreenShot():
         html = re.sub(r'<li.*?>(.*?)</li>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
         html = re.sub(r'<div.*?>(.*?)</div>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
         html = re.sub(r'<p.*?>(.*?)</p>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
-        html = re.sub("<li.*?class='compiti'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*",r"\g<2>📖 \g<3>\n",html)
-        html = re.sub("<li.*?class='verifica'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*",r"\g<2>💥 \g<3>\n",html)
+        html = re.sub("<li.*?class='compiti'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*",r"{\g<2>}📖 \g<3>\n",html)
+        html = re.sub("<li.*?class='verifica'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*",r"{\g<2>}💥 \g<3>\n",html)
         html = re.sub("<li.*?class='file'.*?>(.*?)</li>\n*",r"🔗 \g<1>\n",html)
         html = re.sub("<div>(.*?)</div>\n*",r"\n\g<1>\n\n",html)
         html = re.sub("<.{0,1}ul.*?>", "\n", html)
@@ -102,13 +102,14 @@ class ScreenShot():
             align_text = "left"
             space_lines = 10
 
-            if (l0.startswith("green")):
-                l0 = re.sub("^green","", l0)
+            if (l0.startswith("{green}")):
+                l0 = re.sub("^{green}","", l0)
                 color = green
-            elif (l0.startswith("orange")):
-                l0 = re.sub("^orange","", l0)
+            elif (l0.startswith("{orange}")):
+                l0 = re.sub("^{orange}","", l0)
                 color = orange
             else:
+                l0 = re.sub("^{}","", l0)
                 color = black
 
             if(re.search(r"<h2.*?>(.*?)</h2>", l0) is not None):
