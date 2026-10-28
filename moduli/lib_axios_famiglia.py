@@ -15,6 +15,7 @@ import re
 import json
 from enum import IntEnum
 import hashlib
+import difflib
 
 import requests
 
@@ -107,7 +108,7 @@ class LibAxiosFamiglia():
         self.__get_session(Alunno, link_registrofamiglie, "registrofamiglie_")
         # Notifica qui
         if (self.sha1_REGISTRO != self.sha1_REGISTRO_old or self.sha1_MD != self.sha1_MD_old and self.COMPITI != {}):
-            self.notifica.send_notifica(self.elaborazione_json(self.COMPITI, Alunno), Alunno)
+            self.notifica.send_notifica(self.prepara_notifica(self.COMPITI, Alunno), Alunno)
             print("Registro", self.sha1_REGISTRO, self.sha1_REGISTRO_old, file=sys.stdout)
             print("Materiale-Dit", self.sha1_MD, self.sha1_MD_old, file=sys.stdout)
             print("---", file=sys.stdout)
@@ -256,7 +257,7 @@ class LibAxiosFamiglia():
         print(res.request.headers, file=sys.stdout)
         print("---", file=sys.stdout)
 
-    def elaborazione_json(self, compiti: dict, Alunno: str) -> str:
+    def prepara_notifica(self, compiti: dict, Alunno: str) -> str:
         """
         Costruisce il testo della notifica dal dizionario compiti
 
@@ -268,7 +269,12 @@ class LibAxiosFamiglia():
         :rtype: str
         """
         new_compiti = []
+        old_compiti = []
         oggi_long = datetime.strftime(datetime.now(), "%d/%m/%Y %H:%M:%S")
+
+        if(os.path.exists(os.path.join(self.DIR, f'registrofamiglie_{Alunno}', 'notifica.html'))):
+            with open(os.path.join(self.DIR, f'registrofamiglie_{Alunno}', 'notifica.html'), 'r', encoding='utf-8') as f_notify:
+                old_compiti = f_notify.read().replace('\r','').split("\n")
 
         # FILTRO PER DATA
         for c in compiti["data"]:
@@ -280,6 +286,9 @@ class LibAxiosFamiglia():
         giorno_app = ""
         materia = ""
         testo_list = []
+
+        linee_notifica.append("<!-- BEGIN COMPITI -->")
+
         for c in range(len(new_compiti)-1, -1, -1):
             giorno = new_compiti[c]["giorno"]
             DayOfWeek = datetime.strptime(giorno, "%d/%m/%Y").strftime("%a")
@@ -311,9 +320,13 @@ class LibAxiosFamiglia():
             linee_notifica.append(f"<ul>\n{"\n".join(testo_list)}\n</ul>")
             testo_list = []
 
+        linee_notifica.append("<!-- END COMPITI -->")
+
         if (len(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES) > 0):
+            linee_notifica.append("<!-- BEGIN MATERIALE DIDATTICO -->")
             linee_notifica.append("\n<hr>\n")
             linee_notifica.extend(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES)
+            linee_notifica.append("<!-- END MATERIALE DIDATTICO -->")
 
         modifiche = []
         if (self.sha1_REGISTRO != self.sha1_REGISTRO_old):
@@ -326,4 +339,70 @@ class LibAxiosFamiglia():
         linee_notifica.append("</body>")
         linee_notifica.append("</html>")
 
+        str_notifica = "\n".join(linee_notifica).replace('\r','')
+        linee_notifica = str_notifica.split("\n")
+
+        with open(os.path.join(self.DIR, f'registrofamiglie_{Alunno}', 'notifica.html'), 'w', encoding='utf-8') as f_notify:
+            f_notify.write("\n".join(linee_notifica))
+
+        if (len(old_compiti) > 0 ):
+            linee_notifica = self.evidenzia_cambiamenti(old_compiti, linee_notifica)
+
         return "\n".join(linee_notifica)
+
+    def evidenzia_cambiamenti(self, linee_file_old: list, linee_file_new: list) -> list:
+        """
+        Mette in evidenza i cambiamenti: inserimenti e modifiche
+
+        :param linee_file_old: contenuto dell'ultima notifica
+        :type linee_file_old: list
+        :param linee_file_new: contenuto dell'attuale notifica
+        :type linee_file_new: list
+        :return: contenuto con evidenziazione dei cambiamenti
+        :rtype: list
+        """
+        output = []
+
+        start_new = 0
+        end_new = len(linee_file_new)-1
+
+        start_old = 0
+        end_old = len(linee_file_old)-1
+
+        for l, line in enumerate(linee_file_new):
+            if("<!-- BEGIN COMPITI -->" in line):
+                start_new = l+1
+            if("<!-- END COMPITI -->" in line):
+                end_new = l
+
+        for l, line in enumerate(linee_file_old):
+            if("<!-- BEGIN COMPITI -->" in line):
+                start_old = l+1
+            if("<!-- END COMPITI -->" in line):
+                end_old = l
+
+        corpo_compiti_new = linee_file_new[start_new:end_new]
+        corpo_compiti_old = linee_file_old[start_old:end_old]
+
+        matcher = difflib.SequenceMatcher(None, corpo_compiti_old, corpo_compiti_new)
+
+        for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+            if (tag=='equal'):
+                for riga in corpo_compiti_new[j1:j2]:
+                    output.append(riga)
+            else:
+                if (tag=='insert'):
+                    for riga in corpo_compiti_new[j1:j2]:
+                        riga = re.sub(r'<((?!\/)[^>]+(?<!\/))>','<\\1 style=\'color:green\'>', riga)
+                        output.append(riga)
+                elif (tag=='replace'):
+                    for riga in corpo_compiti_new[j1:j2]:
+                        riga = re.sub(r'<((?!\/)[^>]+(?<!\/))>','<\\1 style=\'color:orange\'>', riga)
+                        output.append(riga)
+                # elif (tag=='delete'):
+                #     output.append("<div style='color:red'>---</div>")
+        if (start_new > 0):
+            output[0:0] = linee_file_new[0:start_new]
+        if (end_new < len(linee_file_new)-1):
+            output.extend(linee_file_new[end_new:len(linee_file_new)-1])
+        return output

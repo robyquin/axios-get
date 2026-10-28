@@ -205,6 +205,19 @@ Il seguente file di configurazione imposta 5 attivazioni giornaliere di *AxiosGe
 </Task>
 ```
 
+## Convezione sulla rappresentazione di cambiamenti nelle notifiche
+
+Per release più recenti (`>= v1.0.7`) le notifiche supportano l'**evidenziazione delle modifiche** apportate al diario già notificato.
+
+Per lo scopo, si adottano due tipi di convenzione dipendente dal fatto che la notifica scelta permetta l'uso di colori o di solo testo enfatizzato.
+
+- Per i colori si useranno:
+  - `green` per i nuovi **inserimenti**,
+  - `orange` per i **cambiamenti** su compiti già notificati.
+- Per il testo enfatizzato si userà:
+  - `italic` per i nuovi **inserimenti**,
+  - `italic+bold` per i **cambiamenti** su compiti già notificati.
+
 ## Licenza
 
 Questo progetto è concesso in licenza nei termini della licenza **MIT** (vedi il file `LICENSE` per i dettagli).
