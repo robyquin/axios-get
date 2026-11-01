@@ -320,13 +320,13 @@ class LibAxiosFamiglia():
             linee_notifica.append(f"<ul>\n{"\n".join(testo_list)}\n</ul>")
             testo_list = []
 
-        linee_notifica.append("<!-- END COMPITI -->")
+        linee_notifica.append("\n\n<!-- END COMPITI -->")
 
         if (len(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES) > 0):
             linee_notifica.append("<!-- BEGIN MATERIALE DIDATTICO -->")
             linee_notifica.append("\n<hr>\n")
             linee_notifica.extend(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES)
-            linee_notifica.append("<!-- END MATERIALE DIDATTICO -->")
+            linee_notifica.append("\n\n<!-- END MATERIALE DIDATTICO -->")
 
         modifiche = []
         if (self.sha1_REGISTRO != self.sha1_REGISTRO_old):
