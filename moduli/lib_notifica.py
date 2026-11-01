@@ -120,7 +120,7 @@ class NotificaMail(Notifica):
         context = ssl.create_default_context()
         context.set_ciphers('HIGH:!DH:!aNULL@SECLEVEL=1')
 
-        m_html = re.findall(r"<h2.*?</ul>\n\n", html, re.DOTALL)
+        m_html = re.findall(r"<!-- BEGIN SCREENSHOT -->(.*?)<!-- END SCREENSHOT -->", html, re.DOTALL)
 
         for i, diario in enumerate(m_html):
             if (i < n_screenshot):
@@ -178,7 +178,7 @@ class NotificaTelegram(Notifica):
                 n_screenshot = self.config['telegram']['n_allegati']
             else:
                 print("Warning: n_allegati non è un intero, [default: 0]", file=sys.stdout)
-        m_html = re.findall(r"<h2.*?</ul>\n\n", html, re.DOTALL)
+        m_html = re.findall(r"<!-- BEGIN SCREENSHOT -->(.*?)<!-- END SCREENSHOT -->", html, re.DOTALL)
 
         # 2. Trasfomazione HTML in messaggio Telegram
         html = re.sub("<head>(.*?)</head>","",html)
@@ -258,7 +258,7 @@ class NotificaScreenShot(Notifica):
             os.makedirs(os.path.join(path_screenshot,f"screenshot_{alunno}"))
         path_screenshot = os.path.join(path_screenshot,f"screenshot_{alunno}")
 
-        m_html = re.findall(r"<h2.*?</ul>\n\n", html, re.DOTALL)
+        m_html = re.findall(r"<!-- BEGIN SCREENSHOT -->(.*?)<!-- END SCREENSHOT -->", html, re.DOTALL)
 
         for _, html in enumerate(m_html):
             dati_bytesio, filename = ScreenShot(self.DIR).diario2image(html)

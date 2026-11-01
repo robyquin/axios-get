@@ -293,14 +293,17 @@ class LibAxiosFamiglia():
             giorno = new_compiti[c]["giorno"]
             DayOfWeek = datetime.strptime(giorno, "%d/%m/%Y").strftime("%a")
             if(c == (len(new_compiti)-1)):
-                linee_notifica.append(f"\n<h2 class='diario'>📰 {DOW_Tr[DayOfWeek]}, {giorno}</h2>")
+                linee_notifica.append("<!-- BEGIN SCREENSHOT -->")
+                linee_notifica.append(f"<h2 class='diario'>📰 {DOW_Tr[DayOfWeek]}, {giorno}</h2>")
             else:
                 if(giorno != giorno_app):
                     materia = ""
                     if (len(testo_list)>0):
                         linee_notifica.append(f"<ul>\n{"\n".join(testo_list)}\n</ul>")
+                        linee_notifica.append("<!-- END SCREENSHOT -->")
                         testo_list = []
-                    linee_notifica.append(f"\n<h2 class='diario'>📰 {DOW_Tr[DayOfWeek]}, {giorno}</h2>")
+                    linee_notifica.append("<!-- BEGIN SCREENSHOT -->")
+                    linee_notifica.append(f"<h2 class='diario'>📰 {DOW_Tr[DayOfWeek]}, {giorno}</h2>")
             giorno_app = giorno
 
             if (materia != new_compiti[c]["materia"]):
@@ -318,15 +321,18 @@ class LibAxiosFamiglia():
 
         if (len(testo_list)>0):
             linee_notifica.append(f"<ul>\n{"\n".join(testo_list)}\n</ul>")
+            linee_notifica.append("<!-- END SCREENSHOT -->")
             testo_list = []
 
-        linee_notifica.append("\n\n<!-- END COMPITI -->")
+        linee_notifica.append("<!-- END COMPITI -->")
 
         if (len(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES) > 0):
             linee_notifica.append("<!-- BEGIN MATERIALE DIDATTICO -->")
-            linee_notifica.append("\n<hr>\n")
+            linee_notifica.append("<hr>")
+            linee_notifica.append("<!-- BEGIN SCREENSHOT -->")
             linee_notifica.extend(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES)
-            linee_notifica.append("\n\n<!-- END MATERIALE DIDATTICO -->")
+            linee_notifica.append("<!-- END SCREENSHOT -->")
+            linee_notifica.append("<!-- END MATERIALE DIDATTICO -->")
 
         modifiche = []
         if (self.sha1_REGISTRO != self.sha1_REGISTRO_old):
@@ -334,7 +340,7 @@ class LibAxiosFamiglia():
         if (self.sha1_MD != self.sha1_MD_old):
             modifiche.append("<i>Materiale Didattico</i>")
 
-        linee_notifica.append(f"\n<hr>\n<p style=\"font-size: 11px\">Aggiornamento del {oggi_long} con modifiche su {" e su ".join(modifiche)}</p>")
+        linee_notifica.append(f"<hr>\n<p style=\"font-size: 11px\">Aggiornamento del {oggi_long} con modifiche su {" e su ".join(modifiche)}</p>")
         linee_notifica.append("<hr><p style=\"font-size: 11px; text-align: center\">⚡ Generato automaticamente da <a href='https://github.com/robyquin/axios-get'>Axios-Get</a> - Open Source (MIT)</p>")
         linee_notifica.append("</body>")
         linee_notifica.append("</html>")
