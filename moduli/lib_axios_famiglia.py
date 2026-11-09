@@ -399,11 +399,11 @@ class LibAxiosFamiglia():
             else:
                 if (tag=='insert'):
                     for riga in corpo_compiti_new[j1:j2]:
-                        riga = re.sub(r'<((?!\/)[^>]+(?<!\/))>','<\\1 style=\'color:green\'>', riga)
+                        riga = re.sub(r'<((?![\/!])[^>]+(?<!\/))>','<\\1 style=\'color:green\'>', riga)
                         output.append(riga)
                 elif (tag=='replace'):
                     for riga in corpo_compiti_new[j1:j2]:
-                        riga = re.sub(r'<((?!\/)[^>]+(?<!\/))>','<\\1 style=\'color:orange\'>', riga)
+                        riga = re.sub(r'<((?![\/!])[^>]+(?<!\/))>','<\\1 style=\'color:orange\'>', riga)
                         output.append(riga)
                 # elif (tag=='delete'):
                 #     output.append("<div style='color:red'>---</div>")
