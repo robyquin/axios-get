@@ -6,6 +6,9 @@ Notifica ai tuoi figli/e i compiti loro assegnati sul registro elettronico.
 
 ![Axios-Get](./icon/Axios-Get.svg)
 
+> [!IMPORTANT]
+> Questo progetto non è affiliato né supportato da *Axios Italia* e non si basa su API ufficiali. Qualora il portale subisse modifiche, lo strumento potrebbe smettere di funzionare fino al rilascio di un nuovo aggiornamento. Usalo a tuo rischio.
+
 ## Requirements
 
 - Python 3.13 or later
