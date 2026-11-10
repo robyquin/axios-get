@@ -14,6 +14,11 @@ Se `credenziali.yml` non esiste, al primo avvio di `AxiosGetCompiti` viene creat
 
 Per funzionare, `credenziali_default.yml` deve essere rinominato in `credenziali.yml` e editato, modificando opportunamente i valori delle impostazioni presenti.
 
+> [!IMPORTANT]
+> Con la versione `v1.1.0` il file di configurazione è stato migliorato e riorganizzato per estendere l'utilizzo a tutti i genitori/tutori con più studenti appartenenti anche a istituti differenti (con più credenziali). Anche se il progetto implementa la migrazione della configurazione da una versione precedente, la correttezza dei dati necessita di essere verificata prima dell'effettivo utilizzo del file.
+>
+> Per questo motivo con la migrazione verrà generato un file aggiornato con il nome `credenziali_{versione}.yml`. Dopo la verifica/controllo dell'esattezza dei dati, il file dovrà essere rinominato in `credenziali.yml` sostituendo il precedente.
+
 ## Convenzioni del documento
 
 Si indicherà con **RF**: *Axios Registro Elettronico FAMIGLIA*
@@ -33,84 +38,95 @@ Sezione1:
 
 ## Configurazione minima richiesta
 
-La configurazione minima richiesta per il corretto funzionamento riguarda la compilazione di tre blocchi:
+Per indicazioni per configurazione `<= v1.0.8` visiona il file [Configurazione v1.0.8](https://github.com/robyquin/axios-get/blob/v1.0.8/docs/Configurazione.md)
 
-- Axios,
-- Selezione del tipo di notifica,
-- Configurazione di notifica.
+La configurazione minima richiesta per il corretto funzionamento riguarda la compilazione di due blocchi:
 
-## Axios
+- version
+- credenziali,
+- params_notifiche.
 
-| Path                           | Tipo dato      | Valore                    | Descrizione                                                      |
-| ------------------------------ | -------------- | ------------------------- | ---------------------------------------------------------------- |
-| `axios`                        | gruppo         |                           | Gruppo principale della configurazione del sistema               |
-| `axios.credenziali`            | gruppo         |                           | Gruppo di definizione delle credenziali di accesso ad **RF**.    |
-| `axios.credenziali.customerid` | testo          | Richiesto                 | CF Istituto/Cliente                                              |
-| `axios.credenziali.username`   | testo          | Richiesto                 | Codice Utente o mail personale                                   |
-| `axios.credenziali.password`   | testo          | Richiesto                 | Password                                                         |
-| `axios.alunni`                 | lista          |                           | Lista degli studenti/studentesse (prelevati da **RF**)           |
-| `axios.alunni.[0]`             | elemento lista | Il primo Nome in **RF**   | Nome dello studente/studentessa soggetto a notifica              |
-| `axios.alunni.[1]`             | elemento lista | Nomi successivi in **RF** | Nomi degli studenti/studentesse soggetto a notifica, se presenti |
+## Version
 
-## Selezione del tipo di notifica
+Indica la versione del file di configurazione.
 
-| Path            | Tipo dato | Valore                          | Descrizione                                              |
-| --------------- | --------- | ------------------------------- | -------------------------------------------------------- |
-| `tipo_notifica` | testo     | **Nome** del gruppo di notifica | Definisce quale notifica adottare tra quelle configurate |
+| Path      | Tipo dato | Valore | Descrizione |
+| --------- | --------- | ------ | ----------- |
+| `version` | testo     |        | Versione.   |
 
-**NOTA**: i nomi dei gruppo di notifica vengono indicati nelle sezioni successive
+## Credenziali
 
-## Configurazione di notifica
+| Path                                          | Tipo dato      | Valore                                                    | Descrizione                                                      |
+| --------------------------------------------- | -------------- | --------------------------------------------------------- | ---------------------------------------------------------------- |
+| `credenziali`                                 | lista          |                                                           | Lista di definizione delle credenziali di accesso ad **RF**.     |
+| `credenziali.[0].customerid`                  | testo          | Richiesto                                                 | CF Istituto/Cliente                                              |
+| `credenziali.[0].username`                    | testo          | Richiesto                                                 | Codice Utente o mail personale                                   |
+| `credenziali.[0].password`                    | testo          | Richiesto                                                 | Password                                                         |
+| `credenziali.[0].alunni`                      | lista          |                                                           | Lista degli studenti/studentesse (prelevati da **RF**)           |
+| `credenziali.[0].alunni.[0].NomeAlunno`       | elemento lista | Il primo Nome in **RF**                                   | Nome dello studente/studentessa soggetto a notifica              |
+| `credenziali.[0].alunni.[0].NomeAlunno.tipo`  | elemento lista | **Nome** del gruppo di notifica                           | Definisce quale notifica adottare tra quelle configurate         |
+| `credenziali.[0].alunni.[0].NomeAlunno.param` | elemento lista | **Parametro caratteristico** per la tipologia di notifica | Percorso, email studente, o CHAT_ID                              |
+| `credenziali.[0].alunni.[1]`                  | elemento lista | Nomi successivi in **RF**                                 | Nomi degli studenti/studentesse soggetto a notifica, se presenti |
+
+**NOTA**: sia i nomi dei gruppo di notifica, che le indicazioni dei parametri caratteristici vengono indicati nelle sezioni successive
+
+## Configurazione di notifica (`params_notifiche`)
 
 Scegli la tipologia di notifica che preferisci tra quelle descritte di seguito e inseriscila nel file `credenziali.yml`.
 
-### Notifica File
+### Notifica `html`
 
 **Obiettivo del tipo di notifica**: salvare in locale la lista dei compiti del registro in un file HTML.
 
-| Path             | Tipo dato | Valore | Descrizione                                                 |
-| ---------------- | --------- | ------ | ----------------------------------------------------------- |
-| `file_html`      | gruppo    |        | Definizione **nome** del gruppo di notifica                 |
-| `file_html.path` | testo     | .      | Percorso relativo o assoluto della cartella di destinazione |
+| Path                         | Tipo dato | Valore | Descrizione                                                                                                                   |
+| ---------------------------- | --------- | ------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| `params_notifiche.html`      | gruppo    |        | Definizione **nome** del gruppo di notifica                                                                                   |
+| `params_notifiche.html.path` | testo     | .      | Percorso relativo o assoluto della cartella di destinazione (valore di default se non dovesse esistere quello dello studente) |
 
-### Notifica Screenshot
+- **Parametro caratteristico** di questa notifica è il percorso relativo o assoluto della cartella di destinazione
+
+### Notifica `screenshot`
 
 **Obiettivo del tipo di notifica**: salvare in locale la lista dei compiti del registro in immagini organizzate per giorno.
 
-| Path              | Tipo dato | Valore | Descrizione                                                 |
-| ----------------- | --------- | ------ | ----------------------------------------------------------- |
-| `screenshot`      | gruppo    |        | Definizione **nome** del gruppo di notifica                 |
-| `screenshot.path` | testo     | .      | Percorso relativo o assoluto della cartella di destinazione |
+| Path                               | Tipo dato | Valore | Descrizione                                                                                                                   |
+| ---------------------------------- | --------- | ------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| `params_notifiche.screenshot`      | gruppo    |        | Definizione **nome** del gruppo di notifica                                                                                   |
+| `params_notifiche.screenshot.path` | testo     | .      | Percorso relativo o assoluto della cartella di destinazione (valore di default se non dovesse esistere quello dello studente) |
 
-### Notifica Email
+- **Parametro caratteristico** di questa notifica è il percorso relativo o assoluto della cartella di destinazione
+
+### Notifica `smtp`
 
 **Obiettivo del tipo di notifica**: inviare in una email la lista dei compiti del registro, e se richiesto, allegare screenshot delle pagine diario.
 
-| Path                   | Tipo dato      | Valore | Descrizione                                                        |
-| ---------------------- | -------------- | ------ | ------------------------------------------------------------------ |
-| `smtp`                 | gruppo         |        | Definizione **nome** del gruppo di notifica                        |
-| `smtp.smtp_server`     | testo          |        | indirizzo server SMTP                                              |
-| `smtp.smtp_port`       | intero         | 465    | porta SMTP                                                         |
-| `smtp.smtp_username`   | testo          |        | username per il login SMTP                                         |
-| `smtp.smtp_password`   | testo          |        | password per il login SMTP                                         |
-| `smtp.destinatari`     | lista          |        | Lista di email dei destinatari della notifica                      |
-| `smtp.destinatari.[0]` | elemento lista | email  | Email di un genitore                                               |
-| `smtp.destinatari.[1]` | elemento lista | email  | Email dello studente/studentessa                                   |
-| `smtp.destinatari.[2]` | elemento lista | email  | Altra email di un'altro studente/studentessa, se esiste            |
-| `smtp.n_allegati`      | intero         | $>=0$  | Numero desiderati di allegati per invio (screenshot pagina diario) |
+| Path                                    | Tipo dato      | Valore | Descrizione                                                        |
+| --------------------------------------- | -------------- | ------ | ------------------------------------------------------------------ |
+| `params_notifiche.smtp`                 | gruppo         |        | Definizione **nome** del gruppo di notifica                        |
+| `params_notifiche.smtp.smtp_server`     | testo          |        | indirizzo server SMTP                                              |
+| `params_notifiche.smtp.smtp_port`       | intero         | 465    | porta SMTP                                                         |
+| `params_notifiche.smtp.smtp_username`   | testo          |        | username per il login SMTP                                         |
+| `params_notifiche.smtp.smtp_password`   | testo          |        | password per il login SMTP                                         |
+| `params_notifiche.smtp.destinatari`     | lista          |        | Lista di email dei destinatari della notifica                      |
+| `params_notifiche.smtp.destinatari.[0]` | elemento lista | email  | Email di un genitore/tutore                                        |
+| `params_notifiche.smtp.destinatari.[1]` | elemento lista | email  | Eventuale altra email di genitore/tutore                           |
+| `params_notifiche.smtp.n_allegati`      | intero         | $>=0$  | Numero desiderati di allegati per invio (screenshot pagina diario) |
 
 Consulta il documento [SMTP server](./SMTP_server.md) per verificare i parametri dei provider supportati.
 
-### Notifica Telegram
+- **Parametro caratteristico** di questa notifica è `EMAIL_STUDENTE`
+
+### Notifica `telegram`
 
 **Obiettivo del tipo di notifica**: inviare messaggio in chat con la lista dei compiti del registro, e se richiesto, allegare screenshot delle pagine diario.
 
-| Path                  | Tipo dato | Valore | Descrizione                                                        |
-| --------------------- | --------- | ------ | ------------------------------------------------------------------ |
-| `telegram`            | gruppo    |        | Definizione **nome** del gruppo di notifica                        |
-| `telegram.BOT_TOKEN`  | testo     |        | TOKEN del bot gestore della notifica                               |
-| `telegram.CHAT_ID`    | intero    |        | Numero identificativo della chat                                   |
-| `telegram.n_allegati` | intero    |        | Numero desiderati di allegati per invio (screenshot pagina diario) |
+| Path                                   | Tipo dato | Valore | Descrizione                                                        |
+| -------------------------------------- | --------- | ------ | ------------------------------------------------------------------ |
+| `params_notifiche.telegram`            | gruppo    |        | Definizione **nome** del gruppo di notifica                        |
+| `params_notifiche.telegram.BOT_TOKEN`  | testo     |        | TOKEN del bot gestore della notifica                               |
+| `params_notifiche.telegram.n_allegati` | intero    |        | Numero desiderati di allegati per invio (screenshot pagina diario) |
+
+- **Parametro caratteristico** di questa notifica è `CHAT_ID`: Numero identificativo della chat.
 
 Consulta il documento [Telegram_token_bot](./Telegram_token_bot.md) per ottenere il `BOT_TOKEN` e il `CHAT_ID`.
 
@@ -120,29 +136,38 @@ Configurazione di default da compilare:
 
 ```yaml
 axios:
-    credenziali: 
-        customerid: STRING_REDACTED
-        username: STRING_REDACTED
-        password: STRING_REDACTED
-    alunni:
-        - Nome_Alunno_1
-        - Nome_Alunno_2
-tipo_notifica: file_html
-file_html:
+version: 1.1.0
+credenziali:
+- customerid: customerid
+  username: username
+  password: password
+  alunni:
+    NOME_ALUNNO_A:
+      tipo: smtp
+      param: EMAIL_STUDENTE
+    NOME_ALUNNO_B:
+      tipo: html
+      param: ./pathfile
+    NOME_ALUNNO_C:
+      tipo: screenshot
+      param: ./pathfile
+    NOME_ALUNNO_D:
+      tipo: telegram
+      param: CHAT_ID
+params_notifiche:
+  html:
     path: ./pathfile
-smtp:
-    smtp_server: STRING_REDACTED
+  smtp:
+    smtp_server: smtp.example.it
     smtp_port: 465
-    smtp_username: STRING_REDACTED
-    smtp_password: STRING_REDACTED
+    smtp_username: Username
+    smtp_password: PaSsWoRd
     destinatari:
-        - @EMAIL_REDACTED1
-        - @EMAIL_REDACTED2
+    - tutore@example.it
     n_allegati: 0
-telegram:
-    BOT_TOKEN: "TOKEN"
-    CHAT_ID: "ID"
+  telegram:
+    BOT_TOKEN: TOKEN
     n_allegati: 0
-screenshot:
+  screenshot:
     path: ./pathfile
 ```
