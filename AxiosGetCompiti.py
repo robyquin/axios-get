@@ -30,17 +30,31 @@ def file_config_default(DIR: str) -> None:
     """
     config_default = {
         'version': __version__,
-        'credenziali': {
-            'customerid': 'customerid',
-            'username': 'username',
-            'password': 'password',
-            'alunni': {
-                'NOME_ALUNNO_A' : {
-                    'tipo': 'html',
-                    'param': '.'
+        'credenziali': [
+                {
+                'customerid': 'customerid',
+                'username': 'username',
+                'password': 'password',
+                'alunni': {
+                    'NOME_ALUNNO_A' : {
+                        'tipo': 'smtp',
+                        'param': 'EMAIL_STUDENTE'
+                    },
+                    'NOME_ALUNNO_B' : {
+                        'tipo': 'html',
+                        'param': '.'
+                    },
+                    'NOME_ALUNNO_C' : {
+                        'tipo': 'screenshot',
+                        'param': '.'
+                    },
+                    'NOME_ALUNNO_D' : {
+                        'tipo': 'telegram',
+                        'param': 'CHAT_ID'
+                    }
                 }
             }
-        },
+        ],
         'params_notifiche':{
             'html': {
                 'path': '.'
@@ -98,7 +112,49 @@ if __name__ == "__main__":
         with open(os.path.join(DIR, "credenziali.yml"), "r", encoding="utf-8") as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
 
-        LibAxiosFamiglia(DIR, config)
+        if (config.get("version", None) == None):
+            # La configurazione esiste ma ad una versione <= v1.0.8, è da aggiornare direttamente all'ultima
+            new_config = {}
+            new_config['version'] = __version__
+            new_config['credenziali'] = [config['axios']['credenziali']]
+            new_config['credenziali'][0]['alunni'] = []
+            for alunno in config['axios']['alunni']:
+                a = {}
+                a[alunno] = { }
+                tipo_notifica = config.get("tipo_notifica", 'html')
+                if (tipo_notifica == 'file_html' or tipo_notifica == 'html'):
+                    a[alunno]['tipo'] = 'html'
+                    a[alunno]['param'] = config.get("file_html", {}).get("path", ".")
+                elif (tipo_notifica == 'screenshot'):
+                    a[alunno]['tipo'] = tipo_notifica
+                    a[alunno]['param'] = config.get(tipo_notifica, {}).get("path", ".")
+                elif (tipo_notifica == 'smtp'):
+                    a[alunno]['tipo'] = tipo_notifica
+                    a[alunno]['param'] = "EMAIL_STUDENTE"
+                elif (tipo_notifica == 'telegram'):
+                    a[alunno]['tipo'] = tipo_notifica
+                    a[alunno]['param'] = config.get(tipo_notifica, {}).get("CHAT_ID", None)
+                new_config['credenziali'][0]['alunni'].append(a)
+            new_config['params_notifiche'] = {}
+            for tipo_notifica in ['file_html', 'smtp', 'telegram', 'screenshot']:
+                if (config.get(tipo_notifica, None) != None):
+                    if (tipo_notifica == 'file_html'):
+                        new_config['params_notifiche']['html'] = config.get(tipo_notifica)
+                    elif (tipo_notifica == 'telegram'):
+                        config.get(tipo_notifica).pop('CHAT_ID', None)
+                        new_config['params_notifiche'][tipo_notifica] = config.get(tipo_notifica)
+                    else:
+                        new_config['params_notifiche'][tipo_notifica] = config.get(tipo_notifica)
+            with open(os.path.join(DIR, f"credenziali_v{__version__}.yml"), "w", encoding="utf-8") as file_config:
+                file_config.write(yaml.dump(new_config, sort_keys=False))
+            print(f"File di configurazione è stato convertito alla nuova versione {__version__}!", file=sys.stderr)
+            print(f"Verifica che i dati siano corretti, poi rinomina credenziali_v{__version__}.yml in credenziali.yml per renderlo effettivo!", file=sys.stderr)
+        elif(config.get("version") != __version__):
+            # La configurazione esiste con una versione diversa da v1.1.0, ma è da aggiornata
+            print("File di configurazione deve essere aggiornata!", file=sys.stderr)
+            print(f"Non è disponibile nessuna procedura di migrazione da v{config.get("version")} a v{__version__}", file=sys.stderr)
+        else:
+            LibAxiosFamiglia(DIR, config)
     else:
         try:
             file_config_default(DIR)
