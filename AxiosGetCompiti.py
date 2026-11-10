@@ -8,6 +8,8 @@ AxiosGetCompiti.
 
 """
 
+__version__ = "1.1.0"
+
 import sys
 import os
 from pathlib import Path
@@ -27,38 +29,39 @@ def file_config_default(DIR: str) -> None:
     :raises FileNotFoundError: file non trovato.
     """
     config_default = {
-        'axios': {
-            'credenziali': {
-                'customerid': 'customerid',
-                'username': 'username',
-                'password': 'password'
+        'version': __version__,
+        'credenziali': {
+            'customerid': 'customerid',
+            'username': 'username',
+            'password': 'password',
+            'alunni': {
+                'NOME_ALUNNO_A' : {
+                    'tipo': 'html',
+                    'param': '.'
+                }
+            }
+        },
+        'params_notifiche':{
+            'html': {
+                'path': '.'
             },
-            'alunni': [
-                'NOME_ALUNNO'
-                ]
-        },
-        'tipo_notifica': 'file_html',
-        'file_html': {
-            'path': '.'
-        },
-        'smtp': {
-            'smtp_server': 'smtp.example.it',
-            'smtp_port': 465,
-            'smtp_username': 'Username',
-            'smtp_password': 'PaSsWoRd',
-            'destinatari': [
-                'genitore1@example.it',
-                'Alunno1@example.it'
-                ],
-            'n_allegati': 0
-        },
-        'telegram': {
-            'BOT_TOKEN': 'TOKEN',
-            'CHAT_ID': 'ID',
-            'n_allegati': 0
-        },
-        'screenshot': {
-            'path': '.'
+            'smtp': {
+                'smtp_server': 'smtp.example.it',
+                'smtp_port': 465,
+                'smtp_username': 'Username',
+                'smtp_password': 'PaSsWoRd',
+                'destinatari': [
+                    'tutore@example.it'
+                    ],
+                'n_allegati': 0
+            },
+            'telegram': {
+                'BOT_TOKEN': 'TOKEN',
+                'n_allegati': 0
+            },
+            'screenshot': {
+                'path': '.'
+            }
         }
     }
     try:
@@ -95,27 +98,7 @@ if __name__ == "__main__":
         with open(os.path.join(DIR, "credenziali.yml"), "r", encoding="utf-8") as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
 
-        tipo_notifica = None
-        if('tipo_notifica' in config.keys()):
-            if (config['tipo_notifica'] == 'file_html'):
-                tipo_notifica = notifica.NotificaFileHTML(DIR, os.path.join(DIR, "credenziali.yml"))
-            elif (config['tipo_notifica'] == 'smtp'):
-                tipo_notifica = notifica.NotificaMail(DIR, os.path.join(DIR, "credenziali.yml"))
-            elif (config['tipo_notifica'] == 'telegram'):
-                tipo_notifica = notifica.NotificaTelegram(DIR, os.path.join(DIR, "credenziali.yml"))
-            elif (config['tipo_notifica'] == 'screenshot'):
-                tipo_notifica = notifica.NotificaScreenShot(DIR, os.path.join(DIR, "credenziali.yml"))
-
-        if (tipo_notifica is not None):
-            try:
-                axios = LibAxiosFamiglia(DIR, config['axios']['credenziali'], tipo_notifica)
-                for alunno in config['axios']['alunni']:
-                    axios.get_session_collabora(alunno)
-                    axios.get_session_registrofamiglie(alunno)
-            except Exception as e:
-                print(f"Si è verificato un errore imprevisto: {e}", file=sys.stderr)
-        else:
-            print("Error: occorre configurare e selezionare un tipo di notifica", file=sys.stderr)
+        LibAxiosFamiglia(DIR, config)
     else:
         try:
             file_config_default(DIR)
