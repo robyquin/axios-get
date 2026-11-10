@@ -85,14 +85,16 @@ class LibAxiosFamiglia():
                     tipo_notifica = param['tipo']
                     if(tipo_notifica in config['params_notifiche'].keys()):
                         if (tipo_notifica == 'html'):
-                            self.notifica = lib_notifica.NotificaFileHTML(DIR, config['params_notifiche'], param['param'])
+                            parametro = param.get('param', config.get('params_notifiche').get(tipo_notifica).get('path', '.'))
+                            self.notifica = lib_notifica.NotificaFileHTML(DIR, config['params_notifiche'], parametro)
+                        elif (tipo_notifica == 'screenshot'):
+                            parametro = param.get('param', config.get('params_notifiche').get(tipo_notifica).get('path', '.'))
+                            self.notifica = lib_notifica.NotificaScreenShot(DIR, config['params_notifiche'], parametro)
                         elif (tipo_notifica == 'smtp'):
                             self.notifica = lib_notifica.NotificaMail(DIR, config['params_notifiche'], param['param'])
                         elif (tipo_notifica == 'telegram'):
                             self.notifica = lib_notifica.NotificaTelegram(DIR, config['params_notifiche'], param['param'])
-                        elif (tipo_notifica == 'screenshot'):
-                            self.notifica = lib_notifica.NotificaScreenShot(DIR, config['params_notifiche'], param['param'])
-                        
+
                         if (self.notifica is not None):
                             self.get_session_collabora(alunno)
                             self.get_session_registrofamiglie(alunno)
@@ -432,6 +434,3 @@ class LibAxiosFamiglia():
         if (end_new < len(linee_file_new)-1):
             output.extend(linee_file_new[end_new:len(linee_file_new)-1])
         return output
-
-    def set_type_nofiticaton(self, class_notifica: lib_notifica.Notifica) -> None:
-        self.notifica = class_notifica
