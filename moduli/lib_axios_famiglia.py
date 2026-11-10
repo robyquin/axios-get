@@ -68,7 +68,6 @@ class LibAxiosFamiglia():
             self.password = str(credenziali['password'])
             self.alunni = {}
             self.COMPITI = {}
-            # self.notifica = class_notifica
             self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES = []
             self.sha1_REGISTRO = ""
             self.sha1_REGISTRO_old = ""
@@ -80,10 +79,9 @@ class LibAxiosFamiglia():
             else:
                 raise Exception("Controlla il file di configurazione: una delle credenziali di Axios è vuota")
 
-            self.notifica = None
-
             try:
                 for alunno, param in credenziali['alunni'].items():
+                    self.notifica = None
                     tipo_notifica = param['tipo']
                     if(tipo_notifica in config['params_notifiche'].keys()):
                         if (tipo_notifica == 'html'):
