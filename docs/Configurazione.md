@@ -56,17 +56,19 @@ Indica la versione del file di configurazione.
 
 ## Credenziali
 
-| Path                                          | Tipo dato      | Valore                                                    | Descrizione                                                      |
-| --------------------------------------------- | -------------- | --------------------------------------------------------- | ---------------------------------------------------------------- |
-| `credenziali`                                 | lista          |                                                           | Lista di definizione delle credenziali di accesso ad **RF**.     |
-| `credenziali.[0].customerid`                  | testo          | Richiesto                                                 | CF Istituto/Cliente                                              |
-| `credenziali.[0].username`                    | testo          | Richiesto                                                 | Codice Utente o mail personale                                   |
-| `credenziali.[0].password`                    | testo          | Richiesto                                                 | Password                                                         |
-| `credenziali.[0].alunni`                      | lista          |                                                           | Lista degli studenti/studentesse (prelevati da **RF**)           |
-| `credenziali.[0].alunni.[0].NomeAlunno`       | elemento lista | Il primo Nome in **RF**                                   | Nome dello studente/studentessa soggetto a notifica              |
-| `credenziali.[0].alunni.[0].NomeAlunno.tipo`  | elemento lista | **Nome** del gruppo di notifica                           | Definisce quale notifica adottare tra quelle configurate         |
-| `credenziali.[0].alunni.[0].NomeAlunno.param` | elemento lista | **Parametro caratteristico** per la tipologia di notifica | Percorso, email studente, o CHAT_ID                              |
-| `credenziali.[0].alunni.[1]`                  | elemento lista | Nomi successivi in **RF**                                 | Nomi degli studenti/studentesse soggetto a notifica, se presenti |
+| Path                                       | Tipo dato | Valore                                                    | Descrizione                                                      |
+| ------------------------------------------ | --------- | --------------------------------------------------------- | ---------------------------------------------------------------- |
+| `credenziali`                              | lista     |                                                           | Lista di definizione delle credenziali di accesso ad **RF**.     |
+| `credenziali.[0].customerid`               | testo     | Richiesto                                                 | CF Istituto/Cliente                                              |
+| `credenziali.[0].username`                 | testo     | Richiesto                                                 | Codice Utente o mail personale                                   |
+| `credenziali.[0].password`                 | testo     | Richiesto                                                 | Password                                                         |
+| `credenziali.[0].alunni`                   | gruppo    |                                                           | Gruppo degli studenti/studentesse (prelevati da **RF**)          |
+| `credenziali.[0].alunni.NomeAlunnoA`       | gruppo    | Il primo Nome in **RF**                                   | Nome dello studente/studentessa soggetto a notifica              |
+| `credenziali.[0].alunni.NomeAlunnoA.tipo`  | testo     | **Nome** del gruppo di notifica                           | Definisce quale notifica adottare tra quelle configurate         |
+| `credenziali.[0].alunni.NomeAlunnoA.param` | testo     | **Parametro caratteristico** per la tipologia di notifica | Percorso, email studente, o CHAT_ID                              |
+| `credenziali.[0].alunni.NomeAlunnoB`       | gruppo    | Nomi successivi in **RF**                                 | Nomi degli studenti/studentesse soggetto a notifica, se presenti |
+| `credenziali.[0].alunni.NomeAlunnoB.tipo`  | testo     | **Nome** del gruppo di notifica                           | Definisce quale notifica adottare tra quelle configurate         |
+| `credenziali.[0].alunni.NomeAlunnoB.param` | testo     | **Parametro caratteristico** per la tipologia di notifica | Percorso, email studente, o CHAT_ID                              |
 
 **NOTA**: sia i nomi dei gruppo di notifica, che le indicazioni dei parametri caratteristici vengono indicati nelle sezioni successive
 
