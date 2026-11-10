@@ -117,24 +117,22 @@ if __name__ == "__main__":
             new_config = {}
             new_config['version'] = __version__
             new_config['credenziali'] = [config['axios']['credenziali']]
-            new_config['credenziali'][0]['alunni'] = []
+            new_config['credenziali'][0]['alunni'] = {}
             for alunno in config['axios']['alunni']:
-                a = {}
-                a[alunno] = { }
+                new_config['credenziali'][0]['alunni'][alunno] = { }
                 tipo_notifica = config.get("tipo_notifica", 'html')
                 if (tipo_notifica == 'file_html' or tipo_notifica == 'html'):
-                    a[alunno]['tipo'] = 'html'
-                    a[alunno]['param'] = config.get("file_html", {}).get("path", ".")
+                    new_config['credenziali'][0]['alunni'][alunno]['tipo'] = 'html'
+                    new_config['credenziali'][0]['alunni'][alunno]['param'] = config.get("file_html", {}).get("path", ".")
                 elif (tipo_notifica == 'screenshot'):
-                    a[alunno]['tipo'] = tipo_notifica
-                    a[alunno]['param'] = config.get(tipo_notifica, {}).get("path", ".")
+                    new_config['credenziali'][0]['alunni'][alunno]['tipo'] = tipo_notifica
+                    new_config['credenziali'][0]['alunni'][alunno]['param'] = config.get(tipo_notifica, {}).get("path", ".")
                 elif (tipo_notifica == 'smtp'):
-                    a[alunno]['tipo'] = tipo_notifica
-                    a[alunno]['param'] = "EMAIL_STUDENTE"
+                    new_config['credenziali'][0]['alunni'][alunno]['tipo'] = tipo_notifica
+                    new_config['credenziali'][0]['alunni'][alunno]['param'] = "EMAIL_STUDENTE"
                 elif (tipo_notifica == 'telegram'):
-                    a[alunno]['tipo'] = tipo_notifica
-                    a[alunno]['param'] = config.get(tipo_notifica, {}).get("CHAT_ID", None)
-                new_config['credenziali'][0]['alunni'].append(a)
+                    new_config['credenziali'][0]['alunni'][alunno]['tipo'] = tipo_notifica
+                    new_config['credenziali'][0]['alunni'][alunno]['param'] = config.get(tipo_notifica, {}).get("CHAT_ID", None)
             new_config['params_notifiche'] = {}
             for tipo_notifica in ['file_html', 'smtp', 'telegram', 'screenshot']:
                 if (config.get(tipo_notifica, None) != None):
