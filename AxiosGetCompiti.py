@@ -18,7 +18,6 @@ import re
 import yaml
 
 from moduli.lib_axios_famiglia import LibAxiosFamiglia
-import moduli.lib_notifica as notifica
 
 def file_config_default(DIR: str) -> None:
     """
