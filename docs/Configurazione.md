@@ -126,6 +126,7 @@ Consulta il documento [SMTP server](./SMTP_server.md) per verificare i parametri
 | -------------------------------------- | --------- | ------ | ------------------------------------------------------------------ |
 | `params_notifiche.telegram`            | gruppo    |        | Definizione **nome** del gruppo di notifica                        |
 | `params_notifiche.telegram.BOT_TOKEN`  | testo     |        | TOKEN del bot gestore della notifica                               |
+| `params_notifiche.telegram.CHAT_ID`    | intero    |        | Numero identificativo della chat                                   |
 | `params_notifiche.telegram.n_allegati` | intero    |        | Numero desiderati di allegati per invio (screenshot pagina diario) |
 
 - **Parametro caratteristico** di questa notifica è `CHAT_ID`: Numero identificativo della chat.
@@ -169,6 +170,7 @@ params_notifiche:
     n_allegati: 0
   telegram:
     BOT_TOKEN: TOKEN
+    CHAT_ID: ID
     n_allegati: 0
   screenshot:
     path: ./pathfile
