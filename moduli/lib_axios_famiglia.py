@@ -49,14 +49,12 @@ class LibAxiosFamiglia():
 
     :param DIR: percorso di salvataggio log e error
     :type DIR: str
-    :param credenziali: dizionario di configurazione
-    :type credenziali: dict
-    :param class_notifica: percorso di salvataggio log e error
-    :type class_notifica: lib_notifica.Notifica
+    :param config: dizionario di configurazione
+    :type config: dict
 
     :raises Exception: credenziali vuote.
     """
-    def __init__(self, DIR: str, credenziali: dict, class_notifica: lib_notifica.Notifica) -> None:
+    def __init__(self, DIR: str, config: dict) -> None:
         self.DIR = DIR
         if getattr(sys, 'frozen', False):
             # Se l'applicazione è compilata con PyInstaller
@@ -64,22 +62,48 @@ class LibAxiosFamiglia():
             sys.stdout = open(os.path.join(self.DIR, "log.txt"), "a", encoding="utf-8")
         self.DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:156.0) Gecko/20100101 Firefox/156.0"
 
-        self.customerid = str(credenziali['customerid'])
-        self.username = str(credenziali['username'])
-        self.password = str(credenziali['password'])
-        self.alunni = {}
-        self.COMPITI = {}
-        self.notifica = class_notifica
-        self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES = []
-        self.sha1_REGISTRO = ""
-        self.sha1_REGISTRO_old = ""
-        self.sha1_MD = ""
-        self.sha1_MD_old = ""
+        for credenziali in config['credenziali']:
+            self.customerid = str(credenziali['customerid'])
+            self.username = str(credenziali['username'])
+            self.password = str(credenziali['password'])
+            self.alunni = {}
+            self.COMPITI = {}
+            self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES = []
+            self.sha1_REGISTRO = ""
+            self.sha1_REGISTRO_old = ""
+            self.sha1_MD = ""
+            self.sha1_MD_old = ""
 
-        if(self.customerid != '' and self.username != '' and self.password != '' ):
-            self.session = requests.session()
-        else:
-            raise Exception("Controlla il file di configurazione: una delle credenziali di Axios è vuota")
+            if(self.customerid != '' and self.username != '' and self.password != '' ):
+                self.session = requests.session()
+            else:
+                raise Exception("Controlla il file di configurazione: una delle credenziali di Axios è vuota")
+
+            try:
+                for alunno, param in credenziali['alunni'].items():
+                    self.notifica = None
+                    tipo_notifica = param['tipo']
+                    if(tipo_notifica in config['params_notifiche'].keys()):
+                        if (tipo_notifica == 'html'):
+                            parametro = param.get('param', config.get('params_notifiche').get(tipo_notifica).get('path', '.'))
+                            self.notifica = lib_notifica.NotificaFileHTML(DIR, config['params_notifiche'], parametro)
+                        elif (tipo_notifica == 'screenshot'):
+                            parametro = param.get('param', config.get('params_notifiche').get(tipo_notifica).get('path', '.'))
+                            self.notifica = lib_notifica.NotificaScreenShot(DIR, config['params_notifiche'], parametro)
+                        elif (tipo_notifica == 'smtp'):
+                            parametro = param.get('param', '')
+                            self.notifica = lib_notifica.NotificaMail(DIR, config['params_notifiche'], parametro)
+                        elif (tipo_notifica == 'telegram'):
+                            parametro = param.get('param', config.get('params_notifiche').get(tipo_notifica).get('CHAT_ID', 'CHAT_ID'))
+                            self.notifica = lib_notifica.NotificaTelegram(DIR, config['params_notifiche'], parametro)
+
+                        if (self.notifica is not None):
+                            self.get_session_collabora(alunno)
+                            self.get_session_registrofamiglie(alunno)
+                        else:
+                            print("Error: occorre configurare e selezionare un tipo di notifica", file=sys.stderr)
+            except Exception as e:
+                print(f"Si è verificato un errore imprevisto: {e}", file=sys.stderr)
 
     def __delete__(self, instance):
         self.session.close()

@@ -28,17 +28,19 @@ class Notifica():
 
     :param DIR: percorso di salvataggio log e error
     :type DIR: str
-    :param path_config: percorso al file di configurazione YAML
-    :type path_config: str
+    :param config: dizionario di configurazione notifica
+    :type config: dict
+    :param parametro: parametro specifico per l'alunno
+    :type parametro: int | str
     """
-    def __init__(self, DIR: str, path_config: str) -> None:
+    def __init__(self, DIR: str, config: dict, parametro: int | str) -> None:
         self.DIR = DIR
         if getattr(sys, 'frozen', False):
             # Se l'applicazione è compilata con PyInstaller
             sys.stderr = open(os.path.join(self.DIR, "errori.txt"), "a", encoding="utf-8")
             sys.stdout = open(os.path.join(self.DIR, "log.txt"), "a", encoding="utf-8")
-        with open(path_config, "r", encoding="utf-8") as file:
-            self.config = yaml.load(file, Loader=yaml.FullLoader)
+        self.config = config
+        self.param = parametro
 
     def send_notifica(self, html: str, alunno: str) -> None:
         """
@@ -60,7 +62,7 @@ class NotificaFileHTML(Notifica):
     """
     def send_notifica(self, html: str, alunno: str) -> None:
         # 1. Configurazione dei parametri di collocazione
-        path_file = self.config['file_html']['path']
+        path_file = self.param
         absolute_path = os.path.join(path_file,"compiti_"+alunno+".html")
 
         # 2. Salvataggio del contenuto
@@ -107,7 +109,10 @@ class NotificaMail(Notifica):
         else:
             starttls = False
 
-        receiver_email = self.config['smtp']['destinatari']
+        receiver_email = []
+        if (self.param != ''):
+            receiver_email.append(self.param)
+        receiver_email.extend(self.config['smtp']['destinatari'])
 
         # 2. Creazione del contenuto dell'email
         msg = EmailMessage()
@@ -171,7 +176,7 @@ class NotificaTelegram(Notifica):
 
         # 1. Configurazione dei parametri del server e delle credenziali
         BOT_TOKEN = self.config['telegram']['BOT_TOKEN']
-        CHAT_ID = self.config['telegram']['CHAT_ID']
+        CHAT_ID = self.param
         n_screenshot = 0
         if ('n_allegati' in self.config['telegram'].keys()):
             if (isinstance(self.config['telegram']['n_allegati'], int)):
@@ -253,7 +258,7 @@ class NotificaScreenShot(Notifica):
     """
     def send_notifica(self, html: str, alunno: str) -> None:
 
-        path_screenshot = self.config['screenshot']['path']
+        path_screenshot = self.param
         if (not os.path.exists(os.path.join(path_screenshot,f"screenshot_{alunno}"))):
             os.makedirs(os.path.join(path_screenshot,f"screenshot_{alunno}"))
         path_screenshot = os.path.join(path_screenshot,f"screenshot_{alunno}")
