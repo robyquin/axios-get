@@ -71,6 +71,7 @@ def file_config_default(DIR: str) -> None:
             },
             'telegram': {
                 'BOT_TOKEN': 'TOKEN',
+                'CHAT_ID': 'ID',
                 'n_allegati': 0
             },
             'screenshot': {
@@ -139,7 +140,6 @@ if __name__ == "__main__":
                     if (tipo_notifica == 'file_html'):
                         new_config['params_notifiche']['html'] = config.get(tipo_notifica)
                     elif (tipo_notifica == 'telegram'):
-                        config.get(tipo_notifica).pop('CHAT_ID', None)
                         new_config['params_notifiche'][tipo_notifica] = config.get(tipo_notifica)
                     else:
                         new_config['params_notifiche'][tipo_notifica] = config.get(tipo_notifica)
