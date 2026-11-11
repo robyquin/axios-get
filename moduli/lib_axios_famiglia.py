@@ -91,9 +91,11 @@ class LibAxiosFamiglia():
                             parametro = param.get('param', config.get('params_notifiche').get(tipo_notifica).get('path', '.'))
                             self.notifica = lib_notifica.NotificaScreenShot(DIR, config['params_notifiche'], parametro)
                         elif (tipo_notifica == 'smtp'):
-                            self.notifica = lib_notifica.NotificaMail(DIR, config['params_notifiche'], param['param'])
+                            parametro = param.get('param', '')
+                            self.notifica = lib_notifica.NotificaMail(DIR, config['params_notifiche'], parametro)
                         elif (tipo_notifica == 'telegram'):
-                            self.notifica = lib_notifica.NotificaTelegram(DIR, config['params_notifiche'], param['param'])
+                            parametro = param.get('param', config.get('params_notifiche').get(tipo_notifica).get('CHAT_ID', 'CHAT_ID'))
+                            self.notifica = lib_notifica.NotificaTelegram(DIR, config['params_notifiche'], parametro)
 
                         if (self.notifica is not None):
                             self.get_session_collabora(alunno)

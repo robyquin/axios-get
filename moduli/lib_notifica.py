@@ -110,7 +110,8 @@ class NotificaMail(Notifica):
             starttls = False
 
         receiver_email = []
-        receiver_email.append(self.param)
+        if (self.param != ''):
+            receiver_email.append(self.param)
         receiver_email.extend(self.config['smtp']['destinatari'])
 
         # 2. Creazione del contenuto dell'email
