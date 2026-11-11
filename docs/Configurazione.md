@@ -140,7 +140,6 @@ Consulta il documento [Telegram_token_bot](./Telegram_token_bot.md) per ottenere
 Configurazione di default da compilare:
 
 ```yaml
-axios:
 version: 1.1.0
 credenziali:
 - customerid: customerid
