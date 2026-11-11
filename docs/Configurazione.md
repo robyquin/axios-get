@@ -15,9 +15,11 @@ Se `credenziali.yml` non esiste, al primo avvio di `AxiosGetCompiti` viene creat
 Per funzionare, `credenziali_default.yml` deve essere rinominato in `credenziali.yml` e editato, modificando opportunamente i valori delle impostazioni presenti.
 
 > [!IMPORTANT]
-> Con la versione `v1.1.0` il file di configurazione è stato migliorato e riorganizzato per estendere l'utilizzo a tutti i genitori/tutori con più studenti appartenenti anche a istituti differenti (con più credenziali). Anche se il progetto implementa la migrazione della configurazione da una versione precedente, la correttezza dei dati necessita di essere verificata prima dell'effettivo utilizzo del file.
+> Con la versione `v1.1.0` il file di configurazione è stato migliorato e riorganizzato per estendere l'utilizzo a tutti i genitori/tutori con più studenti appartenenti anche a istituti differenti (con più credenziali).
 >
-> Per questo motivo con la migrazione verrà generato un file aggiornato con il nome `credenziali_{versione}.yml`. Dopo la verifica/controllo dell'esattezza dei dati, il file dovrà essere rinominato in `credenziali.yml` sostituendo il precedente.
+> Da questa release viene implementata la migrazione automatica della configurazione da una versione precedente, tuttavia, prima dell'effettivo utilizzo del nuovo file, occorre verificare la correttezza di tutti dati.
+>
+> La procedura di migrazione è non distruttiva, al primo avvio della una nuova release verrà generato il file aggiornato con il nome `credenziali_{versione}.yml`. Dopo la verifica/controllo dell'esattezza dei dati il file dovrà essere rinominato in `credenziali.yml` per rendere le modifiche effettive.
 
 ## Convenzioni del documento
 
