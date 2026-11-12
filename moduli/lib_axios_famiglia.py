@@ -11,6 +11,7 @@ Gestore di acquisizione dati da Axios.
 import sys
 from datetime import datetime
 import os
+import shutil
 import re
 import json
 from enum import IntEnum, StrEnum
@@ -79,6 +80,10 @@ class LibAxiosFamiglia():
             self.sha1_REGISTRO_old = ""
             self.sha1_MD = ""
             self.sha1_MD_old = ""
+
+            self.dir_istituto = os.path.join(DIR, "Istituto_"+str(self.customerid))
+            if (not os.path.exists(self.dir_istituto)):
+                os.makedirs(self.dir_istituto)
 
             if(self.customerid != '' and self.username != '' and self.password != '' ):
                 self.session = requests.session()
@@ -200,7 +205,7 @@ class LibAxiosFamiglia():
             dir_alunno = AxiosView.materiale
             if (Alunno != "" and self.alunni.get(AxiosView.materiale, {}).get(Alunno, None) != None):
                 dir_alunno = f'{AxiosView.materiale}_{Alunno}_{hashlib.md5(self.alunni[AxiosView.materiale][Alunno].encode('utf-8')).hexdigest()}'
-            matdit_compiti_alunno = os.path.join(self.DIR, dir_alunno, 'materiale-didattico.html')
+            matdit_compiti_alunno = os.path.join(self.dir_istituto, dir_alunno, 'materiale-didattico.html')
             text_MD = "\n".join(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES)
             self.sha1_MD = hashlib.sha1(text_MD.encode('utf-8')).hexdigest()
             if(os.path.exists(matdit_compiti_alunno)):
@@ -211,11 +216,14 @@ class LibAxiosFamiglia():
                 fp.close()
 
     def __get_session(self, Alunno, link_sequence, prefix):
+        if (os.path.exists(os.path.join(self.DIR, prefix+"_"+Alunno))):
+            shutil.move(os.path.join(self.DIR, prefix+"_"+Alunno), self.dir_istituto)
+            os.rename(os.path.join(self.dir_istituto, prefix+"_"+Alunno), os.path.join(self.dir_istituto, "_"+prefix+"_"+Alunno))
         for link in link_sequence:
             dir_alunno = prefix
             if (Alunno != "" and self.alunni.get(prefix, {}).get(Alunno, None) != None):
                 dir_alunno = f'{prefix}_{Alunno}_{hashlib.md5(self.alunni[prefix][Alunno].encode('utf-8')).hexdigest()}'
-            registo_compiti_alunno = os.path.join(self.DIR, dir_alunno, link[UrlIdType.filename])
+            registo_compiti_alunno = os.path.join(self.dir_istituto, dir_alunno, link[UrlIdType.filename])
             if (link[UrlIdType.method] == 'GET'):
                 res = self.session.get(link[UrlIdType.url], params=link[UrlIdType.params], allow_redirects=True)
                 if ('Action' in link[UrlIdType.params].keys()):
@@ -304,7 +312,7 @@ class LibAxiosFamiglia():
                     raise Exception("{}".format(get_error.group(1)))
 
             if (prefix is not None and link[UrlIdType.filename] is not None):
-                dir_registro_alunno = os.path.join(self.DIR, dir_alunno)
+                dir_registro_alunno = os.path.join(self.dir_istituto, dir_alunno)
                 if (not os.path.exists(dir_registro_alunno)):
                     os.makedirs(dir_registro_alunno)
                 with open(registo_compiti_alunno, 'w', encoding='utf-8') as fp:
@@ -344,8 +352,8 @@ class LibAxiosFamiglia():
         if (Alunno != "" and self.alunni[AxiosView.registro].get(Alunno, None) != None):
             dir_alunno = f'{AxiosView.registro}_{Alunno}_{hashlib.md5(self.alunni[AxiosView.registro][Alunno].encode('utf-8')).hexdigest()}'
 
-        if(os.path.exists(os.path.join(self.DIR, dir_alunno, 'notifica.html'))):
-            with open(os.path.join(self.DIR, dir_alunno, 'notifica.html'), 'r', encoding='utf-8') as f_notify:
+        if(os.path.exists(os.path.join(self.dir_istituto, dir_alunno, 'notifica.html'))):
+            with open(os.path.join(self.dir_istituto, dir_alunno, 'notifica.html'), 'r', encoding='utf-8') as f_notify:
                 old_compiti = f_notify.read().replace('\r','').split("\n")
 
         # FILTRO PER DATA
@@ -420,7 +428,7 @@ class LibAxiosFamiglia():
         str_notifica = "\n".join(linee_notifica).replace('\r','')
         linee_notifica = str_notifica.split("\n")
 
-        with open(os.path.join(self.DIR, dir_alunno, 'notifica.html'), 'w', encoding='utf-8') as f_notify:
+        with open(os.path.join(self.dir_istituto, dir_alunno, 'notifica.html'), 'w', encoding='utf-8') as f_notify:
             f_notify.write("\n".join(linee_notifica))
 
         if (len(old_compiti) > 0 ):
