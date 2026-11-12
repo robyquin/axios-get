@@ -178,14 +178,14 @@ class LibAxiosFamiglia():
                     if (link[UrlIdType.params]['Action'] == 'DashboardLoad'):
                         text = res.text
                         if (prefix == "registrofamiglie_"):
-                            m = re.search(r"<a.*data-action='FAMILY_CHANGE_ALUNNO'.*?data-others='(.*?)'.*?<b>(.*?)</b>.*?</a>", text)
-                            if (m is not None):
-                                self.alunni[m.group(2)] = m.group(1)
+                            m = re.findall(r"<a.*data-action='FAMILY_CHANGE_ALUNNO'.*?data-others='(.*?)'.*?<b>(.*?)</b>.*?</a>", text)
+                            for elm in m:
+                                self.alunni[elm[1]] = elm[0]
                         elif (prefix == "collabora_"):
-                            m = re.search(r"<button.*?utId = '(.*?)'>.*?<div class='details'><div class='desc'>(.*?)</div></div></button>", text)
-                            if (m is not None):
-                                if (Alunno in m.group(2)):
-                                    self.alunni[Alunno] = m.group(1)
+                            m = re.findall(r"<button.*?utId = '(.*?)'>.*?<div class='details'><div class='desc'>(.*?)</div></div></button>", text)
+                            for elm in m:
+                                if (Alunno in elm[1]):
+                                    self.alunni[Alunno] = elm[0]
                         if (not Alunno in self.alunni.keys()):
                             print(f"Warning! Il nome dell'alunno, {Alunno}, non trovato! Verifica e controlla la corrispondenza nel file di configurazione.", file=sys.stderr)
             else:
