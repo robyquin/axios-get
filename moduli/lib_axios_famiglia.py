@@ -171,7 +171,8 @@ class LibAxiosFamiglia():
             ['GET','https://registrofamiglie.axioscloud.it/Pages/SD/SD_Dashboard.aspx', {}, '02_dashboard.html'],
             ['GET','https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'DashboardLoad'}, '03_load_dashboard.html'],
             ['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_CHANGE_ALUNNO'}, '03_FAMILY_CHANGE_ALUNNO.json', 'set_in_session', 'json', False ],
-            ['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_COMPITI_LISTA'}, '04_action.json', {"draw":1,"columns":{},"order":[],"start":0,"length":50,"search":{"value":"","regex":False},"iMatId":""}, 'json', True],
+            ['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_COMPITI_LISTA'}, '04_compiti.json', {"draw":1,"columns":{},"order":[],"start":0,"length":50,"search":{"value":"","regex":False},"iMatId":""}, 'json', True],
+            ['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_ARGOMENTI_LISTA'}, '04_argomenti.json', {"draw":1,"columns":{},"order":[],"start":0,"length":50,"search":{"value":"","regex":False},"iMatId":""}, 'json', True],
             ['GET','https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_NOTE', 'Others': 2}, '05_annotazioni.json']
         ]
 
