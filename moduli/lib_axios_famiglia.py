@@ -330,7 +330,10 @@ class LibAxiosFamiglia():
 
         print(res.request.method, res.request.url, file=sys.stdout)
         if (res.request.method == 'POST'):
-            print(res.request.body, file=sys.stdout)
+            if ("Login.aspx" in res.request.url):
+                print("**[secret information]**", file=sys.stdout)
+            else:
+                print(res.request.body, file=sys.stdout)
         print(res.request.headers, file=sys.stdout)
         print("---", file=sys.stdout)
 
