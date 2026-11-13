@@ -9,7 +9,7 @@ Gestore di acquisizione dati da Axios.
 """
 
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import shutil
 import re
@@ -75,6 +75,7 @@ class LibAxiosFamiglia():
             self.alunni[AxiosView.registro] = {}
             self.alunni[AxiosView.materiale] = {}
             self.COMPITI = {}
+            self.ARGOMENTI = {}
             self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES = []
             self.sha1_REGISTRO = ""
             self.sha1_REGISTRO_old = ""
@@ -179,7 +180,7 @@ class LibAxiosFamiglia():
         self.__get_session(Alunno, link_registrofamiglie, AxiosView.registro)
         # Notifica qui
         if (self.sha1_REGISTRO != self.sha1_REGISTRO_old or self.sha1_MD != self.sha1_MD_old and self.COMPITI != {}):
-            self.notifica.send_notifica(self.prepara_notifica(self.COMPITI, Alunno), Alunno)
+            self.notifica.send_notifica(self.prepara_notifica(self.COMPITI, self.ARGOMENTI, Alunno), Alunno)
             print("Registro", self.sha1_REGISTRO, self.sha1_REGISTRO_old, file=sys.stdout)
             print("Materiale-Dit", self.sha1_MD, self.sha1_MD_old, file=sys.stdout)
             print("---", file=sys.stdout)
@@ -265,6 +266,8 @@ class LibAxiosFamiglia():
                             if(os.path.exists(registo_compiti_alunno)):
                                 with open(registo_compiti_alunno, "rb") as f:
                                     self.sha1_REGISTRO_old = hashlib.file_digest(f, "sha1").hexdigest()
+                        elif (link[UrlIdType.params]['Action'] == 'FAMILY_REGISTRO_CLASSE_ARGOMENTI_LISTA'):
+                            self.ARGOMENTI = json.loads(res.text)
                         elif (link[UrlIdType.params]['Action'] == 'MATERIALE_CONDIVISO_ALUNNO'):
                             jj = json.loads(res.text)
                             text = jj['html']
@@ -337,12 +340,14 @@ class LibAxiosFamiglia():
         print(res.request.headers, file=sys.stdout)
         print("---", file=sys.stdout)
 
-    def prepara_notifica(self, compiti: dict, Alunno: str) -> str:
+    def prepara_notifica(self, compiti: dict, argomenti: dict, Alunno: str) -> str:
         """
         Costruisce il testo della notifica dal dizionario compiti
 
         :param compiti: Dizionario di compiti
         :type compiti: dict
+        :param argomenti: Dizionario degli argomenti/lezioni
+        :type argomenti: dict
         :param Alunno: Nome dell'alunno
         :type Alunno: str
         :return: corpo della notifica
@@ -350,6 +355,7 @@ class LibAxiosFamiglia():
         """
         new_compiti = []
         old_compiti = []
+        new_argomenti = []
         oggi_long = datetime.strftime(datetime.now(), "%d/%m/%Y %H:%M:%S")
 
         dir_alunno = f'{AxiosView.registro}_{Alunno}'
@@ -361,12 +367,53 @@ class LibAxiosFamiglia():
                 old_compiti = f_notify.read().replace('\r','').split("\n")
 
         # FILTRO PER DATA
+        # tomorrow = datetime.strftime(datetime.today() + timedelta(days=1), "%d/%m/%Y")
+        list_idx_argomenti = []
+        for c in argomenti["data"]:
+            dt = datetime.strptime(c["giorno"], "%d/%m/%Y")
+            if (dt > datetime.now()):
+                c["note"] = c.pop("testo")
+                new_argomenti.append(c)
+
         for c in compiti["data"]:
             dt = datetime.strptime(c["giorno"], "%d/%m/%Y")
             if (dt > datetime.now()):
                 new_compiti.append(c)
+                for t, test in enumerate(new_argomenti):
+                    if (c["giorno"] == test["giorno"] and c["materia"] == test["materia"]):
+                        if (c["testo"] != test["note"]):
+                            new_compiti[-1]["note"] = test["note"]
+                        list_idx_argomenti.append(t)
 
-        linee_notifica = ["<html>", "<head><style> hr { border: 0; border-top: 1px solid #e1e4e8; margin: 30px 0 15px 0;} h2 { background-color: beige; border: 1px solid #e1e4e8; text-align: center; } li.compiti {list-style-type: '📗 '; margin-bottom:10px;} li.verifica {list-style-type: '💥 '; margin-bottom:10px;} li.file {list-style-type: '🔗 ';}</style></head>", "<body>", f"<h1>Compiti per {Alunno}</h1>", f"<p>Ciao <i>{Alunno}</i>,<br>\nricorda sempre di verificare e integrare questi compiti con quelli scritti in classe sul tuo diario cartaceo.</p>", "<p>Buon lavoro</p>"]
+        if (len(new_argomenti) > len(list_idx_argomenti)):
+            # non tutti gli elementi di new_argomenti sono stati inseriti
+            # manca il giorno, o manca la materia nel giorno
+            for a, arg_a in enumerate(new_argomenti):
+                if (a not in list_idx_argomenti):
+                    print(f"**ANNOTAZIONE {a}**")
+                    dt_a = datetime.strptime(arg_a["giorno"], "%d/%m/%Y")
+                    # argomento non è stato inserito
+                    for c, arg_c in enumerate(new_compiti):
+                        dt_c = datetime.strptime(arg_c["giorno"], "%d/%m/%Y")
+                        if (dt_c <= dt_a):
+                            # potrebbe mancare il giorno
+                            if (dt_c == dt_a):
+                                # il giorno è presente, ma manca la materia
+                                new_compiti.insert(c, arg_a)
+                                print(arg_a)
+                                print(f"**ANNOTAZIONE {a} [materia]**")
+                                break
+                        else:
+                            # non c'è il giorno, e quindi nemmeno la materia
+                            if (c-1 < 0):
+                                new_compiti.insert(0, arg_a)
+                            else:
+                                new_compiti.insert(c-1, arg_a)
+                            print(arg_a)
+                            print(f"**ANNOTAZIONE {a} [giorno]**")
+                            break
+
+        linee_notifica = ["<html>", "<head><style> hr { border: 0; border-top: 1px solid #e1e4e8; margin: 30px 0 15px 0;} h2 { background-color: beige; border: 1px solid #e1e4e8; text-align: center; } li.compiti {list-style-type: '📗 '; margin-bottom:10px;} li.verifica {list-style-type: '💥 '; margin-bottom:10px;} li.annotazione {list-style-type: '📚 '; margin-bottom:10px;} li.file {list-style-type: '🔗 ';}</style></head>", "<body>", f"<h1>Compiti per {Alunno}</h1>", f"<p>Ciao <i>{Alunno}</i>,<br>\nricorda sempre di verificare e integrare questi compiti con quelli scritti in classe sul tuo diario cartaceo.</p>", "<p>Buon lavoro</p>"]
         giorno_app = ""
         materia = ""
         testo_list = []
@@ -396,10 +443,12 @@ class LibAxiosFamiglia():
                     testo_list = []
                 linee_notifica.append(f"<h3>{new_compiti[c]["materia"].capitalize()}</h3>")
 
-            if (new_compiti[c]["testo"] != ""):
+            if (new_compiti[c].get("testo", "") != ""):
                 testo_list.append(f"<li class='compiti'>{new_compiti[c]["testo"].replace('\n', ' ')}</li>")
-            if(new_compiti[c]["verifica"] != ""):
+            if(new_compiti[c].get("verifica", "") != ""):
                 testo_list.append(f"<li class='verifica'><b>Verifica</b>: {new_compiti[c]["verifica"].replace('\n', ' ')}</li>")
+            if(new_compiti[c].get("note", "") != ""):
+                testo_list.append(f"<li class='annotazione'><b>Annotazione</b>: {new_compiti[c]["note"].replace('\n', ' ')}</li>")
 
             materia = new_compiti[c]["materia"]
 
