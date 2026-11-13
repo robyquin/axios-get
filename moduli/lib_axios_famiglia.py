@@ -387,30 +387,24 @@ class LibAxiosFamiglia():
 
         if (len(new_argomenti) > len(list_idx_argomenti)):
             # non tutti gli elementi di new_argomenti sono stati inseriti
-            # manca il giorno, o manca la materia nel giorno
+            # mancava il giorno, o mancava la materia nel giorno
             for a, arg_a in enumerate(new_argomenti):
                 if (a not in list_idx_argomenti):
-                    print(f"**ANNOTAZIONE {a}**")
                     dt_a = datetime.strptime(arg_a["giorno"], "%d/%m/%Y")
                     # argomento non è stato inserito
                     for c, arg_c in enumerate(new_compiti):
                         dt_c = datetime.strptime(arg_c["giorno"], "%d/%m/%Y")
-                        if (dt_c <= dt_a):
+                        if (dt_c >= dt_a):
                             # potrebbe mancare il giorno
                             if (dt_c == dt_a):
                                 # il giorno è presente, ma manca la materia
                                 new_compiti.insert(c, arg_a)
-                                print(arg_a)
-                                print(f"**ANNOTAZIONE {a} [materia]**")
+                                print(f"Inserimento annotazione {arg_a} - Materia mancante")
                                 break
                         else:
                             # non c'è il giorno, e quindi nemmeno la materia
-                            if (c-1 < 0):
-                                new_compiti.insert(0, arg_a)
-                            else:
-                                new_compiti.insert(c-1, arg_a)
-                            print(arg_a)
-                            print(f"**ANNOTAZIONE {a} [giorno]**")
+                            new_compiti.insert(c, arg_a)
+                            print(f"Inserimento annotazione {arg_a} - Giorno mancante\n---")
                             break
 
         linee_notifica = ["<html>", "<head><style> hr { border: 0; border-top: 1px solid #e1e4e8; margin: 30px 0 15px 0;} h2 { background-color: beige; border: 1px solid #e1e4e8; text-align: center; } li.compiti {list-style-type: '📗 '; margin-bottom:10px;} li.verifica {list-style-type: '💥 '; margin-bottom:10px;} li.annotazione {list-style-type: '📚 '; margin-bottom:10px;} li.file {list-style-type: '🔗 ';}</style></head>", "<body>", f"<h1>Compiti per {Alunno}</h1>", f"<p>Ciao <i>{Alunno}</i>,<br>\nricorda sempre di verificare e integrare questi compiti con quelli scritti in classe sul tuo diario cartaceo.</p>", "<p>Buon lavoro</p>"]
