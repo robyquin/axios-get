@@ -174,12 +174,22 @@ if __name__ == "__main__":
                 file_config.write(yaml.dump(new_config, sort_keys=False))
             print(f"File di configurazione è stato convertito alla nuova versione {__version__}!", file=sys.stderr)
             print(f"Verifica che i dati siano corretti, poi rinomina credenziali_v{__version__}.yml in credenziali.yml per renderlo effettivo!", file=sys.stderr)
-        elif(config.get("version") != __version__):
-            # La configurazione esiste con una versione diversa da v1.1.0, ma è da aggiornata
-            print("File di configurazione deve essere aggiornata!", file=sys.stderr)
-            print(f"Non è disponibile nessuna procedura di migrazione da v{config.get("version")} a v{__version__}", file=sys.stderr)
         else:
-            LibAxiosFamiglia(DIR, config)
+            v_maj_conf, v_min_conf, v_patch_conf = list(map(lambda x: int(x), config.get("version").split('.')))
+            v_maj_app, v_min_app, v_patch_app = list(map(lambda x: int(x), __version__.split('.')))
+
+            if (v_maj_app >= v_maj_conf and v_min_app > v_min_conf):
+                # La configurazione esiste con una versione diversa da v1.1.0, ma è da aggiornata
+                print("File di configurazione deve essere aggiornata!", file=sys.stderr)
+                print(f"Non è disponibile nessuna procedura di migrazione da v{config.get("version")} a v{__version__}", file=sys.stderr)
+            elif (v_maj_app == v_maj_conf and v_min_app == v_min_conf):
+                # La configurazione esiste
+                if (v_patch_app > v_patch_conf):
+                    # La patch della versione è diversa e va aggiornata
+                    config['version'] = __version__
+                    with open(os.path.join(DIR, "credenziali.yml"), "w", encoding="utf-8") as file_config:
+                        file_config.write(yaml.dump(config, sort_keys=False))
+                LibAxiosFamiglia(DIR, config)
     else:
         try:
             file_config_default(DIR)

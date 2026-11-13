@@ -66,6 +66,7 @@ class ScreenShot():
         html = re.sub(r'<p.*?>(.*?)</p>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
         html = re.sub("<li.*?class='compiti'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*",r"{\g<2>}📖 \g<3>\n",html)
         html = re.sub("<li.*?class='verifica'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*",r"{\g<2>}💥 \g<3>\n",html)
+        html = re.sub("<li.*?class='annotazione'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*",r"{\g<2>}📚 \g<3>\n",html)
         html = re.sub("<li.*?class='file'.*?>(.*?)</li>\n*",r"🔗 \g<1>\n",html)
         html = re.sub("<div>(.*?)</div>\n*",r"\n\g<1>\n\n",html)
         html = re.sub("<.{0,1}ul.*?>", "\n", html)
