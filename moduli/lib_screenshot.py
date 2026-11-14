@@ -8,7 +8,6 @@ Gestore di Screenshot.
 
 """
 
-import sys
 import io
 import os
 import textwrap
@@ -17,6 +16,8 @@ from html import unescape as html_unescape
 from datetime import datetime
 
 from PIL import Image, ImageDraw, ImageFont
+
+from .logging_config import log
 
 class ScreenShot():
     """
@@ -27,10 +28,6 @@ class ScreenShot():
     """
     def __init__(self, DIR: str) -> None:
         self.DIR = DIR
-        if getattr(sys, 'frozen', False):
-            # Se l'applicazione è compilata con PyInstaller
-            sys.stderr = open(os.path.join(self.DIR, "errori.txt"), "a", encoding="utf-8")
-            sys.stdout = open(os.path.join(self.DIR, "log.txt"), "a", encoding="utf-8")
 
     def diario2image(self, html: str) -> tuple[io.BytesIO, str]:
         """
@@ -124,7 +121,7 @@ class ScreenShot():
                     dt = datetime.strptime(data_l0, "%d/%m/%Y")
                     filename = datetime.strftime(dt, "%Y-%m-%d")
                 except Exception as e:
-                    print(f"{e}", file=sys.stderr)
+                    log.error(f"{e}")
                     width_wrap = 40
                     filename = "Materiale_didattico"
                 sw = 0.75

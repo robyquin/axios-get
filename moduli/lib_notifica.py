@@ -8,7 +8,6 @@ Gestore di Notifiche.
 
 """
 
-import sys
 import os
 import re
 from datetime import datetime
@@ -18,9 +17,9 @@ import ssl
 from email.message import EmailMessage
 
 import requests
-import yaml
 
 from .lib_screenshot import ScreenShot
+from .logging_config import log
 
 class Notifica():
     """
@@ -35,10 +34,10 @@ class Notifica():
     """
     def __init__(self, DIR: str, config: dict, parametro: int | str) -> None:
         self.DIR = DIR
-        if getattr(sys, 'frozen', False):
-            # Se l'applicazione è compilata con PyInstaller
-            sys.stderr = open(os.path.join(self.DIR, "errori.txt"), "a", encoding="utf-8")
-            sys.stdout = open(os.path.join(self.DIR, "log.txt"), "a", encoding="utf-8")
+        # if getattr(sys, 'frozen', False):
+        #     # Se l'applicazione è compilata con PyInstaller
+        #     sys.stderr = open(os.path.join(self.DIR, "errori.txt"), "a", encoding="utf-8")
+        #     sys.stdout = open(os.path.join(self.DIR, "log.txt"), "a", encoding="utf-8")
         self.config = config
         self.param = parametro
 
@@ -71,16 +70,17 @@ class NotificaFileHTML(Notifica):
             # anche se si verifica un errore durante la scrittura.
             with open(absolute_path, "w", encoding="utf-8") as file:
                 file.write(html)
-            print("Scrittura completata con successo!\n---", file=sys.stdout)
+            log.info("Scrittura completata con successo!")
+            log.info("---")
 
         except PermissionError:
-            print(f"Errore: Non hai i permessi necessari per scrivere nel file '{absolute_path}'.", file=sys.stderr)
+            log.error(f"Errore: Non hai i permessi necessari per scrivere nel file '{absolute_path}'.")
 
         except FileNotFoundError:
-            print(f"Errore: La cartella specificata per il file '{absolute_path}' non esiste.", file=sys.stderr)
+            log.error(f"Errore: La cartella specificata per il file '{absolute_path}' non esiste.")
 
         except Exception as e:
-            print(f"Si è verificato un errore imprevisto: {e}", file=sys.stderr)
+            log.error(f"Si è verificato un errore imprevisto: {e}")
 
 class NotificaMail(Notifica):
     """
@@ -102,7 +102,7 @@ class NotificaMail(Notifica):
             if (isinstance(self.config['smtp']['n_allegati'], int)):
                 n_screenshot = self.config['smtp']['n_allegati']
             else:
-                print("Warning: n_allegati non è un intero, [default: 0]", file=sys.stdout)
+                log.info("Warning: n_allegati non è un intero, [default: 0]")
 
         if (port == 587):
             starttls = True
@@ -161,9 +161,9 @@ class NotificaMail(Notifica):
                     server.login(username, password)
                     server.send_message(msg)
 
-            print("Email inviata con successo!\n---", file=sys.stdout)
+            log.info("Email inviata con successo!\n---")
         except Exception as e:
-            print(f"Si è verificato un errore durante l'invio: {e}", file=sys.stderr)
+            log.error(f"Si è verificato un errore durante l'invio: {e}")
 
 class NotificaTelegram(Notifica):
     """
@@ -182,7 +182,7 @@ class NotificaTelegram(Notifica):
             if (isinstance(self.config['telegram']['n_allegati'], int)):
                 n_screenshot = self.config['telegram']['n_allegati']
             else:
-                print("Warning: n_allegati non è un intero, [default: 0]", file=sys.stdout)
+                log.info("Warning: n_allegati non è un intero, [default: 0]")
         m_html = re.findall(r"<!-- BEGIN SCREENSHOT -->(.*?)<!-- END SCREENSHOT -->", html, re.DOTALL)
 
         # 2. Trasfomazione HTML in messaggio Telegram
@@ -225,7 +225,7 @@ class NotificaTelegram(Notifica):
             "disable_notification": True
         }
 
-        print(requests.get(link, params=parametri).json(), file=sys.stdout)
+        log.info(requests.get(link, params=parametri).json())
 
         for i, diario in enumerate(m_html):
             if (i < n_screenshot):
@@ -238,7 +238,7 @@ class NotificaTelegram(Notifica):
                 files = {
                     'photo': (filename, dati_bytesio.getvalue(), 'image/png')
                 }
-                print(requests.post(link_screenshot, data=payload, files=files).json(), file=sys.stdout)
+                log.info(requests.post(link_screenshot, data=payload, files=files).json())
             elif (i == len(m_html)-1 and n_screenshot != 0):
                 dati_bytesio, filename = ScreenShot(self.DIR).diario2image(diario)
                 payload = {
@@ -248,9 +248,9 @@ class NotificaTelegram(Notifica):
                 files = {
                     'photo': (filename, dati_bytesio.getvalue(), 'image/png')
                 }
-                print(requests.post(link_screenshot, data=payload, files=files).json(), file=sys.stdout)
+                log.info(requests.post(link_screenshot, data=payload, files=files).json())
 
-        print("---", file=sys.stdout)
+        log.info("---")
 
 class NotificaScreenShot(Notifica):
     """

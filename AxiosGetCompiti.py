@@ -18,6 +18,7 @@ import re
 import yaml
 
 from moduli.lib_axios_famiglia import LibAxiosFamiglia
+from moduli.logging_config import log, logging
 
 def file_config_default(DIR: str) -> None:
     """
@@ -119,7 +120,7 @@ def file_config_default(DIR: str) -> None:
             content_yaml = re.sub(r'(- EMAIL_ALTRI.*)', '# \\1 # Specifica, come un elenco, altri destinatari della email', content_yaml)
             file_config.write(content_yaml)
     except Exception as e:
-        print(f"Si è verificato un errore imprevisto: {e}", file=sys.stderr)
+        log.error(f"Si è verificato un errore imprevisto: {e}")
     raise FileNotFoundError(os.path.join(DIR, "credenziali_default.yml"))
 
 if __name__ == "__main__":
@@ -127,12 +128,15 @@ if __name__ == "__main__":
     if getattr(sys, 'frozen', False):
         # Se l'applicazione è compilata con PyInstaller
         DIR=str(os.path.dirname(sys.executable))
-        if(os.path.exists(os.path.join(DIR, "errori.txt"))):
-            os.remove(os.path.join(DIR, "errori.txt"))
-        if(os.path.exists(os.path.join(DIR, "log.txt"))):
-            os.remove(os.path.join(DIR, "log.txt"))
-        sys.stderr = open(os.path.join(DIR, "errori.txt"), "a", encoding="utf-8")
-        sys.stdout = open(os.path.join(DIR, "log.txt"), "a", encoding="utf-8")
+        # Handler file senza colori
+        file_handler = logging.FileHandler(filename=os.path.join(DIR, "output.log"), mode="w")
+        # "%(asctime)-15s [%(levelname)s] %(message)s"
+        file_formatter = logging.Formatter("[%(levelname)s] %(message)s")
+        file_handler.setFormatter(file_formatter)
+        # file_handler.setLevel(logging.DEBUG)
+        log.addHandler(file_handler)
+
+        # log.setLevel(logging.DEBUG)
     else:
         DIR=str(Path(os.path.dirname(__file__)).absolute())
 
@@ -172,16 +176,16 @@ if __name__ == "__main__":
                         new_config['params_notifiche'][tipo_notifica] = config.get(tipo_notifica)
             with open(os.path.join(DIR, f"credenziali_v{__version__}.yml"), "w", encoding="utf-8") as file_config:
                 file_config.write(yaml.dump(new_config, sort_keys=False))
-            print(f"File di configurazione è stato convertito alla nuova versione {__version__}!", file=sys.stderr)
-            print(f"Verifica che i dati siano corretti, poi rinomina credenziali_v{__version__}.yml in credenziali.yml per renderlo effettivo!", file=sys.stderr)
+            log.error(f"File di configurazione è stato convertito alla nuova versione {__version__}!")
+            log.error(f"Verifica che i dati siano corretti, poi rinomina credenziali_v{__version__}.yml in credenziali.yml per renderlo effettivo!")
         else:
             v_maj_conf, v_min_conf, v_patch_conf = list(map(lambda x: int(x), config.get("version").split('.')))
             v_maj_app, v_min_app, v_patch_app = list(map(lambda x: int(x), __version__.split('.')))
 
             if (v_maj_app >= v_maj_conf and v_min_app > v_min_conf):
                 # La configurazione esiste con una versione diversa da v1.1.0, ma è da aggiornata
-                print("File di configurazione deve essere aggiornata!", file=sys.stderr)
-                print(f"Non è disponibile nessuna procedura di migrazione da v{config.get("version")} a v{__version__}", file=sys.stderr)
+                log.error("File di configurazione deve essere aggiornata!")
+                log.error(f"Non è disponibile nessuna procedura di migrazione da v{config.get("version")} a v{__version__}")
             elif (v_maj_app == v_maj_conf and v_min_app == v_min_conf):
                 # La configurazione esiste
                 if (v_patch_app > v_patch_conf):
@@ -194,6 +198,6 @@ if __name__ == "__main__":
         try:
             file_config_default(DIR)
         except FileNotFoundError as e:
-            print(f"File di configurazione non trovato! Creazione del file di default: {e}", file=sys.stderr)
+            log.error(f"File di configurazione non trovato! Creazione del file di default: {e}")
         except Exception as e:
-            print(f"Si è verificato un errore imprevisto: {e}", file=sys.stderr)
+            log.error(f"Si è verificato un errore imprevisto: {e}")
