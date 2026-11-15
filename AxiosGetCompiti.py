@@ -123,7 +123,7 @@ def file_config_default(DIR: str) -> None:
         log.error(f"Si è verificato un errore imprevisto: {e}")
     raise FileNotFoundError(os.path.join(DIR, "credenziali_default.yml"))
 
-if __name__ == "__main__":
+def run_axios_get_compiti():
 
     if getattr(sys, 'frozen', False):
         # Se l'applicazione è compilata con PyInstaller
@@ -133,10 +133,8 @@ if __name__ == "__main__":
         # "%(asctime)-15s [%(levelname)s] %(message)s"
         file_formatter = logging.Formatter("[%(levelname)s] %(message)s")
         file_handler.setFormatter(file_formatter)
-        # file_handler.setLevel(logging.DEBUG)
+        file_handler.setLevel(logging.DEBUG)
         log.addHandler(file_handler)
-
-        # log.setLevel(logging.DEBUG)
     else:
         DIR=str(Path(os.path.dirname(__file__)).absolute())
 
@@ -146,6 +144,8 @@ if __name__ == "__main__":
 
         if (config.get("version", None) == None):
             # La configurazione esiste ma ad una versione <= v1.0.8, è da aggiornare direttamente all'ultima
+            log.info(f"Migrazione automatica alla versione {__version__}")
+            log.warning(f"Il file di configurazione sarà convertito alla nuova versione {__version__}!")
             new_config = {}
             new_config['version'] = __version__
             new_config['credenziali'] = [config['axios']['credenziali']]
@@ -176,8 +176,8 @@ if __name__ == "__main__":
                         new_config['params_notifiche'][tipo_notifica] = config.get(tipo_notifica)
             with open(os.path.join(DIR, f"credenziali_v{__version__}.yml"), "w", encoding="utf-8") as file_config:
                 file_config.write(yaml.dump(new_config, sort_keys=False))
-            log.error(f"File di configurazione è stato convertito alla nuova versione {__version__}!")
-            log.error(f"Verifica che i dati siano corretti, poi rinomina credenziali_v{__version__}.yml in credenziali.yml per renderlo effettivo!")
+            log.info(f"Salvataggio file: {os.path.join(DIR, f"credenziali_v{__version__}.yml")}")
+            log.warning(f"Verifica che i dati siano corretti, poi rinomina credenziali_v{__version__}.yml in credenziali.yml per renderlo effettivo!")
         else:
             v_maj_conf, v_min_conf, v_patch_conf = list(map(lambda x: int(x), config.get("version").split('.')))
             v_maj_app, v_min_app, v_patch_app = list(map(lambda x: int(x), __version__.split('.')))
@@ -190,10 +190,13 @@ if __name__ == "__main__":
                 # La configurazione esiste
                 if (v_patch_app > v_patch_conf):
                     # La patch della versione è diversa e va aggiornata
+                    log.info(f"Aggiornamento automatico di patch da {config['version']} a {__version__}")
                     config['version'] = __version__
                     with open(os.path.join(DIR, "credenziali.yml"), "w", encoding="utf-8") as file_config:
                         file_config.write(yaml.dump(config, sort_keys=False))
+                log.info("INIZIO ELABORAZIONE")
                 LibAxiosFamiglia(DIR, config)
+                log.info("FINE ELABORAZIONE")
     else:
         try:
             file_config_default(DIR)
@@ -201,3 +204,7 @@ if __name__ == "__main__":
             log.error(f"File di configurazione non trovato! Creazione del file di default: {e}")
         except Exception as e:
             log.error(f"Si è verificato un errore imprevisto: {e}")
+
+if __name__ == "__main__":
+
+    run_axios_get_compiti()

@@ -70,8 +70,7 @@ class NotificaFileHTML(Notifica):
             # anche se si verifica un errore durante la scrittura.
             with open(absolute_path, "w", encoding="utf-8") as file:
                 file.write(html)
-            log.info("Scrittura completata con successo!")
-            log.info("---")
+            log.info(f"Notifica Html salvata con successo: {absolute_path}")
 
         except PermissionError:
             log.error(f"Errore: Non hai i permessi necessari per scrivere nel file '{absolute_path}'.")
@@ -102,7 +101,7 @@ class NotificaMail(Notifica):
             if (isinstance(self.config['smtp']['n_allegati'], int)):
                 n_screenshot = self.config['smtp']['n_allegati']
             else:
-                log.info("Warning: n_allegati non è un intero, [default: 0]")
+                log.warning("n_allegati non è un intero, [default: 0]")
 
         if (port == 587):
             starttls = True
@@ -161,7 +160,7 @@ class NotificaMail(Notifica):
                     server.login(username, password)
                     server.send_message(msg)
 
-            log.info("Email inviata con successo!\n---")
+            log.info("Notifica Email inviata con successo!")
         except Exception as e:
             log.error(f"Si è verificato un errore durante l'invio: {e}")
 
@@ -182,7 +181,7 @@ class NotificaTelegram(Notifica):
             if (isinstance(self.config['telegram']['n_allegati'], int)):
                 n_screenshot = self.config['telegram']['n_allegati']
             else:
-                log.info("Warning: n_allegati non è un intero, [default: 0]")
+                log.warning("n_allegati non è un intero, [default: 0]")
         m_html = re.findall(r"<!-- BEGIN SCREENSHOT -->(.*?)<!-- END SCREENSHOT -->", html, re.DOTALL)
 
         # 2. Trasfomazione HTML in messaggio Telegram
@@ -225,32 +224,40 @@ class NotificaTelegram(Notifica):
             "disable_notification": True
         }
 
-        log.info(requests.get(link, params=parametri).json())
+        risposta = requests.get(link, params=parametri).json()
+        if (risposta.get("ok")):
+            # Il messaggio è stato inviato con successo
+            id_nuovo_messaggio = risposta["result"]["message_id"]
+            log.info(f"Notifica messaggio Telegram inviata con successo! ID: {id_nuovo_messaggio}")
 
-        for i, diario in enumerate(m_html):
-            if (i < n_screenshot):
-                dati_bytesio, filename = ScreenShot(self.DIR).diario2image(diario)
-                YY, MM, DD = filename.split("-")
-                payload = {
-                    'chat_id': str(CHAT_ID),
-                    'caption': f'Pagina diario {DD}/{MM}/{YY}'
-                }
-                files = {
-                    'photo': (filename, dati_bytesio.getvalue(), 'image/png')
-                }
-                log.info(requests.post(link_screenshot, data=payload, files=files).json())
-            elif (i == len(m_html)-1 and n_screenshot != 0):
-                dati_bytesio, filename = ScreenShot(self.DIR).diario2image(diario)
-                payload = {
-                    'chat_id': str(CHAT_ID),
-                    'caption': f'Pagina diario {filename}'
-                }
-                files = {
-                    'photo': (filename, dati_bytesio.getvalue(), 'image/png')
-                }
-                log.info(requests.post(link_screenshot, data=payload, files=files).json())
+            for i, diario in enumerate(m_html):
+                if (i < n_screenshot):
+                    dati_bytesio, filename = ScreenShot(self.DIR).diario2image(diario)
+                    YY, MM, DD = filename.split("-")
+                    payload = {
+                        'chat_id': str(CHAT_ID),
+                        'caption': f'Pagina diario {DD}/{MM}/{YY}'
+                    }
+                    files = {
+                        'photo': (filename, dati_bytesio.getvalue(), 'image/png')
+                    }
+                    log.debug(requests.post(link_screenshot, data=payload, files=files).json())
+                elif (i == len(m_html)-1 and n_screenshot != 0):
+                    dati_bytesio, filename = ScreenShot(self.DIR).diario2image(diario)
+                    payload = {
+                        'chat_id': str(CHAT_ID),
+                        'caption': f'Pagina diario {filename}'
+                    }
+                    files = {
+                        'photo': (filename, dati_bytesio.getvalue(), 'image/png')
+                    }
+                    log.debug(requests.post(link_screenshot, data=payload, files=files).json())
+        else:
+            # Telegram ha rifiutato la richiesta
+            codice_errore = risposta.get("error_code")
+            descrizione = risposta.get("description")
+            log.error(f"Errore di notifica messaggio Telegram ({codice_errore}): {descrizione}")
 
-        log.info("---")
 
 class NotificaScreenShot(Notifica):
     """
@@ -269,6 +276,18 @@ class NotificaScreenShot(Notifica):
         m_html = re.findall(r"<!-- BEGIN SCREENSHOT -->(.*?)<!-- END SCREENSHOT -->", html, re.DOTALL)
 
         for _, html in enumerate(m_html):
-            dati_bytesio, filename = ScreenShot(self.DIR).diario2image(html)
-            with open(os.path.join(path_screenshot,filename+".png"), "wb") as f:
-                f.write(dati_bytesio.getvalue())
+            try:
+                dati_bytesio, filename = ScreenShot(self.DIR).diario2image(html)
+                absolute_path = os.path.join(path_screenshot,filename+".png")
+                with open(absolute_path, "wb") as f:
+                    f.write(dati_bytesio.getvalue())
+                log.info(f"Notifica Screenshot salvata con successo: {absolute_path}")
+
+            except PermissionError:
+                log.error(f"Errore: Non hai i permessi necessari per scrivere nel file '{absolute_path}'.")
+
+            except FileNotFoundError:
+                log.error(f"Errore: La cartella specificata per il file '{absolute_path}' non esiste.")
+
+            except Exception as e:
+                log.error(f"Si è verificato un errore imprevisto: {e}")

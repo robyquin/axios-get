@@ -123,6 +123,7 @@ class LibAxiosFamiglia():
         self.session.close()
 
     def _login(self):
+        log.info(f"Login all'Istituto: {self.customerid}")
         self.session.headers['User-Agent'] = self.DefaultUserAgent
         prefixes = [AxiosView.registro, AxiosView.materiale]
         for prefix in prefixes:
@@ -142,6 +143,7 @@ class LibAxiosFamiglia():
             self.__get_session("", link_sequence, prefix)
 
     def _logout(self):
+        log.info(f"Logout all'Istituto: {self.customerid}")
         self.session.headers['User-Agent'] = self.DefaultUserAgent
         prefixes = [AxiosView.registro, AxiosView.materiale]
         for prefix in prefixes:
@@ -165,6 +167,8 @@ class LibAxiosFamiglia():
         :param Alunno: Nome dell'alunno
         :type Alunno: str
         """
+        log.info(f"Elaborazione del Diario di {Alunno}")
+
         self.session.headers['User-Agent'] = self.DefaultUserAgent
         self.session.headers['Referer'] = "https://registrofamiglie.axioscloud.it/"
 
@@ -181,12 +185,10 @@ class LibAxiosFamiglia():
         # Notifica qui
         if (self.sha1_REGISTRO != self.sha1_REGISTRO_old or self.sha1_MD != self.sha1_MD_old and self.COMPITI != {}):
             self.notifica.send_notifica(self.prepara_notifica(self.COMPITI, self.ARGOMENTI, Alunno), Alunno)
-            log.info(f"Registro {self.sha1_REGISTRO} {self.sha1_REGISTRO_old}")
-            log.info("Materiale-Dit {self.sha1_MD} {self.sha1_MD_old}")
-            log.info("---")
+            log.debug(f"Registro {self.sha1_REGISTRO} {self.sha1_REGISTRO_old}")
+            log.debug("Materiale-Dit {self.sha1_MD} {self.sha1_MD_old}")
         else:
             log.info("Nessuna notifica: non ci sono modifiche!")
-            log.info("---")
 
     def get_session_collabora(self, Alunno: str) -> None:
         """
@@ -195,6 +197,8 @@ class LibAxiosFamiglia():
         :param Alunno: Nome dell'alunno
         :type Alunno: str
         """
+        log.info(f"Elaborazione del Materiale Didattico di {Alunno}")
+
         self.session.headers['User-Agent'] = self.DefaultUserAgent
         self.session.headers['Referer'] = "https://collabora.axioscloud.it/"
         link_collabora = [
@@ -323,6 +327,7 @@ class LibAxiosFamiglia():
                 with open(registo_compiti_alunno, 'w', encoding='utf-8') as fp:
                     fp.write(res.text)
                     fp.close()
+                    log.debug(f"Salvataggio: {registo_compiti_alunno}")
 
     def __debug(self, res: requests.Response) -> None:
         """
@@ -332,14 +337,13 @@ class LibAxiosFamiglia():
         :type res: requests.Response
         """
 
-        log.info(f"{res.request.method}, {res.request.url}")
+        log.debug(f"[{res.request.method}] {res.request.url}")
         if (res.request.method == 'POST'):
             if ("Login.aspx" in res.request.url):
-                log.info("**[secret information]**")
+                log.debug("**[secret information]**")
             else:
-                log.info(res.request.body)
-        log.info(res.request.headers)
-        log.info("---")
+                log.debug(f"[BODY] {res.request.body}")
+        log.debug(f"[HEADER] {res.request.headers}")
 
     def prepara_notifica(self, compiti: dict, argomenti: dict, Alunno: str) -> str:
         """
@@ -354,6 +358,7 @@ class LibAxiosFamiglia():
         :return: corpo della notifica
         :rtype: str
         """
+        log.info("Preparazione della notifica...")
         new_compiti = []
         old_compiti = []
         new_argomenti = []
@@ -400,14 +405,12 @@ class LibAxiosFamiglia():
                             if (dt_c == dt_a):
                                 # il giorno è presente, ma manca la materia
                                 new_compiti.insert(c, arg_a)
-                                log.info(f"Inserimento annotazione {arg_a} - Materia mancante")
-                                log.info("---")
+                                log.debug(f"Inserimento annotazione {arg_a} - Materia mancante")
                                 break
                         else:
                             # non c'è il giorno, e quindi nemmeno la materia
                             new_compiti.insert(c, arg_a)
-                            log.info(f"Inserimento annotazione {arg_a} - Giorno mancante")
-                            log.info("---")
+                            log.debug(f"Inserimento annotazione {arg_a} - Giorno mancante")
                             break
 
         linee_notifica = ["<html>", "<head><style> hr { border: 0; border-top: 1px solid #e1e4e8; margin: 30px 0 15px 0;} h2 { background-color: beige; border: 1px solid #e1e4e8; text-align: center; } li.compiti {list-style-type: '📗 '; margin-bottom:10px;} li.verifica {list-style-type: '💥 '; margin-bottom:10px;} li.annotazione {list-style-type: '📚 '; margin-bottom:10px;} li.file {list-style-type: '🔗 ';}</style></head>", "<body>", f"<h1>Compiti per {Alunno}</h1>", f"<p>Ciao <i>{Alunno}</i>,<br>\nricorda sempre di verificare e integrare questi compiti con quelli scritti in classe sul tuo diario cartaceo.</p>", "<p>Buon lavoro</p>"]
@@ -497,6 +500,7 @@ class LibAxiosFamiglia():
         :return: contenuto con evidenziazione dei cambiamenti
         :rtype: list
         """
+        log.info("Elaborazione dell'evidenziatura dei cambiamenti nel contenuto")
         output = []
 
         start_new = 0
