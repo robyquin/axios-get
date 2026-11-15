@@ -18,7 +18,7 @@ import re
 import yaml
 
 from moduli.lib_axios_famiglia import LibAxiosFamiglia
-from moduli.logging_config import log, logging
+from moduli.logging_config import log
 
 def file_config_default(DIR: str) -> None:
     """
@@ -82,15 +82,6 @@ def file_config_default(DIR: str) -> None:
         }
     }
     try:
-        if (os.path.exists(os.path.join(DIR, "schedula_axios-get.xml_tmp")) and getattr(sys, 'frozen', False)):
-            content = ""
-            with open(os.path.join(DIR, "schedula_axios-get.xml_tmp"), "r", encoding="utf-16") as file_schedule:
-                content = file_schedule.read()
-            content = content.replace("<Command>Axios-Get</Command>", f"<Command>{str(os.path.abspath(sys.executable))}</Command>")
-            content = content.replace("<WorkingDirectory>Axios-Get</WorkingDirectory>", f"<WorkingDirectory>{str(os.path.dirname(sys.executable))}</WorkingDirectory>")
-            with open(os.path.join(DIR, "schedula_axios-get.xml"), "w", encoding="utf-16") as file_schedule:
-                content = file_schedule.write(content)
-                os.remove(os.path.join(DIR, "schedula_axios-get.xml_tmp"))
         with open(os.path.join(DIR, "credenziali_default.yml"), "w", encoding="utf-8") as file_config:
             content_yaml = yaml.dump(config_default, sort_keys=False)
             file_config.write("""# GUIDA ALLA CONFIGURAZIONE
@@ -123,20 +114,7 @@ def file_config_default(DIR: str) -> None:
         log.error(f"Si è verificato un errore imprevisto: {e}")
     raise FileNotFoundError(os.path.join(DIR, "credenziali_default.yml"))
 
-def run_axios_get_compiti():
-
-    if getattr(sys, 'frozen', False):
-        # Se l'applicazione è compilata con PyInstaller
-        DIR=str(os.path.dirname(sys.executable))
-        # Handler file senza colori
-        file_handler = logging.FileHandler(filename=os.path.join(DIR, "output.log"), mode="w")
-        # "%(asctime)-15s [%(levelname)s] %(message)s"
-        file_formatter = logging.Formatter("[%(levelname)s] %(message)s")
-        file_handler.setFormatter(file_formatter)
-        file_handler.setLevel(logging.DEBUG)
-        log.addHandler(file_handler)
-    else:
-        DIR=str(Path(os.path.dirname(__file__)).absolute())
+def run_axios_get_compiti(DIR):
 
     if (os.path.exists(os.path.join(DIR, "credenziali.yml"))):
         with open(os.path.join(DIR, "credenziali.yml"), "r", encoding="utf-8") as file:
@@ -207,4 +185,5 @@ def run_axios_get_compiti():
 
 if __name__ == "__main__":
 
-    run_axios_get_compiti()
+    run_axios_get_compiti(str(Path(os.path.dirname(__file__)).absolute()))
+    sys.exit(0)
