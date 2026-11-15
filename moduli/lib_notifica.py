@@ -34,10 +34,6 @@ class Notifica():
     """
     def __init__(self, DIR: str, config: dict, parametro: int | str) -> None:
         self.DIR = DIR
-        # if getattr(sys, 'frozen', False):
-        #     # Se l'applicazione è compilata con PyInstaller
-        #     sys.stderr = open(os.path.join(self.DIR, "errori.txt"), "a", encoding="utf-8")
-        #     sys.stdout = open(os.path.join(self.DIR, "log.txt"), "a", encoding="utf-8")
         self.config = config
         self.param = parametro
 

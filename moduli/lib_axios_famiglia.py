@@ -61,10 +61,6 @@ class LibAxiosFamiglia():
     """
     def __init__(self, DIR: str, config: dict) -> None:
         self.DIR = DIR
-        # if getattr(sys, 'frozen', False):
-            # Se l'applicazione è compilata con PyInstaller
-            # sys.stderr = open(os.path.join(self.DIR, "errori.txt"), "a", encoding="utf-8")
-            # sys.stdout = open(os.path.join(self.DIR, "log.txt"), "a", encoding="utf-8")
         self.DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:156.0) Gecko/20100101 Firefox/156.0"
 
         for credenziali in config['credenziali']:
