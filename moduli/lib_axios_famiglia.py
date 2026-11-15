@@ -229,6 +229,7 @@ class LibAxiosFamiglia():
             registo_compiti_alunno = os.path.join(self.dir_istituto, dir_alunno, link[UrlIdType.filename])
             if (link[UrlIdType.method] == 'GET'):
                 res = self.session.get(link[UrlIdType.url], params=link[UrlIdType.params], allow_redirects=True)
+                self.__debug(res)
                 if ('Action' in link[UrlIdType.params].keys()):
                     if (link[UrlIdType.params]['Action'] == 'DashboardLoad'):
                         text = res.text
