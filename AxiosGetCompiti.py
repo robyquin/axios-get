@@ -18,6 +18,7 @@ import re
 import yaml
 
 from moduli.lib_axios_famiglia import LibAxiosFamiglia
+from moduli.logging_config import log
 
 def file_config_default(DIR: str) -> None:
     """
@@ -81,15 +82,6 @@ def file_config_default(DIR: str) -> None:
         }
     }
     try:
-        if (os.path.exists(os.path.join(DIR, "schedula_axios-get.xml_tmp")) and getattr(sys, 'frozen', False)):
-            content = ""
-            with open(os.path.join(DIR, "schedula_axios-get.xml_tmp"), "r", encoding="utf-16") as file_schedule:
-                content = file_schedule.read()
-            content = content.replace("<Command>Axios-Get</Command>", f"<Command>{str(os.path.abspath(sys.executable))}</Command>")
-            content = content.replace("<WorkingDirectory>Axios-Get</WorkingDirectory>", f"<WorkingDirectory>{str(os.path.dirname(sys.executable))}</WorkingDirectory>")
-            with open(os.path.join(DIR, "schedula_axios-get.xml"), "w", encoding="utf-16") as file_schedule:
-                content = file_schedule.write(content)
-                os.remove(os.path.join(DIR, "schedula_axios-get.xml_tmp"))
         with open(os.path.join(DIR, "credenziali_default.yml"), "w", encoding="utf-8") as file_config:
             content_yaml = yaml.dump(config_default, sort_keys=False)
             file_config.write("""# GUIDA ALLA CONFIGURAZIONE
@@ -119,22 +111,10 @@ def file_config_default(DIR: str) -> None:
             content_yaml = re.sub(r'(- EMAIL_ALTRI.*)', '# \\1 # Specifica, come un elenco, altri destinatari della email', content_yaml)
             file_config.write(content_yaml)
     except Exception as e:
-        print(f"Si è verificato un errore imprevisto: {e}", file=sys.stderr)
+        log.error(f"Si è verificato un errore imprevisto: {e}")
     raise FileNotFoundError(os.path.join(DIR, "credenziali_default.yml"))
 
-if __name__ == "__main__":
-
-    if getattr(sys, 'frozen', False):
-        # Se l'applicazione è compilata con PyInstaller
-        DIR=str(os.path.dirname(sys.executable))
-        if(os.path.exists(os.path.join(DIR, "errori.txt"))):
-            os.remove(os.path.join(DIR, "errori.txt"))
-        if(os.path.exists(os.path.join(DIR, "log.txt"))):
-            os.remove(os.path.join(DIR, "log.txt"))
-        sys.stderr = open(os.path.join(DIR, "errori.txt"), "a", encoding="utf-8")
-        sys.stdout = open(os.path.join(DIR, "log.txt"), "a", encoding="utf-8")
-    else:
-        DIR=str(Path(os.path.dirname(__file__)).absolute())
+def run_axios_get_compiti(DIR):
 
     if (os.path.exists(os.path.join(DIR, "credenziali.yml"))):
         with open(os.path.join(DIR, "credenziali.yml"), "r", encoding="utf-8") as file:
@@ -142,6 +122,8 @@ if __name__ == "__main__":
 
         if (config.get("version", None) == None):
             # La configurazione esiste ma ad una versione <= v1.0.8, è da aggiornare direttamente all'ultima
+            log.info(f"Migrazione automatica alla versione {__version__}")
+            log.warning(f"Il file di configurazione sarà convertito alla nuova versione {__version__}!")
             new_config = {}
             new_config['version'] = __version__
             new_config['credenziali'] = [config['axios']['credenziali']]
@@ -172,28 +154,36 @@ if __name__ == "__main__":
                         new_config['params_notifiche'][tipo_notifica] = config.get(tipo_notifica)
             with open(os.path.join(DIR, f"credenziali_v{__version__}.yml"), "w", encoding="utf-8") as file_config:
                 file_config.write(yaml.dump(new_config, sort_keys=False))
-            print(f"File di configurazione è stato convertito alla nuova versione {__version__}!", file=sys.stderr)
-            print(f"Verifica che i dati siano corretti, poi rinomina credenziali_v{__version__}.yml in credenziali.yml per renderlo effettivo!", file=sys.stderr)
+            log.info(f"Salvataggio file: {os.path.join(DIR, f"credenziali_v{__version__}.yml")}")
+            log.warning(f"Verifica che i dati siano corretti, poi rinomina credenziali_v{__version__}.yml in credenziali.yml per renderlo effettivo!")
         else:
             v_maj_conf, v_min_conf, v_patch_conf = list(map(lambda x: int(x), config.get("version").split('.')))
             v_maj_app, v_min_app, v_patch_app = list(map(lambda x: int(x), __version__.split('.')))
 
             if (v_maj_app >= v_maj_conf and v_min_app > v_min_conf):
                 # La configurazione esiste con una versione diversa da v1.1.0, ma è da aggiornata
-                print("File di configurazione deve essere aggiornata!", file=sys.stderr)
-                print(f"Non è disponibile nessuna procedura di migrazione da v{config.get("version")} a v{__version__}", file=sys.stderr)
+                log.error("File di configurazione deve essere aggiornata!")
+                log.error(f"Non è disponibile nessuna procedura di migrazione da v{config.get("version")} a v{__version__}")
             elif (v_maj_app == v_maj_conf and v_min_app == v_min_conf):
                 # La configurazione esiste
                 if (v_patch_app > v_patch_conf):
                     # La patch della versione è diversa e va aggiornata
+                    log.info(f"Aggiornamento automatico di patch da {config['version']} a {__version__}")
                     config['version'] = __version__
                     with open(os.path.join(DIR, "credenziali.yml"), "w", encoding="utf-8") as file_config:
                         file_config.write(yaml.dump(config, sort_keys=False))
+                log.info("INIZIO ELABORAZIONE")
                 LibAxiosFamiglia(DIR, config)
+                log.info("FINE ELABORAZIONE")
     else:
         try:
             file_config_default(DIR)
         except FileNotFoundError as e:
-            print(f"File di configurazione non trovato! Creazione del file di default: {e}", file=sys.stderr)
+            log.error(f"File di configurazione non trovato! Creazione del file di default: {e}")
         except Exception as e:
-            print(f"Si è verificato un errore imprevisto: {e}", file=sys.stderr)
+            log.error(f"Si è verificato un errore imprevisto: {e}")
+
+if __name__ == "__main__":
+
+    run_axios_get_compiti(str(Path(os.path.dirname(__file__)).absolute()))
+    sys.exit(0)
