@@ -8,7 +8,7 @@ Se possiedi già una casella di posta elettronica con uno di questi gestori, i l
 | ------------- | ---------- | ------------------ | ----- | --------- | ------------------------- | ------------------------- |
 | Tim           | Verificato | smtp.tim.it        | 587   | STARTTLS  | email Tim + password      | Richiesta connessione Tim |
 | Aruba         | Verificato | smtps.aruba.it     | 465   | SSL       | WebEmail Aruba + password |                           |
-| Libero Mail   | ?          | smtp.libero.it     | 465   | SSL       | email Libero + password   |                           |
+| Libero Mail   | Verificato | smtp.libero.it     | 465   | SSL       | email Libero + password   |                           |
 | Virgilio Mail | ?          | smtp.virgilio.it   | 465   | SSL       | email Virgilio + password |                           |
 | Tiscali       | Verificato | smtp.tiscali.it    | 465   | SSL       | email Tiscali + password  |                           |
 | Fastweb       | ?          | smtp.fastwebnet.it | 465   | SSL       | email Fastweb + password  |                           |
