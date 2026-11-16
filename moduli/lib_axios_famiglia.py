@@ -274,13 +274,14 @@ class LibAxiosFamiglia():
                             jj = json.loads(res.text)
                             text = jj['html']
                             m = re.search(r"'userList' value = '(.*?)'", text)
-                            MATERIALE_CONDIVISO_ALUNNO = m.group(1)
-                            m = re.search(r"<legend.*?>(.*?)</legend>", text)
-                            self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<h2>{m.group(1)}</h2>")
-                            new_link_collabora = [
-                                ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_FOLDERS_SHARED'}, '05_MATERIALE_DIDATTICO_FOLDERS_SHARED.json', MATERIALE_CONDIVISO_ALUNNO, '', False]
-                            ]
-                            self.__get_session(Alunno, new_link_collabora, prefix)
+                            if (m is not None):
+                                MATERIALE_CONDIVISO_ALUNNO = m.group(1)
+                                m = re.search(r"<legend.*?>(.*?)</legend>", text)
+                                self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<h2>{m.group(1)}</h2>")
+                                new_link_collabora = [
+                                    ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_FOLDERS_SHARED'}, '05_MATERIALE_DIDATTICO_FOLDERS_SHARED.json', MATERIALE_CONDIVISO_ALUNNO, '', False]
+                                ]
+                                self.__get_session(Alunno, new_link_collabora, prefix)
                         elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_FOLDERS_SHARED'):
                             MATERIALE_DIDATTICO_FOLDERS_SHARED = json.loads(json.loads(res.text)['json'])
                             MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF = ""
