@@ -348,6 +348,17 @@ class LibAxiosFamiglia():
                     fp.close()
                     log.debug(f"Salvataggio: {registo_compiti_alunno}")
 
+            if (link[UrlIdType.filename].split('.')[1] == 'json'):
+                msg_data = json.loads(res.text)
+                errorcode = int(msg_data.get("errorcode", -1))
+                errormsg = msg_data.get("errormsg", "")
+                if (errormsg != ""):
+                    if (errorcode == 0):
+                        log.debug(f"Return ({errorcode}): {errormsg}")
+                    else:
+                        log.error(f"Return ({errorcode}): {errormsg}")
+                        get_error = errormsg
+
             if (get_error != None):
                 raise Exception("{}".format(get_error))
 
