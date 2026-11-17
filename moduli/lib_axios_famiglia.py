@@ -221,6 +221,7 @@ class LibAxiosFamiglia():
                 fp.close()
 
     def __get_session(self, Alunno, link_sequence, prefix):
+        get_error = None
         if (os.path.exists(os.path.join(self.DIR, prefix+"_"+Alunno))):
             shutil.move(os.path.join(self.DIR, prefix+"_"+Alunno), self.dir_istituto)
             os.rename(os.path.join(self.dir_istituto, prefix+"_"+Alunno), os.path.join(self.dir_istituto, "_"+prefix+"_"+Alunno))
@@ -231,7 +232,7 @@ class LibAxiosFamiglia():
             registo_compiti_alunno = os.path.join(self.dir_istituto, dir_alunno, link[UrlIdType.filename])
             if (link[UrlIdType.method] == 'GET'):
                 res = self.session.get(link[UrlIdType.url], params=link[UrlIdType.params], allow_redirects=True)
-                self.__debug(res)
+
                 if ('Action' in link[UrlIdType.params].keys()):
                     if (link[UrlIdType.params]['Action'] == 'DashboardLoad'):
                         text = res.text
@@ -265,8 +266,6 @@ class LibAxiosFamiglia():
                     res = self.session.post(link[UrlIdType.url], json=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content-Type': 'application/x-www-form-urlencoded'})
                 else:
                     res = self.session.post(link[UrlIdType.url], data=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content-Type': 'application/x-www-form-urlencoded'})
-
-                self.__debug(res)
 
                 get_error = re.search(r"SweetMessage.error\('(.*)'\);", res.text)
                 if (get_error == None):
@@ -326,7 +325,9 @@ class LibAxiosFamiglia():
                                 self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<li class='file'><b>{ll[0]}</b><div>{ll[1]} - {ll[2]}</div></li>")
                             self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append("</ul>")
                 else:
-                    raise Exception("{}".format(get_error.group(1)))
+                    get_error = f"{get_error.group(1)} ({prefix} - {link[UrlIdType.filename]})"
+
+            self.__debug(res)
 
             if (prefix is not None and link[UrlIdType.filename] is not None):
                 dir_registro_alunno = os.path.join(self.dir_istituto, dir_alunno)
@@ -336,6 +337,9 @@ class LibAxiosFamiglia():
                     fp.write(res.text)
                     fp.close()
                     log.debug(f"Salvataggio: {registo_compiti_alunno}")
+
+            if (get_error != None):
+                raise Exception("{}".format(get_error))
 
     def __debug(self, res: requests.Response) -> None:
         """
