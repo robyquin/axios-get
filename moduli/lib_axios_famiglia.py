@@ -180,6 +180,11 @@ class LibAxiosFamiglia():
         ]
 
         self.__get_session(Alunno, link_registrofamiglie, AxiosView.registro)
+
+        if (Alunno not in self.alunni[AxiosView.registro].keys()):
+            if (self.alunno_nome_completo in self.alunni[AxiosView.registro].keys()):
+                    Alunno = self.alunno_nome_completo
+        
         # Notifica qui
         if (self.sha1_REGISTRO != self.sha1_REGISTRO_old or self.sha1_MD != self.sha1_MD_old and self.COMPITI != {}):
             self.notifica.send_notifica(self.prepara_notifica(self.COMPITI, self.ARGOMENTI, Alunno), Alunno)
@@ -206,6 +211,11 @@ class LibAxiosFamiglia():
         ]
 
         self.__get_session(Alunno, link_collabora, AxiosView.materiale)
+
+        if (Alunno not in self.alunni[AxiosView.materiale].keys()):
+            if (self.alunno_nome_completo in self.alunni[AxiosView.materiale].keys()):
+                    Alunno = self.alunno_nome_completo
+
         if (len(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES) > 0):
             dir_alunno = AxiosView.materiale
             if (Alunno != "" and self.alunni.get(AxiosView.materiale, {}).get(Alunno, None) != None):
@@ -376,7 +386,7 @@ class LibAxiosFamiglia():
         new_argomenti = []
         oggi_long = datetime.strftime(datetime.now(), "%d/%m/%Y %H:%M:%S")
 
-        dir_alunno = f'{AxiosView.registro}_{Alunno}'
+        dir_alunno = AxiosView.registro
         if (Alunno != "" and self.alunni[AxiosView.registro].get(Alunno, None) != None):
             dir_alunno = f'{AxiosView.registro}_{Alunno}_{hashlib.md5(self.alunni[AxiosView.registro][Alunno].encode('utf-8')).hexdigest()}'
 
