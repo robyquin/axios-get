@@ -67,6 +67,7 @@ class LibAxiosFamiglia():
             self.customerid = str(credenziali['customerid'])
             self.username = str(credenziali['username'])
             self.password = str(credenziali['password'])
+            self.alunno_nome_completo = ""
             self.alunni = {}
             self.alunni[AxiosView.registro] = {}
             self.alunni[AxiosView.materiale] = {}
@@ -107,6 +108,7 @@ class LibAxiosFamiglia():
                             self.notifica = lib_notifica.NotificaTelegram(DIR, config['params_notifiche'], parametro)
 
                         if (self.notifica is not None):
+                            self.alunno_nome_completo = param.get('nome_completo', '')
                             self.get_session_collabora(alunno)
                             self.get_session_registrofamiglie(alunno)
                         else:
@@ -182,7 +184,7 @@ class LibAxiosFamiglia():
         if (self.sha1_REGISTRO != self.sha1_REGISTRO_old or self.sha1_MD != self.sha1_MD_old and self.COMPITI != {}):
             self.notifica.send_notifica(self.prepara_notifica(self.COMPITI, self.ARGOMENTI, Alunno), Alunno)
             log.debug(f"Registro {self.sha1_REGISTRO} {self.sha1_REGISTRO_old}")
-            log.debug("Materiale-Dit {self.sha1_MD} {self.sha1_MD_old}")
+            log.debug(f"Materiale-Dit {self.sha1_MD} {self.sha1_MD_old}")
         else:
             log.info("Nessuna notifica: non ci sono modifiche!")
 
@@ -240,10 +242,18 @@ class LibAxiosFamiglia():
                         elif (prefix == AxiosView.materiale):
                             m = re.findall(r"<button.*?utId = '(.*?)'>.*?<div class='details'><div class='desc'>(.*?)</div></div></button>", text)
                             for elm in m:
-                                if (Alunno in elm[1]):
-                                    self.alunni[prefix][Alunno] = elm[0]
-                        if (not Alunno in self.alunni[prefix].keys()):
-                            log.error(f"Warning! Il nome dell'alunno, {Alunno}, non trovato! Verifica e controlla la corrispondenza nel file di configurazione.")
+                                self.alunni[prefix][elm[1]] = elm[0]
+                        if (not Alunno in self.alunni[prefix].keys() and not self.alunno_nome_completo in self.alunni[prefix].keys()):
+                            log.warning(f"Il nome '{Alunno}' non trovato nella lista alunni!")
+                            if (prefix == AxiosView.materiale):
+                                log.warning(f"Aggiungi nella configurazione corrispondente di {Alunno} un campo 'nome_completo' scegliendo uno tra questi:\n - {"\n - ".join(self.alunni[prefix].keys())}")
+                                log.warning("L'elaborazione del contenuto del materiale didattico verrà momentaneamente disabilitata!")
+                            else:
+                                log.warning(f"Nel file di configurazione, dovresti verificare/controllare la corrispondenza con uno di questi:\n - {"\n - ".join(self.alunni[prefix].keys())}")
+                            break
+                        elif (self.alunno_nome_completo in self.alunni[prefix].keys()):
+                            Alunno = self.alunno_nome_completo
+
             else:
                 if ('Action' in link[UrlIdType.params].keys()):
                     if (link[UrlIdType.params]['Action'] == 'MATERIALE_CONDIVISO_ALUNNO'):
