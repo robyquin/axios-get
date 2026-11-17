@@ -301,6 +301,8 @@ class LibAxiosFamiglia():
                                     ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_FOLDERS_SHARED'}, '05_MATERIALE_DIDATTICO_FOLDERS_SHARED.json', MATERIALE_CONDIVISO_ALUNNO, '', False]
                                 ]
                                 self.__get_session(Alunno, new_link_collabora, prefix)
+                            else:
+                                log.info(f"Non è presente materiale didattico per {Alunno}")
                         elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_FOLDERS_SHARED'):
                             MATERIALE_DIDATTICO_FOLDERS_SHARED = json.loads(json.loads(res.text)['json'])
                             MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF = ""
