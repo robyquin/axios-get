@@ -67,7 +67,7 @@ class LibAxiosFamiglia():
             self.customerid = str(credenziali['customerid'])
             self.username = str(credenziali['username'])
             self.password = str(credenziali['password'])
-            self.alunno_nome_completo = ""
+            self.nome_alternativo_alunno = ""
             self.alunni = {}
             self.alunni[AxiosView.registro] = {}
             self.alunni[AxiosView.materiale] = {}
@@ -108,7 +108,7 @@ class LibAxiosFamiglia():
                             self.notifica = lib_notifica.NotificaTelegram(DIR, config['params_notifiche'], parametro)
 
                         if (self.notifica is not None):
-                            self.alunno_nome_completo = param.get('nome_completo', '')
+                            self.nome_alternativo_alunno = param.get('nome_alternativo', '')
                             self.get_session_collabora(alunno)
                             self.get_session_registrofamiglie(alunno)
                         else:
@@ -182,9 +182,9 @@ class LibAxiosFamiglia():
         self.__get_session(Alunno, link_registrofamiglie, AxiosView.registro)
 
         if (Alunno not in self.alunni[AxiosView.registro].keys()):
-            if (self.alunno_nome_completo in self.alunni[AxiosView.registro].keys()):
-                    Alunno = self.alunno_nome_completo
-        
+            if (self.nome_alternativo_alunno in self.alunni[AxiosView.registro].keys()):
+                Alunno = self.nome_alternativo_alunno
+
         # Notifica qui
         if (self.sha1_REGISTRO != self.sha1_REGISTRO_old or self.sha1_MD != self.sha1_MD_old and self.COMPITI != {}):
             self.notifica.send_notifica(self.prepara_notifica(self.COMPITI, self.ARGOMENTI, Alunno), Alunno)
@@ -213,8 +213,8 @@ class LibAxiosFamiglia():
         self.__get_session(Alunno, link_collabora, AxiosView.materiale)
 
         if (Alunno not in self.alunni[AxiosView.materiale].keys()):
-            if (self.alunno_nome_completo in self.alunni[AxiosView.materiale].keys()):
-                    Alunno = self.alunno_nome_completo
+            if (self.nome_alternativo_alunno in self.alunni[AxiosView.materiale].keys()):
+                Alunno = self.nome_alternativo_alunno
 
         if (len(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES) > 0):
             dir_alunno = AxiosView.materiale
@@ -230,7 +230,7 @@ class LibAxiosFamiglia():
                 fp.write(text_MD)
                 fp.close()
 
-    def __get_session(self, Alunno, link_sequence, prefix):
+    def __get_session(self, Alunno, link_sequence, prefix) -> bool:
         get_error = None
         if (os.path.exists(os.path.join(self.DIR, prefix+"_"+Alunno))):
             shutil.move(os.path.join(self.DIR, prefix+"_"+Alunno), self.dir_istituto)
@@ -254,16 +254,16 @@ class LibAxiosFamiglia():
                             m = re.findall(r"<button.*?utId = '(.*?)'>.*?<div class='details'><div class='desc'>(.*?)</div></div></button>", text)
                             for elm in m:
                                 self.alunni[prefix][elm[1]] = elm[0]
-                        if (not Alunno in self.alunni[prefix].keys() and not self.alunno_nome_completo in self.alunni[prefix].keys()):
+                        if (not Alunno in self.alunni[prefix].keys() and not self.nome_alternativo_alunno in self.alunni[prefix].keys()):
                             log.warning(f"Il nome '{Alunno}' non trovato nella lista alunni!")
                             if (prefix == AxiosView.materiale):
-                                log.warning(f"Aggiungi nella configurazione corrispondente di {Alunno} un campo 'nome_completo' scegliendo uno tra questi:\n - {"\n - ".join(self.alunni[prefix].keys())}")
+                                log.warning(f"Aggiungi nella configurazione corrispondente di {Alunno} un campo 'nome_alternativo' scegliendo uno tra questi:\n - {"\n - ".join(self.alunni[prefix].keys())}")
                                 log.warning("L'elaborazione del contenuto del materiale didattico verrà momentaneamente disabilitata!")
                             else:
                                 log.warning(f"Nel file di configurazione, dovresti verificare/controllare la corrispondenza con uno di questi:\n - {"\n - ".join(self.alunni[prefix].keys())}")
                             break
-                        elif (self.alunno_nome_completo in self.alunni[prefix].keys()):
-                            Alunno = self.alunno_nome_completo
+                        elif (self.nome_alternativo_alunno in self.alunni[prefix].keys()):
+                            Alunno = self.nome_alternativo_alunno
 
             else:
                 if ('Action' in link[UrlIdType.params].keys()):
