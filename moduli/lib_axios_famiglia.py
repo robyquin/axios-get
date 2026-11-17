@@ -67,17 +67,6 @@ class LibAxiosFamiglia():
             self.customerid = str(credenziali['customerid'])
             self.username = str(credenziali['username'])
             self.password = str(credenziali['password'])
-            self.nome_alternativo_alunno = ""
-            self.alunni = {}
-            self.alunni[AxiosView.registro] = {}
-            self.alunni[AxiosView.materiale] = {}
-            self.COMPITI = {}
-            self.ARGOMENTI = {}
-            self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES = []
-            self.sha1_REGISTRO = ""
-            self.sha1_REGISTRO_old = ""
-            self.sha1_MD = ""
-            self.sha1_MD_old = ""
 
             self.dir_istituto = os.path.join(DIR, "Istituto_"+str(self.customerid))
             if (not os.path.exists(self.dir_istituto)):
@@ -91,6 +80,17 @@ class LibAxiosFamiglia():
             try:
                 self._login()
                 for alunno, param in credenziali['alunni'].items():
+                    self.nome_alternativo_alunno = ""
+                    self.alunni = {}
+                    self.alunni[AxiosView.registro] = {}
+                    self.alunni[AxiosView.materiale] = {}
+                    self.COMPITI = {}
+                    self.ARGOMENTI = {}
+                    self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES = []
+                    self.sha1_REGISTRO = ""
+                    self.sha1_REGISTRO_old = ""
+                    self.sha1_MD = ""
+                    self.sha1_MD_old = ""
                     self.notifica = None
                     tipo_notifica = param['tipo']
                     if(tipo_notifica in config['params_notifiche'].keys()):
