@@ -62,8 +62,12 @@ class LibAxiosFamiglia():
     def __init__(self, DIR: str, config: dict) -> None:
         self.DIR = DIR
         self.DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:156.0) Gecko/20100101 Firefox/156.0"
+        if (len(config['credenziali']) == 1):
+            log.info(f"Presente una sola configurazione di istituto")
+        else:
+            log.info(f"Presenti {len(config['credenziali'])} configurazione di istituto")
 
-        for credenziali in config['credenziali']:
+        for idx_istituto, credenziali in enumerate(config['credenziali']):
             self.customerid = str(credenziali['customerid'])
             self.username = str(credenziali['username'])
             self.password = str(credenziali['password'])
@@ -78,8 +82,14 @@ class LibAxiosFamiglia():
                 raise Exception("Controlla il file di configurazione: una delle credenziali di Axios è vuota")
 
             try:
+                if (len(credenziali['alunni']) == 1):
+                    log.info(f"{idx_istituto+1}. Elaborazione Istituto **{str(self.customerid)}** con un solo studente")
+                else:
+                    log.info(f"{idx_istituto+1}. Elaborazione Istituto **{str(self.customerid)}** con {len(credenziali['alunni'])} studenti")
                 self._login()
-                for alunno, param in credenziali['alunni'].items():
+                for idx_alunno, item in enumerate(credenziali['alunni'].items()):
+                    alunno, param = item
+                    log.info(f"- {idx_istituto+1}.{idx_alunno+1}. per **{alunno}** verrà utilizzata la notificata **{param['tipo']}**")
                     self.nome_alternativo_alunno = ""
                     self.alunni = {}
                     self.alunni[AxiosView.registro] = {}
@@ -115,7 +125,7 @@ class LibAxiosFamiglia():
                             log.error("Error: occorre configurare e selezionare un tipo di notifica")
                 self._logout()
             except Exception as e:
-                log.error(f"Si è verificato un errore imprevisto: {e}")
+                log.error(f"Si è verificato un errore imprevisto nel processo interno a LibAxiosFamiglia: {e}")
 
     def __delete__(self, instance):
         self.session.close()

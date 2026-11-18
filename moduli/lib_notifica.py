@@ -75,7 +75,7 @@ class NotificaFileHTML(Notifica):
             log.error(f"Errore: La cartella specificata per il file '{absolute_path}' non esiste.")
 
         except Exception as e:
-            log.error(f"Si è verificato un errore imprevisto: {e}")
+            log.error(f"Si è verificato un errore imprevisto NotificaFileHTML: {e}")
 
 class NotificaMail(Notifica):
     """
@@ -286,4 +286,4 @@ class NotificaScreenShot(Notifica):
                 log.error(f"Errore: La cartella specificata per il file '{absolute_path}' non esiste.")
 
             except Exception as e:
-                log.error(f"Si è verificato un errore imprevisto: {e}")
+                log.error(f"Si è verificato un errore imprevisto in NotificaScreenShot: {e}")
