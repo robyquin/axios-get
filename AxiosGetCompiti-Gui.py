@@ -90,6 +90,10 @@ class ApplicationGUI:
 
         self.start_button.config(state="disabled")
         self.status_label.config(text="Elaborazione in corso...", fg="orange")
+        
+        self.log_text.config(state="normal")
+        self.log_text.delete('1.0', 'end')
+        self.log_text.config(state="disabled")
 
         threading.Thread(
             target=self.run_worker,
