@@ -44,6 +44,9 @@ Per la prima configurazione occorre creare un file, se non esiste, con il nome `
 
 - Per la compilazione dei campi del file e per conoscere tutte le tipologie di notifiche disponibili, segui le indicazioni nel documento [CONFIGURAZIONE](./docs/Configurazione.md)
 
+> [!CAUTION]
+> `credenziali.yml` contiene in chiaro le credenziali Axios e, se configurati, la password SMTP e il token Telegram. **Non condividerlo né caricarlo su Git** e limita l’accesso al file e alle sue copie di backup.
+
 ## Usage
 
 Dalla versione `>= v1.1.2` il progetto include un'interfaccia grafica minimale (**GUI**) per avviare e configurare `axios-get`.

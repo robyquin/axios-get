@@ -21,6 +21,9 @@ Per funzionare, `credenziali_default.yml` deve essere rinominato in `credenziali
 >
 > La procedura di migrazione è non distruttiva, al primo avvio della una nuova release verrà generato il file aggiornato con il nome `credenziali_{versione}.yml`. Dopo la verifica/controllo dell'esattezza dei dati il file dovrà essere rinominato in `credenziali.yml` per rendere le modifiche effettive.
 
+> [!CAUTION]
+> `credenziali.yml` contiene in chiaro le credenziali Axios e, se configurati, la password SMTP e il token Telegram. **Non condividerlo né caricarlo su Git** e limita l’accesso al file e alle sue copie di backup.
+
 ## Convenzioni del documento
 
 Si indicherà con **RF**: *Axios Registro Elettronico FAMIGLIA*
@@ -37,6 +40,22 @@ Sezione1:
     NomeLista:
         - Valore_1
 ```
+
+## Protezione del file `credenziali.yml`
+
+Su Linux, macOS e altri sistemi Unix-like, dalla cartella del progetto, si consiglia di limitare i permessi del file delle credenziali:
+
+```bash
+chmod 600 credenziali.yml
+```
+
+Per limitare l’accesso anche alla cartella del progetto, sostituire il percorso d’esempio con quello effettivo:
+
+```bash
+chmod 700 /percorso/axios-get
+```
+
+La cartella deve appartenere all’utente che esegue Axios-Get; altrimenti il programma potrebbe non riuscire ad accedere al file di configurazione.
 
 ## Configurazione minima richiesta
 

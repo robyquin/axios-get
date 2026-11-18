@@ -84,7 +84,9 @@ def file_config_default() -> str:
     content_yaml = f"""# GUIDA ALLA CONFIGURAZIONE
 # https://github.com/robyquin/axios-get/blob/master/docs/Configurazione.md
 # Questo file è scritto in YAML, se lo modifichi manualmente presta attenzione all'indentazione e alla sintassi specifica.
-# Il testo che segue il carattere # è un commento e quindi nell'esecuzione verrà ignorato\n\n{content_yaml}"""
+# Il testo che segue il carattere # è un commento e quindi nell'esecuzione verrà ignorato
+# ATTENZIONE: questo file può contenere in chiaro le credenziali Axios e, se configurati, la password SMTP e il token Telegram.
+# Non condividerlo; limita l'accesso al file e alle copie di backup.\n\n{content_yaml}"""
 
     content_yaml = re.sub(r'(version:.*)', '\\1 # Versione della release', content_yaml)
     content_yaml = re.sub(r'(credenziali:.*)', '\\1 # Gruppo credenziali: raccoglie informazioni per l\'accesso al portale, la definizione degli studenti e per ciascuno la propria configurazione di notifica', content_yaml)
