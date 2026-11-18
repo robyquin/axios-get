@@ -22,23 +22,26 @@ class ApplicationGUIConfigurator():
 
     def __init__(self):
         self.percorso_configurazione = None
-        # --- Finestra ---
-        self.window = tk.Tk()
-        ttk.Style().theme_use("clam")
-        self.window.title("Axios-get Configuratore")
-        self.window.geometry("650x500")
 
-        self.window.columnconfigure((0, 1, 2), weight=1)
-        self.window.rowconfigure(1, weight=1)
+        # Finestra 5x2
+        self.window = tk.Toplevel()
+
+        self.window.title("Axios-get Configuratore")
+        self.window.geometry("800x400") 
 
         # Pulsanti
-        ttk.Button(self.window, text="Apri .yml", command=self.carica_file).grid(row=0, column=0, sticky="ew", padx=5, pady=5)
-        ttk.Button(self.window, text="Verifica Sintassi", command=self.verifica_yaml).grid(row=0, column=1, sticky="ew", padx=5, pady=5)
-        ttk.Button(self.window, text="Salva credenziali.yml", command=self.salva_file).grid(row=0, column=2, sticky="ew", padx=5, pady=5)
+        button_open = ttk.Button(self.window, text="Apri .yml", command=self.carica_file)
+        button_open.grid(row=0, column=0, padx=10, pady=10)
+
+        button_verifica = ttk.Button(self.window, text="Verifica Sintassi", command=self.verifica_yaml)
+        button_verifica.grid(row=1, column=0, padx=10, pady=10)
+
+        button_save = ttk.Button(self.window, text="Salva credenziali.yml", command=self.salva_file)
+        button_save.grid(row=2, column=0, padx=10, pady=10)
 
         # Area di testo con tema scuro
         self.text_area = scrolledtext.ScrolledText(self.window, font=("Consolas", 9), bg="#1e1e1e", fg="#d4d4d4", insertbackground="white", undo=True)
-        self.text_area.grid(row=1, column=0, columnspan=3, sticky="nsew", padx=5, pady=5)
+        self.text_area.grid(row=0, column=1, rowspan=4, sticky="nsew", padx=5, pady=5)
 
         # Configurazione colori dei Tag
         self.text_area.tag_configure("chiave", foreground="#569cd6", font=("Consolas", 12, "bold")) # Blu
@@ -55,7 +58,10 @@ class ApplicationGUIConfigurator():
         self.evidenzia_sintassi() # Colora subito all'avvio
 
         self.lbl_stato = tk.Label(self.window, text="Stato: Pronto", anchor="w", relief="sunken", padx=5)
-        self.lbl_stato.grid(row=2, column=0, columnspan=3, sticky="ew")
+        self.lbl_stato.grid(row=4, column=0, columnspan=2, sticky="ew")
+
+        self.window.columnconfigure(1, weight=1)
+        self.window.rowconfigure(3, weight=1)
 
     def evidenzia_sintassi(self, event=None):
         """Scansiona il testo e applica i colori YAML tramite i Tag."""

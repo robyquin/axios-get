@@ -49,41 +49,34 @@ class ApplicationGUI:
         # Coda per ricevere i messaggi
         self.event_queue = Queue()
 
-        # Finestra
+        # Finestra grid 4x3
         self.root = tk.Tk()
-        
-        # Applica il tema scelto (es. 'clam', 'alt', 'default', 'vista')
+
         ttk.Style().theme_use("clam")
         self.root.title("Axios-get GUI")
         self.root.geometry("800x400")
+        
+        # Pulsante avvio
+        self.start_button = ttk.Button(self.root, text="Avvia", command=self.start)
+        self.start_button.grid(row=0, column=0, padx=10, pady=10)
 
         # Pulsante configuratore
         self.config_button = ttk.Button(self.root, text="Configurazione", command=self.avvia_configuratore)
-        self.config_button.grid(row=0, column=0, columnspan=2, sticky="ew", padx=5, pady=5)
+        self.config_button.grid(row=1, column=0, padx=10, pady=10)
+
+        self.status_label = tk.Label(self.root, text="Pronto", anchor="w", relief="sunken", padx=5)
+        self.status_label.grid(row=3, column=0, columnspan=3, sticky="ew")
 
         # Area messaggi
-        # self.log_text = tk.Text(self.root, height=15, state="disabled")
         self.log_text = scrolledtext.ScrolledText(self.root, wrap=tk.WORD, width=40, height=10)
-        self.log_text.grid(row=1, column=0, columnspan=2, sticky="ewns", padx=10, pady=10)
-
-        # Colori messaggi
+        self.log_text.grid(row=0, column=1, columnspan=2, rowspan=3, sticky="ewns", padx=10, pady=10)
         self.log_text.tag_config("INFO", foreground="black")
         self.log_text.tag_config("WARNING", foreground="orange")
         self.log_text.tag_config("ERROR", foreground="red")
         self.log_text.tag_config("DEBUG", foreground="gray")
 
-        # Pulsante avvio
-        self.start_button = ttk.Button(self.root, text="Avvia", command=self.start)
-        self.start_button.grid(row=2, column=0, padx=10, pady=10)
-
-        self.status_label = ttk.Label(self.root, text="Pronto")
-        self.status_label.grid(row=2, column=1, padx=10, pady=5)
-
-        self.root.columnconfigure(0, weight=0)
         self.root.columnconfigure(1, weight=1)
-        self.root.rowconfigure(0, weight=0)
-        self.root.rowconfigure(1, weight=1)
-        self.root.rowconfigure(2, weight=0)
+        self.root.rowconfigure(2, weight=1)
 
         # Handler per intercettare il logger
         self.gui_handler = GuiHandler(self.event_queue)
