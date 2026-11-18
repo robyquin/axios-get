@@ -12,6 +12,7 @@ import argparse
 from moduli.logging_config import logging, log
 
 from AxiosGetCompiti import run_axios_get_compiti
+from AxiosGetCompitiConfigurator import ApplicationGUIConfigurator
 
 logger = log
 
@@ -43,6 +44,13 @@ class ApplicationGUI:
         self.root = tk.Tk()
         self.root.title("Axios-get GUI")
         self.root.geometry("800x400")
+        # Pulsante configuratore
+        self.config_button = ttk.Button(
+            self.root,
+            text="Configurazione",
+            command=self.avvia_configuratore
+        )
+        self.config_button.grid(row=0, column=0, columnspan=2, sticky="ew", padx=5, pady=5)
 
         # Area messaggi
         self.log_text = tk.Text(
@@ -51,7 +59,7 @@ class ApplicationGUI:
             state="disabled"
         )
         self.log_text.grid(
-            row=0,
+            row=1,
             column=0,
             columnspan=2,
             sticky="ewns",
@@ -71,18 +79,19 @@ class ApplicationGUI:
             text="Avvia",
             command=self.start
         )
-        self.start_button.grid(row=1, column=0, padx=10, pady=10)
+        self.start_button.grid(row=2, column=0, padx=10, pady=10)
 
         self.status_label = ttk.Label(
             self.root,
             text="Pronto"
         )
-        self.status_label.grid(row=1, column=1, padx=10, pady=5)
+        self.status_label.grid(row=2, column=1, padx=10, pady=5)
 
         self.root.columnconfigure(0, weight=0)
         self.root.columnconfigure(1, weight=1)
-        self.root.rowconfigure(0, weight=1)
-        self.root.rowconfigure(1, weight=0)
+        self.root.rowconfigure(0, weight=0)
+        self.root.rowconfigure(1, weight=1)
+        self.root.rowconfigure(2, weight=0)
 
         # Handler per intercettare il logger
         self.gui_handler = GuiHandler(self.event_queue)
@@ -155,6 +164,20 @@ class ApplicationGUI:
 
     def run(self):
         self.root.mainloop()
+
+    def avvia_configuratore(self):
+        if (getattr(sys, 'frozen', False)):
+            # Se l'applicazione è compilata con PyInstaller
+            DIR=str(os.path.dirname(sys.executable))
+        else:
+            DIR=str(Path(os.path.dirname(__file__)).absolute())
+
+        gui = ApplicationGUIConfigurator()
+
+        if (os.path.exists(os.path.join(DIR, "credenziali.yml"))):
+            gui.run(os.path.join(DIR, "credenziali.yml"))
+        else:
+            gui.run()
 
 def main():
 
