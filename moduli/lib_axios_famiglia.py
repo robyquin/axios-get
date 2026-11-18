@@ -58,6 +58,7 @@ class LibAxiosFamiglia():
     :type config: dict
 
     :raises Exception: credenziali vuote.
+    :raises RuntimeError: Elaborazione con esito positivi parziale.
     """
     def __init__(self, DIR: str, config: dict) -> None:
         self.DIR = DIR
@@ -137,6 +138,9 @@ class LibAxiosFamiglia():
             except Exception as e:
                 log.error(f"Si è verificato un errore imprevisto nel processare l'Istituto {self.customerid}: {e}")
                 cnt_error +=1
+        if (cnt_error > 0):
+            log.warning(f"Elaborazione terminata con {cnt_error} errori; controlla il log")
+            raise RuntimeError(f"Esecuzione con esito positivo parziale (errori = {cnt_error})")
 
     def __delete__(self, instance):
         self.session.close()

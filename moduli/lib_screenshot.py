@@ -121,7 +121,7 @@ class ScreenShot():
                     dt = datetime.strptime(data_l0, "%d/%m/%Y")
                     filename = datetime.strftime(dt, "%Y-%m-%d")
                 except Exception as e:
-                    log.error(f"{e}")
+                    log.warning(f"{e}")
                     width_wrap = 40
                     filename = "Materiale_didattico"
                 sw = 0.75
