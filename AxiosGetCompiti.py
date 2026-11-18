@@ -174,11 +174,13 @@ def run_axios_get_compiti(DIR):
         try:
             with open(os.path.join(DIR, "credenziali_default.yml"), "w", encoding="utf-8") as file_config:
                 file_config.write(file_config_default())
-            raise FileNotFoundError(os.path.join(DIR, "credenziali_default.yml"))            
+            raise FileNotFoundError(os.path.join(DIR, "credenziali_default.yml"))
         except FileNotFoundError as e:
             log.error(f"File di configurazione non trovato! Creazione del file di default: {e}")
+        except PermissionError:
+            log.error(f"Non hai i permessi necessari per scrivere nel file '{os.path.join(DIR, "credenziali_default.yml")}'.")
         except Exception as e:
-            log.error(f"Si è verificato un errore imprevisto: {e}")
+            log.error(f"Si è verificato un errore imprevisto nel salvataggio di credenziali_default.yml: {e}")
 
 if __name__ == "__main__":
 
