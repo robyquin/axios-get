@@ -22,7 +22,7 @@ import argparse
 from moduli.logging_config import logging, log
 
 from AxiosGetCompiti import run_axios_get_compiti
-from AxiosGetCompitiConfigurator import ApplicationGUIConfigurator
+from moduli.gui.AxiosGetCompitiConfigurator import ApplicationGUIConfigurator
 
 logger = log
 
