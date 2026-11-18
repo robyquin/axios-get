@@ -167,6 +167,7 @@ def run_axios_get_compiti(DIR):
                     config['version'] = __version__
                     with open(os.path.join(DIR, "credenziali.yml"), "w", encoding="utf-8") as file_config:
                         file_config.write(yaml.dump(config, sort_keys=False))
+                log.info(f"Axios-Get v{__version__}")
                 log.info("INIZIO ELABORAZIONE")
                 LibAxiosFamiglia(DIR, config)
                 log.info("FINE ELABORAZIONE")
