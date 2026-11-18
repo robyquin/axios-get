@@ -56,7 +56,7 @@ class ApplicationGUI:
         ttk.Style().theme_use("clam")
         self.root.title("Axios-get GUI")
         self.root.geometry("800x400")
-        
+
         # Pulsante avvio
         self.start_button = ttk.Button(self.root, text="Avvia", command=self.start)
         self.start_button.grid(row=0, column=0, padx=10, pady=10)
@@ -64,9 +64,6 @@ class ApplicationGUI:
         # Pulsante configuratore
         self.config_button = ttk.Button(self.root, text="Configurazione", command=self.avvia_configuratore)
         self.config_button.grid(row=1, column=0, padx=10, pady=10)
-
-        self.status_label = tk.Label(self.root, text="Pronto", anchor="w", relief="sunken", padx=5, fg="green")
-        self.status_label.grid(row=3, column=0, columnspan=3, sticky="ew")
 
         # Area messaggi
         self.log_text = scrolledtext.ScrolledText(self.root, font=("Consolas", 10), wrap=tk.WORD, width=40, height=10)
@@ -76,6 +73,19 @@ class ApplicationGUI:
         self.log_text.tag_config("ERROR", foreground="red")
         self.log_text.tag_config("DEBUG", foreground="gray")
         self.log_text.tag_config("Bold", foreground="#569cd6", font=("Consolas", 10, "bold")) # Blu
+        self.log_text.config(state="disabled")
+
+        self.label_credit = tk.Text(self.root, font=("Consolas", 8), wrap=tk.WORD, relief="flat", bd=0, height=4, bg=self.root.cget("bg"))
+        self.label_credit.tag_config("Bold", foreground="#569cd6", font=("Consolas", 8, "bold"))
+        self.label_credit.insert("end","Axios-get\n", "Bold")
+        self.label_credit.insert("end","Autore: Roberto Quintiliani\n")
+        self.label_credit.insert("end","Licenza: Open Source (MIT)\n")
+        self.label_credit.insert("end","Progetto: https://github.com/robyquin/axios-get")
+        self.label_credit.grid(row=3, column=1, sticky="ew", padx=5, pady=5)
+        self.label_credit.config(state="disabled")
+
+        self.status_label = tk.Label(self.root, text="Pronto", anchor="w", relief="sunken", padx=5, fg="green")
+        self.status_label.grid(row=4, column=0, columnspan=3, sticky="ew")
 
         self.root.columnconfigure(1, weight=1)
         self.root.rowconfigure(2, weight=1)
@@ -92,7 +102,7 @@ class ApplicationGUI:
 
         self.start_button.config(state="disabled")
         self.status_label.config(text="Elaborazione in corso...", fg="orange")
-        
+
         self.log_text.config(state="normal")
         self.log_text.delete('1.0', 'end')
         self.log_text.config(state="disabled")

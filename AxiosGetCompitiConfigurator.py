@@ -59,8 +59,17 @@ class ApplicationGUIConfigurator():
         self.text_area.insert("1.0", esempio)
         self.evidenzia_sintassi() # Colora subito all'avvio
 
+        self.label_credit = tk.Text(self.window, font=("Consolas", 8), wrap=tk.WORD, relief="flat", bd=0, height=4, bg=self.window.cget("bg"))
+        self.label_credit.tag_config("Bold", foreground="#569cd6", font=("Consolas", 8, "bold"))
+        self.label_credit.insert("end","Axios-get\n", "Bold")
+        self.label_credit.insert("end","Autore: Roberto Quintiliani\n")
+        self.label_credit.insert("end","Licenza: Open Source (MIT)\n")
+        self.label_credit.insert("end","Progetto: https://github.com/robyquin/axios-get")
+        self.label_credit.grid(row=4, column=1, sticky="ew", padx=5, pady=5)
+        self.label_credit.config(state="disabled")
+
         self.lbl_stato = tk.Label(self.window, text="Stato: Pronto", anchor="w", relief="sunken", padx=5)
-        self.lbl_stato.grid(row=4, column=0, columnspan=2, sticky="ew")
+        self.lbl_stato.grid(row=5, column=0, columnspan=2, sticky="ew")
 
         self.window.columnconfigure(1, weight=1)
         self.window.rowconfigure(3, weight=1)
