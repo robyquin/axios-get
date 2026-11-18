@@ -44,7 +44,7 @@ class ApplicationGUIConfigurator():
         self.text_area.grid(row=0, column=1, rowspan=4, sticky="nsew", padx=5, pady=5)
 
         # Configurazione colori dei Tag
-        self.text_area.tag_configure("chiave", foreground="#569cd6", font=("Consolas", 12, "bold")) # Blu
+        self.text_area.tag_configure("chiave", foreground="#569cd6", font=("Consolas", 9, "bold")) # Blu
         self.text_area.tag_configure("stringa", foreground="#ce9178")                               # Arancione
         self.text_area.tag_configure("numero_bool", foreground="#b5cea8")                           # Verde chiaro
         self.text_area.tag_configure("commento", foreground="#6a9955", font=("Consolas", 9, "italic")) # Verde scuro
