@@ -67,6 +67,7 @@ class LibAxiosFamiglia():
         else:
             log.info(f"Presenti {len(config['credenziali'])} configurazione di istituto")
 
+        cnt_error = 0
         for idx_istituto, credenziali in enumerate(config['credenziali']):
             self.customerid = str(credenziali['customerid'])
             self.username = str(credenziali['username'])
@@ -88,44 +89,54 @@ class LibAxiosFamiglia():
                     log.info(f"{idx_istituto+1}. Elaborazione Istituto **{str(self.customerid)}** con {len(credenziali['alunni'])} studenti")
                 self._login()
                 for idx_alunno, item in enumerate(credenziali['alunni'].items()):
-                    alunno, param = item
-                    log.info(f"- {idx_istituto+1}.{idx_alunno+1}. per **{alunno}** verrà utilizzata la notificata **{param['tipo']}**")
-                    self.nome_alternativo_alunno = ""
-                    self.alunni = {}
-                    self.alunni[AxiosView.registro] = {}
-                    self.alunni[AxiosView.materiale] = {}
-                    self.COMPITI = {}
-                    self.ARGOMENTI = {}
-                    self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES = []
-                    self.sha1_REGISTRO = ""
-                    self.sha1_REGISTRO_old = ""
-                    self.sha1_MD = ""
-                    self.sha1_MD_old = ""
-                    self.notifica = None
-                    tipo_notifica = param['tipo']
-                    if(tipo_notifica in config['params_notifiche'].keys()):
-                        if (tipo_notifica == 'html'):
-                            parametro = param.get('param', config.get('params_notifiche').get(tipo_notifica).get('path', '.'))
-                            self.notifica = lib_notifica.NotificaFileHTML(DIR, config['params_notifiche'], parametro)
-                        elif (tipo_notifica == 'screenshot'):
-                            parametro = param.get('param', config.get('params_notifiche').get(tipo_notifica).get('path', '.'))
-                            self.notifica = lib_notifica.NotificaScreenShot(DIR, config['params_notifiche'], parametro)
-                        elif (tipo_notifica == 'smtp'):
-                            parametro = param.get('param', '')
-                            self.notifica = lib_notifica.NotificaMail(DIR, config['params_notifiche'], parametro)
-                        elif (tipo_notifica == 'telegram'):
-                            parametro = param.get('param', config.get('params_notifiche').get(tipo_notifica).get('CHAT_ID', 'CHAT_ID'))
-                            self.notifica = lib_notifica.NotificaTelegram(DIR, config['params_notifiche'], parametro)
+                    try:
+                        alunno, param = item
+                        log.info(f"- {idx_istituto+1}.{idx_alunno+1}. per **{alunno}** verrà utilizzata la notificata **{param['tipo']}**")
+                        self.nome_alternativo_alunno = ""
+                        self.alunni = {}
+                        self.alunni[AxiosView.registro] = {}
+                        self.alunni[AxiosView.materiale] = {}
+                        self.COMPITI = {}
+                        self.ARGOMENTI = {}
+                        self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES = []
+                        self.sha1_REGISTRO = ""
+                        self.sha1_REGISTRO_old = ""
+                        self.sha1_MD = ""
+                        self.sha1_MD_old = ""
+                        self.notifica = None
+                        tipo_notifica = param['tipo']
+                        if(tipo_notifica in config['params_notifiche'].keys()):
+                            if (tipo_notifica == 'html'):
+                                parametro = param.get('param', config.get('params_notifiche').get(tipo_notifica).get('path', '.'))
+                                self.notifica = lib_notifica.NotificaFileHTML(DIR, config['params_notifiche'], parametro)
+                            elif (tipo_notifica == 'screenshot'):
+                                parametro = param.get('param', config.get('params_notifiche').get(tipo_notifica).get('path', '.'))
+                                self.notifica = lib_notifica.NotificaScreenShot(DIR, config['params_notifiche'], parametro)
+                            elif (tipo_notifica == 'smtp'):
+                                parametro = param.get('param', '')
+                                self.notifica = lib_notifica.NotificaMail(DIR, config['params_notifiche'], parametro)
+                            elif (tipo_notifica == 'telegram'):
+                                parametro = param.get('param', config.get('params_notifiche').get(tipo_notifica).get('CHAT_ID', 'CHAT_ID'))
+                                self.notifica = lib_notifica.NotificaTelegram(DIR, config['params_notifiche'], parametro)
 
-                        if (self.notifica is not None):
-                            self.nome_alternativo_alunno = param.get('nome_alternativo', '')
-                            self.get_session_collabora(alunno)
-                            self.get_session_registrofamiglie(alunno)
-                        else:
-                            log.error("Error: occorre configurare e selezionare un tipo di notifica")
+                            if (self.notifica is not None):
+                                self.nome_alternativo_alunno = param.get('nome_alternativo', '')
+                                try:
+                                    self.get_session_collabora(alunno)
+                                except Exception as e:
+                                    log.warning(f"Si è verificato un errore imprevisto nel processare il materiale didattico dello studente {alunno}: {e}")
+                                    self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES = []
+                                    cnt_error +=1
+                                self.get_session_registrofamiglie(alunno)
+                            else:
+                                log.error("Error: occorre configurare e selezionare un tipo di notifica")
+                    except Exception as e:
+                        log.error(f"Si è verificato un errore imprevisto nel processare lo studente {alunno}: {e}")
+                        cnt_error +=1
                 self._logout()
             except Exception as e:
-                log.error(f"Si è verificato un errore imprevisto nel processo interno a LibAxiosFamiglia: {e}")
+                log.error(f"Si è verificato un errore imprevisto nel processare l'Istituto {self.customerid}: {e}")
+                cnt_error +=1
 
     def __delete__(self, instance):
         self.session.close()
@@ -251,7 +262,7 @@ class LibAxiosFamiglia():
                 dir_alunno = f'{prefix}_{Alunno}_{hashlib.md5(self.alunni[prefix][Alunno].encode('utf-8')).hexdigest()}'
             registo_compiti_alunno = os.path.join(self.dir_istituto, dir_alunno, link[UrlIdType.filename])
             if (link[UrlIdType.method] == 'GET'):
-                res = self.session.get(link[UrlIdType.url], params=link[UrlIdType.params], allow_redirects=True)
+                res = self.session.get(link[UrlIdType.url], params=link[UrlIdType.params], allow_redirects=True, timeout=(10, 30))
 
                 if ('Action' in link[UrlIdType.params].keys()):
                     if (link[UrlIdType.params]['Action'] == 'DashboardLoad'):
@@ -283,9 +294,9 @@ class LibAxiosFamiglia():
                         link[UrlIdType.data] = {"alunnoId": self.alunni[prefix][Alunno]}
 
                 if (link[UrlIdType.type_data]=='json'):
-                    res = self.session.post(link[UrlIdType.url], json=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content-Type': 'application/x-www-form-urlencoded'})
+                    res = self.session.post(link[UrlIdType.url], json=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content-Type': 'application/x-www-form-urlencoded'}, timeout=(10, 30))
                 else:
-                    res = self.session.post(link[UrlIdType.url], data=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content-Type': 'application/x-www-form-urlencoded'})
+                    res = self.session.post(link[UrlIdType.url], data=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content-Type': 'application/x-www-form-urlencoded'}, timeout=(10, 30))
 
                 get_error = re.search(r"SweetMessage.error\('(.*)'\);", res.text)
                 if (get_error == None):

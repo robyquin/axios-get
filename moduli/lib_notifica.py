@@ -143,12 +143,12 @@ class NotificaMail(Notifica):
         # 4. Connessione al server e invio del messaggio
         try:
             if (not starttls):
-                with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+                with smtplib.SMTP_SSL(smtp_server, port, context=context, timeout=30) as server:
                     server.login(username, password)
                     server.send_message(msg)
             else:
                 # Stabilisce una connessione in chiaro sulla porta 587
-                with smtplib.SMTP(smtp_server, port, timeout=10) as server:
+                with smtplib.SMTP(smtp_server, port, timeout=30) as server:
                     server.ehlo()  # Identifica il client presso il server SMTP
                     server.starttls(context=context) # Aggiorna la connessione a TLS in modo sicuro
                     server.ehlo()  # Re-identifica il client all'interno della connessione crittografata
@@ -220,7 +220,7 @@ class NotificaTelegram(Notifica):
             "disable_notification": True
         }
 
-        risposta = requests.get(link, params=parametri).json()
+        risposta = requests.get(link, params=parametri, timeout=(10, 30)).json()
         if (risposta.get("ok")):
             # Il messaggio è stato inviato con successo
             id_nuovo_messaggio = risposta["result"]["message_id"]
@@ -237,7 +237,7 @@ class NotificaTelegram(Notifica):
                     files = {
                         'photo': (filename, dati_bytesio.getvalue(), 'image/png')
                     }
-                    log.debug(requests.post(link_screenshot, data=payload, files=files).json())
+                    log.debug(requests.post(link_screenshot, data=payload, files=files, timeout=(10, 30)).json())
                 elif (i == len(m_html)-1 and n_screenshot != 0):
                     dati_bytesio, filename = ScreenShot(self.DIR).diario2image(diario)
                     payload = {
@@ -247,7 +247,7 @@ class NotificaTelegram(Notifica):
                     files = {
                         'photo': (filename, dati_bytesio.getvalue(), 'image/png')
                     }
-                    log.debug(requests.post(link_screenshot, data=payload, files=files).json())
+                    log.debug(requests.post(link_screenshot, data=payload, files=files, timeout=(10, 30)).json())
         else:
             # Telegram ha rifiutato la richiesta
             codice_errore = risposta.get("error_code")
