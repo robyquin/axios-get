@@ -74,7 +74,7 @@ class ApplicationGUIConfigurator():
         # 2. Regole Regex per gli elementi YAML
         regole = [
             # Chiavi (es. "nome:" o "- nome:")
-            (r"(?m)^[\s\-]*([a-zA-Z0-9_\-\.]+)\s*:", "chiave", 1),
+            (r"(?m)^[\s\-]*([a-zA-Z0-9_\-\.\s]+)\s*:", "chiave", 1),
             # Valori booleani o nulli
             (r":\s*\b(true|false|yes|no|null|~)\b", "numero_bool", 1),
             # Numeri interi o decimali dopo i due punti
