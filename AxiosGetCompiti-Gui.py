@@ -11,6 +11,7 @@ AxiosGetCompiti GUI.
 import sys
 import os
 from pathlib import Path
+import re
 
 import tkinter as tk
 from tkinter import ttk, scrolledtext
@@ -68,12 +69,13 @@ class ApplicationGUI:
         self.status_label.grid(row=3, column=0, columnspan=3, sticky="ew")
 
         # Area messaggi
-        self.log_text = scrolledtext.ScrolledText(self.root, wrap=tk.WORD, width=40, height=10)
+        self.log_text = scrolledtext.ScrolledText(self.root, font=("Consolas", 10), wrap=tk.WORD, width=40, height=10)
         self.log_text.grid(row=0, column=1, columnspan=2, rowspan=3, sticky="ewns", padx=10, pady=10)
         self.log_text.tag_config("INFO", foreground="black")
         self.log_text.tag_config("WARNING", foreground="orange")
         self.log_text.tag_config("ERROR", foreground="red")
         self.log_text.tag_config("DEBUG", foreground="gray")
+        self.log_text.tag_config("Bold", foreground="#569cd6", font=("Consolas", 10, "bold")) # Blu
 
         self.root.columnconfigure(1, weight=1)
         self.root.rowconfigure(2, weight=1)
@@ -136,11 +138,24 @@ class ApplicationGUI:
 
             self.log_text.config(state="normal")
 
+            inizio_riga = self.log_text.index("end-1c linestart")
+            # fine_riga = self.log_text.index("end-1c lineend")
+
             self.log_text.insert(
                 "end",
                 f"[{level}] {message}\n",
                 level
             )
+
+            regole = [
+                (r"\*\*([a-zA-Z0-9_\-\.\s]+)\*\*", "Bold", 1),
+            ]
+
+            for pattern, tag, gruppo in regole:
+                for match in re.finditer(pattern, f"[{level}] {message}\n", re.MULTILINE):
+                    start = f"{inizio_riga} + {match.start(gruppo)} chars"
+                    end = f"{inizio_riga} + {match.end(gruppo)} chars"
+                    self.log_text.tag_add(tag, start, end)
 
             self.log_text.see("end")
             self.log_text.config(state="disabled")
