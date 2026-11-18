@@ -188,9 +188,8 @@ def main():
         DIR=str(Path(os.path.dirname(__file__)).absolute())
 
     # Handler file senza colori
-    file_handler = logging.FileHandler(filename=os.path.join(DIR, "output.log"), mode="w")
-    # "%(asctime)-15s [%(levelname)s] %(message)s"
-    file_formatter = logging.Formatter("[%(levelname)s] %(message)s")
+    file_handler = logging.FileHandler(filename=os.path.join(DIR, "output.log"), mode="w", encoding='utf-8')
+    file_formatter = logging.Formatter("%(asctime)-15s [%(levelname)s] %(message)s")
     file_handler.setFormatter(file_formatter)
     file_handler.setLevel(logging.DEBUG)
     log.addHandler(file_handler)
