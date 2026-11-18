@@ -8,7 +8,7 @@ AxiosGetCompiti.
 
 """
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
 import sys
 import os
@@ -79,7 +79,7 @@ def file_config_default() -> str:
             }
         }
     }
-    
+
     content_yaml = yaml.dump(config_default, sort_keys=False)
     content_yaml = f"""# GUIDA ALLA CONFIGURAZIONE
 # https://github.com/robyquin/axios-get/blob/master/docs/Configurazione.md

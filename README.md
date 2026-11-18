@@ -46,6 +46,8 @@ Per la prima configurazione occorre creare un file, se non esiste, con il nome `
 
 ## Usage
 
+Dalla versione `>= v1.1.2` il progetto include un'interfaccia grafica minimale (**GUI**) per avviare e configurare `axios-get`.
+
 ### Unix Like
 
 ```bash
@@ -56,7 +58,7 @@ python /__absolute_path__/AxiosGetCompiti.py
 
 ### Windows Like
 
-Semplicemente doppio click su `AxiosGetCompiti.exe`
+Semplicemente doppio click su `AxiosGetCompiti-Gui.exe` per funzionalità *one-shot*, oppure configurando uno schedulatore utilizzando il parametro `--silent` (`AxiosGetCompiti-Gui.exe --silent`).
 
 ## Integrazione con schedulatori
 
