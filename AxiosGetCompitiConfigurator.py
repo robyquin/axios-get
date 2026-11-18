@@ -18,6 +18,8 @@ from tkinter import filedialog, messagebox, scrolledtext
 import yaml
 import re
 
+from AxiosGetCompiti import file_config_default
+
 class ApplicationGUIConfigurator():
 
     def __init__(self):
@@ -53,7 +55,7 @@ class ApplicationGUIConfigurator():
         self.text_area.bind("<KeyRelease>", self.evidenzia_sintassi)
 
         # Testo iniziale
-        esempio = self.file_config_default("1.1.1")
+        esempio = file_config_default()
         self.text_area.insert("1.0", esempio)
         self.evidenzia_sintassi() # Colora subito all'avvio
 
@@ -134,91 +136,9 @@ class ApplicationGUIConfigurator():
             self.verifica_yaml()
 
     def run(self, path_config_file=None):
-        print(path_config_file)
         if (path_config_file is not None):
             self.carica_file(percorso=path_config_file)
         self.window.mainloop()
-
-    def file_config_default(self, version):
-        config_default = {
-            'version': version,
-            'credenziali': [
-                    {
-                    'customerid': 'customerid',
-                    'username': 'username',
-                    'password': 'password',
-                    'alunni': {
-                        'NOME_ALUNNO_A' : {
-                            'tipo': 'smtp',
-                            'param': 'EMAIL_STUDENTE'
-                        },
-                        'NOME_ALUNNO_B' : {
-                            'tipo': 'html',
-                            'param': '.'
-                        },
-                        'NOME_ALUNNO_C' : {
-                            'tipo': 'screenshot',
-                            'param': '.'
-                        },
-                        'NOME_ALUNNO_D' : {
-                            'tipo': 'telegram',
-                            'param': 'CHAT_ID'
-                        }
-                    }
-                }
-            ],
-            'params_notifiche':{
-                'html': {
-                    'path': '.'
-                },
-                'smtp': {
-                    'smtp_server': 'smtp.example.it',
-                    'smtp_port': 465,
-                    'smtp_username': 'Username',
-                    'smtp_password': 'PaSsWoRd',
-                    'destinatari': [
-                        'EMAIL_GENITORE-TUTORE',
-                        'EMAIL_ALTRI'
-                        ],
-                    'n_allegati': 0
-                },
-                'telegram': {
-                    'BOT_TOKEN': 'TOKEN',
-                    'CHAT_ID': 'ID',
-                    'n_allegati': 0
-                },
-                'screenshot': {
-                    'path': '.'
-                }
-            }
-        }
-        content_yaml = yaml.dump(config_default, sort_keys=False)
-        content_yaml = """# GUIDA ALLA CONFIGURAZIONE
-        # https://github.com/robyquin/axios-get/blob/master/docs/Configurazione.md
-        # Questo file è scritto in YAML, se lo modifichi manualmente presta attenzione all'indentazione e alla sintassi specifica.
-        # Il testo che segue il carattere # è un commento e quindi nell'esecuzione verrà ignorato\n\n""" + content_yaml
-
-        content_yaml = re.sub(r'(version:.*)', '\\1 # Versione della release', content_yaml)
-        content_yaml = re.sub(r'(credenziali:.*)', '\\1 # Gruppo credenziali: raccoglie informazioni per l\'accesso al portale, la definizione degli studenti e per ciascuno la propria configurazione di notifica', content_yaml)
-        content_yaml = re.sub(r'(- customerid:.*)', '\\1 # CF Istituto/Cliente', content_yaml)
-        content_yaml = re.sub(r'(\s+username:.*)', '\\1 # Codice Utente o mail personale', content_yaml)
-        content_yaml = re.sub(r'(\s+alunni:.*)', '\\1 # Gruppo alunni: definisce nome studente, tipologia di notifica e relativi parametri', content_yaml)
-        content_yaml = re.sub(r'(\s+NOME_ALUNNO_A:.*)', '\\1 # Inserisci qui il nome dello studente che trovi nel menu a tendina sul portale AxiosFamiglia', content_yaml)
-        content_yaml = re.sub(r'(\s+tipo:.*)', "\\1 # Tipi di notifiche disponibili: html, screenshot, smtp, telegram", content_yaml)
-        content_yaml = re.sub(r'(\s+param:.*)', "\\1 # Parametro caratteristico della notifica scelta [default: eredita il parametro dalla configurazione generale]", content_yaml)
-
-        content_yaml = re.sub(r'(params_notifiche:.*)', '\\1 # Gruppo parametri globali di notifica: raccoglie informazioni generali per rendere possibile la tipologia di notifica', content_yaml)
-        content_yaml = re.sub(r'(\s+(html|screenshot):.*)', '\\1 # Gruppo di configurazione globale per la notifica \\2', content_yaml)
-        content_yaml = re.sub(r'(\s+(telegram):.*)', '\\1 # Gruppo di configurazione globale per la notifica \\2 (https://github.com/robyquin/axios-get/blob/master/docs/Telegram_token_bot.md)', content_yaml)
-        content_yaml = re.sub(r'(\s+(smtp):.*)', '\\1 # Gruppo di configurazione globale per la notifica \\2 (https://github.com/robyquin/axios-get/blob/master/docs/SMTP_server.md)', content_yaml)
-        content_yaml = re.sub(r'(\s+path:.*)', '\\1 # Specifica qui il percorso relativo o assoluto della cartella di destinazione', content_yaml)
-        content_yaml = re.sub(r'(\s+n_allegati:.*)', '\\1 # Specifica il numero di screenshot da allegare alla notifica [>=0]', content_yaml)
-
-        content_yaml = re.sub(r'(NOME_ALUNNO_[B-D]:.*)', '# \\1 # Inserisci qui il nome dello studente successivo che trovi nel menu', content_yaml)
-        content_yaml = re.sub(r'(tipo: (html|screenshot|telegram))', '# \\1', content_yaml)
-        content_yaml = re.sub(r'(param: (\.|CHAT_ID))', '# \\1', content_yaml)
-        content_yaml = re.sub(r'(- EMAIL_ALTRI.*)', '# \\1 # Specifica, come un elenco, altri destinatari della email', content_yaml)
-        return content_yaml
 
 if __name__ == "__main__":
 
