@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, scrolledtext
 from queue import Queue
 import threading
 import argparse
@@ -51,30 +51,20 @@ class ApplicationGUI:
 
         # Finestra
         self.root = tk.Tk()
+        
+        # Applica il tema scelto (es. 'clam', 'alt', 'default', 'vista')
+        ttk.Style().theme_use("clam")
         self.root.title("Axios-get GUI")
         self.root.geometry("800x400")
+
         # Pulsante configuratore
-        self.config_button = ttk.Button(
-            self.root,
-            text="Configurazione",
-            command=self.avvia_configuratore
-        )
+        self.config_button = ttk.Button(self.root, text="Configurazione", command=self.avvia_configuratore)
         self.config_button.grid(row=0, column=0, columnspan=2, sticky="ew", padx=5, pady=5)
 
         # Area messaggi
-        self.log_text = tk.Text(
-            self.root,
-            height=15,
-            state="disabled"
-        )
-        self.log_text.grid(
-            row=1,
-            column=0,
-            columnspan=2,
-            sticky="ewns",
-            padx=10,
-            pady=10
-        )
+        # self.log_text = tk.Text(self.root, height=15, state="disabled")
+        self.log_text = scrolledtext.ScrolledText(self.root, wrap=tk.WORD, width=40, height=10)
+        self.log_text.grid(row=1, column=0, columnspan=2, sticky="ewns", padx=10, pady=10)
 
         # Colori messaggi
         self.log_text.tag_config("INFO", foreground="black")
@@ -83,17 +73,10 @@ class ApplicationGUI:
         self.log_text.tag_config("DEBUG", foreground="gray")
 
         # Pulsante avvio
-        self.start_button = ttk.Button(
-            self.root,
-            text="Avvia",
-            command=self.start
-        )
+        self.start_button = ttk.Button(self.root, text="Avvia", command=self.start)
         self.start_button.grid(row=2, column=0, padx=10, pady=10)
 
-        self.status_label = ttk.Label(
-            self.root,
-            text="Pronto"
-        )
+        self.status_label = ttk.Label(self.root, text="Pronto")
         self.status_label.grid(row=2, column=1, padx=10, pady=5)
 
         self.root.columnconfigure(0, weight=0)

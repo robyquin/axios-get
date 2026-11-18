@@ -13,7 +13,8 @@ import os
 from pathlib import Path
 
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import ttk
+from tkinter import filedialog, messagebox, scrolledtext
 import yaml
 import re
 
@@ -23,6 +24,7 @@ class ApplicationGUIConfigurator():
         self.percorso_configurazione = None
         # --- Finestra ---
         self.window = tk.Tk()
+        ttk.Style().theme_use("clam")
         self.window.title("Axios-get Configuratore")
         self.window.geometry("650x500")
 
@@ -30,19 +32,12 @@ class ApplicationGUIConfigurator():
         self.window.rowconfigure(1, weight=1)
 
         # Pulsanti
-        tk.Button(self.window, text="Apri .yml", command=self.carica_file).grid(row=0, column=0, sticky="ew", padx=5, pady=5)
-        tk.Button(self.window, text="Verifica Sintassi", command=self.verifica_yaml, bg="#e1f5fe").grid(row=0, column=1, sticky="ew", padx=5, pady=5)
-        tk.Button(self.window, text="Salva credenziali.yml", command=self.salva_file, bg="#c8e6c9").grid(row=0, column=2, sticky="ew", padx=5, pady=5)
+        ttk.Button(self.window, text="Apri .yml", command=self.carica_file).grid(row=0, column=0, sticky="ew", padx=5, pady=5)
+        ttk.Button(self.window, text="Verifica Sintassi", command=self.verifica_yaml).grid(row=0, column=1, sticky="ew", padx=5, pady=5)
+        ttk.Button(self.window, text="Salva credenziali.yml", command=self.salva_file).grid(row=0, column=2, sticky="ew", padx=5, pady=5)
 
         # Area di testo con tema scuro
-        self.text_area = tk.Text(
-            self.window, 
-            font=("Consolas", 9),
-            bg="#1e1e1e",          # Sfondo scuro
-            fg="#d4d4d4",          # Testo base grigio chiaro
-            insertbackground="white", # Cursore bianco
-            undo=True
-        )
+        self.text_area = scrolledtext.ScrolledText(self.window, font=("Consolas", 9), bg="#1e1e1e", fg="#d4d4d4", insertbackground="white", undo=True)
         self.text_area.grid(row=1, column=0, columnspan=3, sticky="nsew", padx=5, pady=5)
 
         # Configurazione colori dei Tag
