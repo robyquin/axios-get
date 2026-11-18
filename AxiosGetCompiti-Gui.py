@@ -64,7 +64,7 @@ class ApplicationGUI:
         self.config_button = ttk.Button(self.root, text="Configurazione", command=self.avvia_configuratore)
         self.config_button.grid(row=1, column=0, padx=10, pady=10)
 
-        self.status_label = tk.Label(self.root, text="Pronto", anchor="w", relief="sunken", padx=5)
+        self.status_label = tk.Label(self.root, text="Pronto", anchor="w", relief="sunken", padx=5, fg="green")
         self.status_label.grid(row=3, column=0, columnspan=3, sticky="ew")
 
         # Area messaggi
@@ -89,7 +89,7 @@ class ApplicationGUI:
     def start(self):
 
         self.start_button.config(state="disabled")
-        self.status_label.config(text="Elaborazione in corso...")
+        self.status_label.config(text="Elaborazione in corso...", fg="orange")
 
         threading.Thread(
             target=self.run_worker,
@@ -121,13 +121,9 @@ class ApplicationGUI:
             if event.get("type") == "finished":
                 self.start_button.config(state="normal")
                 if event["success"]:
-                    self.status_label.config(
-                        text="Elaborazione completata"
-                    )
+                    self.status_label.config(text="Elaborazione completata", fg="green")
                 else:
-                    self.status_label.config(
-                        text="Elaborazione terminata con errori"
-                    )
+                    self.status_label.config(text="Elaborazione terminata con errori", fg="red")
                 continue
 
             # Messaggi del logger
