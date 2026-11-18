@@ -1,4 +1,13 @@
 #!python
+"""
+AxiosGetCompiti Configuratore.
+
+:Author: Roberto Quintiliani
+:Copyright: Copyright (c) Roberto Quintiliani
+:License: MIT
+
+"""
+
 import sys
 import os
 from pathlib import Path
