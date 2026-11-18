@@ -202,6 +202,7 @@ Il seguente file di configurazione imposta 5 attivazioni giornaliere di *AxiosGe
   <Actions Context="Author">
     <Exec>
       <Command>__absolute_path__\AxiosGetCompiti.exe</Command>
+      <Arguments>--silent</Arguments>
       <WorkingDirectory>__absolute_path__</WorkingDirectory>
     </Exec>
   </Actions>
