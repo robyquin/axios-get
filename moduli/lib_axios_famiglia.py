@@ -68,7 +68,7 @@ class LibAxiosFamiglia():
         else:
             log.info(f"Presenti {len(config['credenziali'])} configurazione di istituto")
 
-        cnt_error = 0
+        cnt_warning = 0
         for idx_istituto, credenziali in enumerate(config['credenziali']):
             self.customerid = str(credenziali['customerid'])
             self.username = str(credenziali['username'])
@@ -127,20 +127,20 @@ class LibAxiosFamiglia():
                                 except Exception as e:
                                     log.warning(f"Si è verificato un errore imprevisto nel processare il materiale didattico dello studente {alunno}: {e}")
                                     self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES = []
-                                    cnt_error +=1
+                                    cnt_warning +=1
                                 self.get_session_registrofamiglie(alunno)
                             else:
                                 log.error("Error: occorre configurare e selezionare un tipo di notifica")
                     except Exception as e:
-                        log.error(f"Si è verificato un errore imprevisto nel processare lo studente {alunno}: {e}")
-                        cnt_error +=1
+                        log.warning(f"Si è verificato un errore imprevisto nel processare lo studente {alunno}: {e}")
+                        cnt_warning +=1
                 self._logout()
             except Exception as e:
-                log.error(f"Si è verificato un errore imprevisto nel processare l'Istituto {self.customerid}: {e}")
-                cnt_error +=1
-        if (cnt_error > 0):
-            log.warning(f"Elaborazione terminata con {cnt_error} errori; controlla il log")
-            raise RuntimeError(f"Esecuzione con esito positivo parziale (errori = {cnt_error})")
+                log.warning(f"Si è verificato un errore imprevisto nel processare l'Istituto {self.customerid}: {e}")
+                cnt_warning +=1
+        if (cnt_warning > 0):
+            log.warning(f"Elaborazione terminata con {cnt_warning} errori; controlla il log")
+            raise RuntimeError(f"Esito positivo parziale con {cnt_warning} warnings!")
 
     def __delete__(self, instance):
         self.session.close()
