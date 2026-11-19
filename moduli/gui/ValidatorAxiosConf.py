@@ -1,6 +1,6 @@
 #!python
 from typing import Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 class ConfigurazioneAlunno(BaseModel):
     tipo: Literal['smtp', 'html', 'screenshot', 'telegram']
@@ -42,6 +42,23 @@ class ConfigCredenzialiYaml(BaseModel):
     version: str = Field(pattern=r"^\d+\.\d+\.\d+\w*$")
     credenziali: list[ConfigurazioneIstituto]
     params_notifiche: ParamsNotifiche
+
+    @model_validator(mode='after')
+    def verifica_coerenza_notifiche(self) -> 'ConfigCredenzialiYaml':
+        errori = []
+
+        for credenziali_config in self.credenziali:
+            for nome_alunno, config in credenziali_config.alunni.items():
+                canale = config.tipo
+                
+                if getattr(self.params_notifiche, canale) is None:
+                    errori.append(
+                        f"L'alunno '{nome_alunno}' usa il tipo '{canale}', "
+                        f"ma '{canale}' non è configurato in 'params_notifiche'."
+                    )
+        if errori:
+            raise ValueError(" | ".join(errori))
+        return self
 
 # modello = ConfigCredenzialiYaml.model_validate(config_default)
 # print(modello.model_dump())
