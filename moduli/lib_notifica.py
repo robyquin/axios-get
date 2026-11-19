@@ -67,15 +67,8 @@ class NotificaFileHTML(Notifica):
             with open(absolute_path, "w", encoding="utf-8") as file:
                 file.write(html)
             log.info(f"Notifica Html salvata con successo: {absolute_path}")
-
-        except PermissionError:
-            log.error(f"Errore: Non hai i permessi necessari per scrivere nel file '{absolute_path}'.")
-
-        except FileNotFoundError:
-            log.error(f"Errore: La cartella specificata per il file '{absolute_path}' non esiste.")
-
         except Exception as e:
-            log.error(f"Si è verificato un errore imprevisto NotificaFileHTML: {e}")
+            raise RuntimeError(f"NotificaFileHTML - {e}") from e
 
 class NotificaMail(Notifica):
     """
@@ -143,12 +136,12 @@ class NotificaMail(Notifica):
         # 4. Connessione al server e invio del messaggio
         try:
             if (not starttls):
-                with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+                with smtplib.SMTP_SSL(smtp_server, port, context=context, timeout=30) as server:
                     server.login(username, password)
                     server.send_message(msg)
             else:
                 # Stabilisce una connessione in chiaro sulla porta 587
-                with smtplib.SMTP(smtp_server, port, timeout=10) as server:
+                with smtplib.SMTP(smtp_server, port, timeout=30) as server:
                     server.ehlo()  # Identifica il client presso il server SMTP
                     server.starttls(context=context) # Aggiorna la connessione a TLS in modo sicuro
                     server.ehlo()  # Re-identifica il client all'interno della connessione crittografata
@@ -158,7 +151,7 @@ class NotificaMail(Notifica):
 
             log.info("Notifica Email inviata con successo!")
         except Exception as e:
-            log.error(f"Si è verificato un errore durante l'invio: {e}")
+            raise RuntimeError(f"NotificaMail: {e}") from e
 
 class NotificaTelegram(Notifica):
     """
@@ -220,39 +213,59 @@ class NotificaTelegram(Notifica):
             "disable_notification": True
         }
 
-        risposta = requests.get(link, params=parametri).json()
-        if (risposta.get("ok")):
-            # Il messaggio è stato inviato con successo
-            id_nuovo_messaggio = risposta["result"]["message_id"]
-            log.info(f"Notifica messaggio Telegram inviata con successo! ID: {id_nuovo_messaggio}")
+        try:
+            risposta = requests.get(link, params=parametri, timeout=(10, 30)).json()
+            if (risposta.get("ok")):
+                # Il messaggio è stato inviato con successo
+                id_nuovo_messaggio = risposta["result"]["message_id"]
+                log.info(f"Notifica messaggio Telegram inviata con successo! ID: {id_nuovo_messaggio}")
 
-            for i, diario in enumerate(m_html):
-                if (i < n_screenshot):
-                    dati_bytesio, filename = ScreenShot(self.DIR).diario2image(diario)
-                    YY, MM, DD = filename.split("-")
-                    payload = {
-                        'chat_id': str(CHAT_ID),
-                        'caption': f'Pagina diario {DD}/{MM}/{YY}'
-                    }
-                    files = {
-                        'photo': (filename, dati_bytesio.getvalue(), 'image/png')
-                    }
-                    log.debug(requests.post(link_screenshot, data=payload, files=files).json())
-                elif (i == len(m_html)-1 and n_screenshot != 0):
-                    dati_bytesio, filename = ScreenShot(self.DIR).diario2image(diario)
-                    payload = {
-                        'chat_id': str(CHAT_ID),
-                        'caption': f'Pagina diario {filename}'
-                    }
-                    files = {
-                        'photo': (filename, dati_bytesio.getvalue(), 'image/png')
-                    }
-                    log.debug(requests.post(link_screenshot, data=payload, files=files).json())
-        else:
-            # Telegram ha rifiutato la richiesta
-            codice_errore = risposta.get("error_code")
-            descrizione = risposta.get("description")
-            log.error(f"Errore di notifica messaggio Telegram ({codice_errore}): {descrizione}")
+                for i, diario in enumerate(m_html):
+                    try:
+                        if (i < n_screenshot):
+                            dati_bytesio, filename = ScreenShot(self.DIR).diario2image(diario)
+                            YY, MM, DD = filename.split("-")
+                            payload = {
+                                'chat_id': str(CHAT_ID),
+                                'caption': f'Pagina diario {DD}/{MM}/{YY}'
+                            }
+                            files = {
+                                'photo': (filename, dati_bytesio.getvalue(), 'image/png')
+                            }
+                            risposta_allegato = requests.post(link_screenshot, data=payload, files=files, timeout=(10, 30)).json()
+                            if (risposta_allegato.get("ok")):
+                                id_nuovo_allegato = risposta_allegato["result"]["message_id"]
+                                log.info(f"Notifica allegato Telegram inviato con successo! ID: {id_nuovo_allegato}")
+                            else:
+                                codice_errore_allegato = risposta_allegato.get("error_code")
+                                descrizione_allegato = risposta_allegato.get("description")
+                                raise RuntimeError(f"NotificaTelegram immagini - ({codice_errore_allegato}): {descrizione_allegato}")
+                        elif (i == len(m_html)-1 and n_screenshot != 0):
+                            dati_bytesio, filename = ScreenShot(self.DIR).diario2image(diario)
+                            payload = {
+                                'chat_id': str(CHAT_ID),
+                                'caption': f'Pagina diario {filename}'
+                            }
+                            files = {
+                                'photo': (filename, dati_bytesio.getvalue(), 'image/png')
+                            }
+                            risposta_allegato = requests.post(link_screenshot, data=payload, files=files, timeout=(10, 30)).json()
+                            if (risposta_allegato.get("ok")):
+                                id_nuovo_allegato = risposta_allegato["result"]["message_id"]
+                                log.info(f"Notifica allegato Telegram inviato con successo! ID: {id_nuovo_allegato}")
+                            else:
+                                codice_errore_allegato = risposta_allegato.get("error_code")
+                                descrizione_allegato = risposta_allegato.get("description")
+                                raise RuntimeError(f"NotificaTelegram immagini - ({codice_errore_allegato}): {descrizione_allegato}")
+                    except Exception as e:
+                        raise RuntimeError(f"NotificaTelegram immagini - {e}") from e
+            else:
+                # Telegram ha rifiutato la richiesta
+                codice_errore = risposta.get("error_code")
+                descrizione = risposta.get("description")
+                raise RuntimeError(f"NotificaTelegram - ({codice_errore}): {descrizione}")
+        except Exception as e:
+            raise RuntimeError(f"NotificaTelegram - {e}") from e
 
 
 class NotificaScreenShot(Notifica):
@@ -278,12 +291,5 @@ class NotificaScreenShot(Notifica):
                 with open(absolute_path, "wb") as f:
                     f.write(dati_bytesio.getvalue())
                 log.info(f"Notifica Screenshot salvata con successo: {absolute_path}")
-
-            except PermissionError:
-                log.error(f"Errore: Non hai i permessi necessari per scrivere nel file '{absolute_path}'.")
-
-            except FileNotFoundError:
-                log.error(f"Errore: La cartella specificata per il file '{absolute_path}' non esiste.")
-
             except Exception as e:
-                log.error(f"Si è verificato un errore imprevisto in NotificaScreenShot: {e}")
+                raise RuntimeError(f"NotificaScreenShot - {e}") from e
