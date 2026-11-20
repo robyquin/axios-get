@@ -17,12 +17,14 @@ from tkinter import ttk
 from tkinter import filedialog, messagebox, scrolledtext
 import yaml
 import re
+from pydantic import ValidationError
 
-from AxiosGetCompiti import file_config_default
+from AxiosGetCompiti import file_config_default, format_yaml_with_comments
+from moduli.model_config import ConfigCredenzialiYaml
 
 class ApplicationGUIConfigurator():
 
-    def __init__(self):
+    def __init__(self, root):
         self.percorso_configurazione = None
 
         # Finestra 5x2
@@ -30,6 +32,9 @@ class ApplicationGUIConfigurator():
 
         self.window.title("Axios-get Configuratore")
         self.window.geometry("800x400") 
+
+        self.window.grab_set()
+        self.window.transient(root)
 
         # Pulsanti
         button_open = ttk.Button(self.window, text="Apri .yml", command=self.carica_file)
@@ -46,9 +51,9 @@ class ApplicationGUIConfigurator():
         self.text_area.grid(row=0, column=1, rowspan=4, sticky="nsew", padx=5, pady=5)
 
         # Configurazione colori dei Tag
-        self.text_area.tag_configure("chiave", foreground="#569cd6", font=("Consolas", 9, "bold")) # Blu
-        self.text_area.tag_configure("stringa", foreground="#ce9178")                               # Arancione
-        self.text_area.tag_configure("numero_bool", foreground="#b5cea8")                           # Verde chiaro
+        self.text_area.tag_configure("chiave", foreground="#46acff", font=("Consolas", 9, "bold")) # Blu
+        self.text_area.tag_configure("stringa", foreground="#fda33d")                               # Arancione
+        self.text_area.tag_configure("numero_bool", foreground="#ffdc43")                           # Giallo
         self.text_area.tag_configure("commento", foreground="#6a9955", font=("Consolas", 9, "italic")) # Verde scuro
 
         # Collega la colorazione a ogni tasto rilasciato
@@ -73,6 +78,8 @@ class ApplicationGUIConfigurator():
 
         self.window.columnconfigure(1, weight=1)
         self.window.rowconfigure(3, weight=1)
+        
+        root.wait_window(self.window)
 
     def evidenzia_sintassi(self, event=None):
         """Scansiona il testo e applica i colori YAML tramite i Tag."""
@@ -84,16 +91,18 @@ class ApplicationGUIConfigurator():
 
         # 2. Regole Regex per gli elementi YAML
         regole = [
+            # Ipotizzo che ci sia di default una stringa
+            (r":(.*)$", "stringa", 1),
+            # Elementi di una lista (elementi non chiavi)
+            (r"(?m)^[ \t\-]*([a-zA-Z0-9_\-\.]+)[^:]+$", "stringa", 1),
+            # Numeri interi o decimali dopo i due punti
+            (r":\s*(\-{0,1}\d+(\.\d+){0,1})[^\.]", "numero_bool", 0),
             # Chiavi (es. "nome:" o "- nome:")
-            (r"(?m)^[\s\-]*([a-zA-Z0-9_\-\.\s]+)\s*:", "chiave", 1),
+            (r"(?m)^[ \t\-]*([a-zA-Z0-9_\-\.]+)\s*:", "chiave", 1),
             # Valori booleani o nulli
             (r":\s*\b(true|false|yes|no|null|~)\b", "numero_bool", 1),
-            # Numeri interi o decimali dopo i due punti
-            (r":\s*(-?\d+(?:\.\d+)?)\b", "numero_bool", 1),
-            # Stringhe tra virgolette singole o doppie
-            (r"([\"'])(?:(?=(\\?))\2.)*?\1", "stringa", 0),
             # Commenti che iniziano con #
-            (r"#.*$", "commento", 0),
+            (r"(?m)#.*$", "commento", 0),
         ]
 
         # 3. Applica i tag alle corrispondenze trovate
@@ -109,29 +118,60 @@ class ApplicationGUIConfigurator():
             self.lbl_stato.config(text="Stato: Il file è vuoto", fg="orange")
             return False
         try:
-            yaml.safe_load(contenuto)
+            config_default = yaml.safe_load(contenuto)
             self.lbl_stato.config(text="Stato: YAML valido ✔", fg="green")
+            ConfigCredenzialiYaml.model_validate(config_default)
             return True
         except yaml.YAMLError as e:
-            self.lbl_stato.config(text="Stato: Errore di sintassi ✖", fg="red")
-            messagebox.showerror("Errore di sintassi YAML", f"Dettagli:\n\n{e}")
+            self.lbl_stato.config(text=f"Stato: Errore di sintassi {e} ✖", fg="red")
+            # messagebox.showerror("Errore di sintassi YAML", f"Dettagli:\n\n{e}")
+            return False
+        except ValidationError as e:
+            for dettagli_e in e.errors():
+                loc = ".".join(str(x) for x in dettagli_e.get('loc', ['unknown']))
+                msg = dettagli_e.get('msg', 'Unknown error')
+                if dettagli_e.get('type') == 'missing_field':
+                    self.lbl_stato.config(text=f"Manca il campo: {loc} ✖", fg="red")
+                elif dettagli_e.get('type') == 'extra_forbidden':
+                    self.lbl_stato.config(text=f"Campo non permesso: {loc} ✖", fg="red")
+                else:
+                    self.lbl_stato.config(text=f"{dettagli_e.get('type')} {loc}: {msg} ✖", fg="red")
+            return False
+        except ValueError as e:
+            # Eccezione custom (coerenza notifiche non configurata)
+            self.lbl_stato.config(text=f"Errore di coerenza: {e} ✖", fg="red")
+            return False
+        except Exception as e:
+            # Altri errori (file non trovato, permessi, ecc.)
+            print(f"Errore imprevisto: {type(e).__name__}: {e}")
             return False
 
     def salva_file(self):
         if not self.verifica_yaml():
             if not messagebox.askyesno("Attenzione", "YAML non valido. Salvare comunque?"):
                 return
+
         if (getattr(sys, 'frozen', False)):
             # Se l'applicazione è compilata con PyInstaller
             DIR=str(os.path.dirname(sys.executable))
         else:
             DIR=str(Path(os.path.dirname(__file__)).absolute())
-        # percorso = filedialog.asksaveasfilename(defaultextension=".yml", filetypes=[("YAML", "*.yml *.yaml")])
+
         percorso = os.path.join(DIR, "credenziali.yml")
         if percorso:
-            with open(percorso, "w", encoding="utf-8") as f:
-                f.write(self.text_area.get("1.0", "end-1c"))
-            self.lbl_stato.config(text=f"Salvato in: {percorso}", fg="blue")
+            try:
+                config_default = yaml.safe_load(self.text_area.get("1.0", "end-1c"))
+                config_validato = ConfigCredenzialiYaml.model_validate(config_default)
+                
+                # Genera YAML con commenti
+                content_con_commenti = format_yaml_with_comments(config_validato.model_dump())
+                
+                with open(percorso, "w", encoding="utf-8") as f:
+                    f.write(content_con_commenti)
+                self.lbl_stato.config(text=f"Salvato in: {percorso}", fg="blue")
+            except Exception as e:
+                messagebox.showerror("Errore salvataggio", f"Impossibile formattare il file:\n{e}")
+                return
 
     def carica_file(self, percorso=None):
         if (percorso is None):
