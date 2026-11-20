@@ -26,6 +26,7 @@ from moduli.gui.AxiosGetCompitiConfigurator import ApplicationGUIConfigurator
 
 logger = log
 
+
 class GuiHandler(logging.Handler):
 
     def __init__(self, event_queue):
@@ -41,6 +42,7 @@ class GuiHandler(logging.Handler):
         except Exception:
             self.handleError(record)
 
+
 class ApplicationGUI:
 
     def __init__(self, logger, run_function):
@@ -54,7 +56,7 @@ class ApplicationGUI:
         self.root = tk.Tk()
 
         ttk.Style().theme_use("clam")
-        self.root.title("Axios-get GUI")
+        self.root.title("Axios - get GUI")
         self.root.geometry("800x400")
 
         # Pulsante avvio
@@ -72,15 +74,15 @@ class ApplicationGUI:
         self.log_text.tag_config("WARNING", foreground="orange")
         self.log_text.tag_config("ERROR", foreground="red")
         self.log_text.tag_config("DEBUG", foreground="gray")
-        self.log_text.tag_config("Bold", foreground="#569cd6", font=("Consolas", 10, "bold")) # Blu
+        self.log_text.tag_config("Bold", foreground="#569cd6", font=("Consolas", 10, "bold"))  # Blu
         self.log_text.config(state="disabled")
 
         self.label_credit = tk.Text(self.root, font=("Consolas", 8), wrap=tk.WORD, relief="flat", bd=0, height=4, bg=self.root.cget("bg"))
         self.label_credit.tag_config("Bold", foreground="#569cd6", font=("Consolas", 8, "bold"))
-        self.label_credit.insert("end","Axios-get\n", "Bold")
-        self.label_credit.insert("end","Autore: Roberto Quintiliani\n")
-        self.label_credit.insert("end","Licenza: Open Source (MIT)\n")
-        self.label_credit.insert("end","Progetto: https://github.com/robyquin/axios-get")
+        self.label_credit.insert("end", "Axios - get\n", "Bold")
+        self.label_credit.insert("end", "Autore: Roberto Quintiliani\n")
+        self.label_credit.insert("end", "Licenza: Open Source (MIT)\n")
+        self.label_credit.insert("end", "Progetto: https://github.com / robyquin / axios - get")
         self.label_credit.grid(row=3, column=1, sticky="ew", padx=5, pady=5)
         self.label_credit.config(state="disabled")
 
@@ -148,8 +150,8 @@ class ApplicationGUI:
 
             self.log_text.config(state="normal")
 
-            inizio_riga = self.log_text.index("end-1c linestart")
-            # fine_riga = self.log_text.index("end-1c lineend")
+            inizio_riga = self.log_text.index("end - 1c linestart")
+            # fine_riga = self.log_text.index("end - 1c lineend")
 
             self.log_text.insert(
                 "end",
@@ -158,7 +160,7 @@ class ApplicationGUI:
             )
 
             regole = [
-                (r"\*\*([a-zA-Z0-9_\-\.\s]+)\*\*", "Bold", 1),
+                (r"\*\*([a - zA - Z0 - 9_\-\.\s]+)\*\*", "Bold", 1),
             ]
 
             for pattern, tag, gruppo in regole:
@@ -178,9 +180,9 @@ class ApplicationGUI:
     def avvia_configuratore(self):
         if (getattr(sys, 'frozen', False)):
             # Se l'applicazione è compilata con PyInstaller
-            DIR=str(os.path.dirname(sys.executable))
+            DIR = str(os.path.dirname(sys.executable))
         else:
-            DIR=str(Path(os.path.dirname(__file__)).absolute())
+            DIR = str(Path(os.path.dirname(__file__)).absolute())
 
         gui = ApplicationGUIConfigurator(DIR, self.root)
 
@@ -189,6 +191,7 @@ class ApplicationGUI:
             gui.run(os.path.join(DIR, "credenziali.yml"))
         else:
             gui.run()
+
 
 def main():
 
@@ -204,21 +207,21 @@ def main():
 
     if (getattr(sys, 'frozen', False)):
         # Se l'applicazione è compilata con PyInstaller
-        DIR=str(os.path.dirname(sys.executable))
-        if (os.path.exists(os.path.join(DIR, "schedula_axios-get.xml_tmp"))):
+        DIR = str(os.path.dirname(sys.executable))
+        if (os.path.exists(os.path.join(DIR, "schedula_axios - get.xml_tmp"))):
             content = ""
-            with open(os.path.join(DIR, "schedula_axios-get.xml_tmp"), "r", encoding="utf-16") as file_schedule:
+            with open(os.path.join(DIR, "schedula_axios - get.xml_tmp"), "r", encoding="utf - 16") as file_schedule:
                 content = file_schedule.read()
-            content = content.replace("<Command>Axios-Get</Command>", f"<Command>{str(os.path.abspath(sys.executable))}</Command>")
-            content = content.replace("<WorkingDirectory>Axios-Get</WorkingDirectory>", f"<WorkingDirectory>{str(os.path.dirname(sys.executable))}</WorkingDirectory>")
-            with open(os.path.join(DIR, "schedula_axios-get.xml"), "w", encoding="utf-16") as file_schedule:
+            content = content.replace("<Command>Axios - Get</Command>", f"<Command>{str(os.path.abspath(sys.executable))}</Command>")
+            content = content.replace("<WorkingDirectory>Axios - Get</WorkingDirectory>", f"<WorkingDirectory>{str(os.path.dirname(sys.executable))}</WorkingDirectory>")
+            with open(os.path.join(DIR, "schedula_axios - get.xml"), "w", encoding="utf - 16") as file_schedule:
                 content = file_schedule.write(content)
-                os.remove(os.path.join(DIR, "schedula_axios-get.xml_tmp"))
+                os.remove(os.path.join(DIR, "schedula_axios - get.xml_tmp"))
     else:
-        DIR=str(Path(os.path.dirname(__file__)).absolute())
+        DIR = str(Path(os.path.dirname(__file__)).absolute())
 
     # Handler file senza colori
-    file_handler = logging.FileHandler(filename=os.path.join(DIR, "output.log"), mode="w", encoding='utf-8')
+    file_handler = logging.FileHandler(filename=os.path.join(DIR, "output.log"), mode="w", encoding='utf - 8')
     file_formatter = logging.Formatter("%(asctime)-15s [%(levelname)s] %(message)s")
     file_handler.setFormatter(file_formatter)
     file_handler.setLevel(logging.DEBUG)
@@ -238,6 +241,7 @@ def main():
 
         gui.run()
         return 0
+
 
 if __name__ == "__main__":
 

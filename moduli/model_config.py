@@ -2,13 +2,16 @@
 from typing import Literal
 from pydantic import BaseModel, Field, model_validator
 
+
 class ConfigurazioneAlunno(BaseModel):
     tipo: Literal['smtp', 'html', 'screenshot', 'telegram']
     param: str
     nome_alternativo: str | None = None
 
+
 class RegistroAlunni(BaseModel):
     alunni: dict[str, ConfigurazioneAlunno]
+
 
 class ConfigurazioneIstituto(BaseModel):
     customerid: str | int
@@ -16,8 +19,10 @@ class ConfigurazioneIstituto(BaseModel):
     password: str
     alunni: dict[str, ConfigurazioneAlunno]
 
+
 class ConfigNotificaLocale(BaseModel):
     path: str
+
 
 class ConfigNotificaSmtp(BaseModel):
     smtp_server: str
@@ -27,16 +32,19 @@ class ConfigNotificaSmtp(BaseModel):
     destinatari: list[str]
     n_allegati: int = Field(ge=0)
 
+
 class ConfigNotificaTelegram(BaseModel):
     BOT_TOKEN: str
     CHAT_ID: str | None = None
     n_allegati: int = Field(ge=0)
+
 
 class ParamsNotifiche(BaseModel):
     html: ConfigNotificaLocale | None = None
     screenshot: ConfigNotificaLocale | None = None
     smtp: ConfigNotificaSmtp | None = None
     telegram: ConfigNotificaTelegram | None = None
+
 
 class ConfigCredenzialiYaml(BaseModel):
     version: str = Field(pattern=r"^\d+\.\d+\.\d+\w*$")
@@ -50,7 +58,7 @@ class ConfigCredenzialiYaml(BaseModel):
         for credenziali_config in self.credenziali:
             for nome_alunno, config in credenziali_config.alunni.items():
                 canale = config.tipo
-                
+
                 if getattr(self.params_notifiche, canale) is None:
                     errori.append(
                         f"L'alunno '{nome_alunno}' usa il tipo '{canale}', "
@@ -59,6 +67,3 @@ class ConfigCredenzialiYaml(BaseModel):
         if errori:
             raise ValueError(" | ".join(errori))
         return self
-
-# modello = ConfigCredenzialiYaml.model_validate(config_default)
-# print(modello.model_dump())

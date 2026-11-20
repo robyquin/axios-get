@@ -8,9 +8,7 @@ AxiosGetCompiti Configuratore.
 
 """
 
-import sys
 import os
-from pathlib import Path
 
 import tkinter as tk
 from tkinter import ttk
@@ -22,6 +20,7 @@ from pydantic import ValidationError
 from AxiosGetCompiti import file_config_default, format_yaml_with_comments
 from moduli.model_config import ConfigCredenzialiYaml
 
+
 class ApplicationGUIConfigurator():
 
     def __init__(self, DIR, root):
@@ -32,7 +31,7 @@ class ApplicationGUIConfigurator():
         # Finestra 5x2
         self.window = tk.Toplevel()
 
-        self.window.title("Axios-get Configuratore")
+        self.window.title("Axios - get Configuratore")
         self.window.geometry("800x400")
 
         self.window.grab_set()
@@ -53,10 +52,10 @@ class ApplicationGUIConfigurator():
         self.text_area.grid(row=0, column=1, rowspan=4, sticky="nsew", padx=5, pady=5)
 
         # Configurazione colori dei Tag
-        self.text_area.tag_configure("chiave", foreground="#46acff", font=("Consolas", 9, "bold")) # Blu
+        self.text_area.tag_configure("chiave", foreground="#46acff", font=("Consolas", 9, "bold"))  # Blu
         self.text_area.tag_configure("stringa", foreground="#fda33d")                               # Arancione
         self.text_area.tag_configure("numero_bool", foreground="#ffdc43")                           # Giallo
-        self.text_area.tag_configure("commento", foreground="#6a9955", font=("Consolas", 9, "italic")) # Verde scuro
+        self.text_area.tag_configure("commento", foreground="#6a9955", font=("Consolas", 9, "italic"))  # Verde scuro
 
         # Collega la colorazione a ogni tasto rilasciato
         self.text_area.bind("<KeyRelease>", self.evidenzia_sintassi)
@@ -64,14 +63,14 @@ class ApplicationGUIConfigurator():
         # Testo iniziale
         esempio = file_config_default()
         self.text_area.insert("1.0", esempio)
-        self.evidenzia_sintassi() # Colora subito all'avvio
+        self.evidenzia_sintassi()  # Colora subito all'avvio
 
         self.label_credit = tk.Text(self.window, font=("Consolas", 8), wrap=tk.WORD, relief="flat", bd=0, height=4, bg=self.window.cget("bg"))
         self.label_credit.tag_config("Bold", foreground="#569cd6", font=("Consolas", 8, "bold"))
-        self.label_credit.insert("end","Axios-get\n", "Bold")
-        self.label_credit.insert("end","Autore: Roberto Quintiliani\n")
-        self.label_credit.insert("end","Licenza: Open Source (MIT)\n")
-        self.label_credit.insert("end","Progetto: https://github.com/robyquin/axios-get")
+        self.label_credit.insert("end", "Axios - get\n", "Bold")
+        self.label_credit.insert("end", "Autore: Roberto Quintiliani\n")
+        self.label_credit.insert("end", "Licenza: Open Source (MIT)\n")
+        self.label_credit.insert("end", "Progetto: https://github.com / robyquin / axios - get")
         self.label_credit.grid(row=4, column=1, sticky="ew", padx=5, pady=5)
         self.label_credit.config(state="disabled")
 
@@ -87,18 +86,18 @@ class ApplicationGUIConfigurator():
         for tag in ["chiave", "stringa", "numero_bool", "commento"]:
             self.text_area.tag_remove(tag, "1.0", tk.END)
 
-        contenuto = self.text_area.get("1.0", "end-1c")
+        contenuto = self.text_area.get("1.0", "end - 1c")
 
         # 2. Regole Regex per gli elementi YAML
         regole = [
             # Ipotizzo che ci sia di default una stringa
             (r":(.*)$", "stringa", 1),
             # Elementi di una lista (elementi non chiavi)
-            (r"(?m)^[ \t\-]*([a-zA-Z0-9_\-\.]+)[^:]+$", "stringa", 1),
+            (r"(?m)^[ \t\-]*([a - zA - Z0 - 9_\-\.]+)[^:]+$", "stringa", 1),
             # Numeri interi o decimali dopo i due punti
-            (r":\s*(\-{0,1}\d+(\.\d+){0,1})[^\.]", "numero_bool", 0),
+            (r":\s*(\-{0, 1}\d+(\.\d+){0, 1})[^\.]", "numero_bool", 0),
             # Chiavi (es. "nome:" o "- nome:")
-            (r"(?m)^[ \t\-]*([a-zA-Z0-9_\-\.]+)\s*:", "chiave", 1),
+            (r"(?m)^[ \t\-]*([a - zA - Z0 - 9_\-\.]+)\s*:", "chiave", 1),
             # Valori booleani o nulli
             (r":\s*\b(true|false|yes|no|null|~)\b", "numero_bool", 1),
             # Commenti che iniziano con #
@@ -113,7 +112,7 @@ class ApplicationGUIConfigurator():
                 self.text_area.tag_add(tag, start, end)
 
     def verifica_yaml(self):
-        contenuto = self.text_area.get("1.0", "end-1c")
+        contenuto = self.text_area.get("1.0", "end - 1c")
         if not contenuto.strip():
             self.lbl_stato.config(text="Stato: Il file è vuoto", fg="orange")
             return False
@@ -154,13 +153,13 @@ class ApplicationGUIConfigurator():
         percorso = os.path.join(self.DIR, "credenziali.yml")
         if percorso:
             try:
-                config_default = yaml.safe_load(self.text_area.get("1.0", "end-1c"))
+                config_default = yaml.safe_load(self.text_area.get("1.0", "end - 1c"))
                 config_validato = ConfigCredenzialiYaml.model_validate(config_default)
-                
+
                 # Genera YAML con commenti
                 content_con_commenti = format_yaml_with_comments(config_validato.model_dump())
-                
-                with open(percorso, "w", encoding="utf-8") as f:
+
+                with open(percorso, "w", encoding="utf - 8") as f:
                     f.write(content_con_commenti)
                 self.lbl_stato.config(text=f"Salvato in: {percorso}", fg="blue")
             except Exception as e:
@@ -172,7 +171,7 @@ class ApplicationGUIConfigurator():
             percorso = filedialog.askopenfilename(filetypes=[("YAML", "*.yml *.yaml")])
         self.percorso_configurazione = percorso
         if self.percorso_configurazione:
-            with open(self.percorso_configurazione, "r", encoding="utf-8") as f:
+            with open(self.percorso_configurazione, "r", encoding="utf - 8") as f:
                 self.text_area.delete("1.0", tk.END)
                 self.text_area.insert("1.0", f.read())
             self.evidenzia_sintassi()
