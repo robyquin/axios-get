@@ -11,8 +11,8 @@ class RegistroAlunni(BaseModel):
     alunni: dict[str, ConfigurazioneAlunno]
 
 class ConfigurazioneIstituto(BaseModel):
-    customerid: str
-    username: str
+    customerid: str | int
+    username: str | int
     password: str
     alunni: dict[str, ConfigurazioneAlunno]
 
@@ -29,7 +29,7 @@ class ConfigNotificaSmtp(BaseModel):
 
 class ConfigNotificaTelegram(BaseModel):
     BOT_TOKEN: str
-    CHAT_ID: str
+    CHAT_ID: str | None = None
     n_allegati: int = Field(ge=0)
 
 class ParamsNotifiche(BaseModel):
