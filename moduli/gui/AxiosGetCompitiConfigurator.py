@@ -24,14 +24,16 @@ from moduli.model_config import ConfigCredenzialiYaml
 
 class ApplicationGUIConfigurator():
 
-    def __init__(self, root):
+    def __init__(self, DIR, root):
         self.percorso_configurazione = None
+        self.DIR = DIR
+        self.root = root
 
         # Finestra 5x2
         self.window = tk.Toplevel()
 
         self.window.title("Axios-get Configuratore")
-        self.window.geometry("800x400") 
+        self.window.geometry("800x400")
 
         self.window.grab_set()
         self.window.transient(root)
@@ -78,8 +80,6 @@ class ApplicationGUIConfigurator():
 
         self.window.columnconfigure(1, weight=1)
         self.window.rowconfigure(3, weight=1)
-        
-        root.wait_window(self.window)
 
     def evidenzia_sintassi(self, event=None):
         """Scansiona il testo e applica i colori YAML tramite i Tag."""
@@ -151,13 +151,7 @@ class ApplicationGUIConfigurator():
             if not messagebox.askyesno("Attenzione", "YAML non valido. Salvare comunque?"):
                 return
 
-        if (getattr(sys, 'frozen', False)):
-            # Se l'applicazione è compilata con PyInstaller
-            DIR=str(os.path.dirname(sys.executable))
-        else:
-            DIR=str(Path(os.path.dirname(__file__)).absolute())
-
-        percorso = os.path.join(DIR, "credenziali.yml")
+        percorso = os.path.join(self.DIR, "credenziali.yml")
         if percorso:
             try:
                 config_default = yaml.safe_load(self.text_area.get("1.0", "end-1c"))
@@ -183,23 +177,9 @@ class ApplicationGUIConfigurator():
                 self.text_area.insert("1.0", f.read())
             self.evidenzia_sintassi()
             self.verifica_yaml()
+            self.root.wait_window(self.window)
 
     def run(self, path_config_file=None):
         if (path_config_file is not None):
             self.carica_file(percorso=path_config_file)
         self.window.mainloop()
-
-if __name__ == "__main__":
-
-    if (getattr(sys, 'frozen', False)):
-        # Se l'applicazione è compilata con PyInstaller
-        DIR=str(os.path.dirname(sys.executable))
-    else:
-        DIR=str(Path(os.path.dirname(__file__)).absolute())
-
-    gui = ApplicationGUIConfigurator()
-
-    if (os.path.exists(os.path.join(DIR, "credenziali.yml"))):
-        gui.run(os.path.join(DIR, "credenziali.yml"))
-    else:
-        gui.run()

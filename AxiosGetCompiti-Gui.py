@@ -182,9 +182,10 @@ class ApplicationGUI:
         else:
             DIR=str(Path(os.path.dirname(__file__)).absolute())
 
-        gui = ApplicationGUIConfigurator(self.root)
+        gui = ApplicationGUIConfigurator(DIR, self.root)
 
         if (os.path.exists(os.path.join(DIR, "credenziali.yml"))):
+            print(os.path.join(DIR, "credenziali.yml"))
             gui.run(os.path.join(DIR, "credenziali.yml"))
         else:
             gui.run()
