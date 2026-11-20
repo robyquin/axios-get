@@ -20,6 +20,65 @@ import yaml
 from moduli.lib_axios_famiglia import LibAxiosFamiglia
 from moduli.logging_config import log
 
+def format_yaml_with_comments(config: dict) -> str:
+    """
+    Formatta un dizionario YAML aggiungendo commenti descrittivi simili a file_config_default.
+    
+    Args:
+        config: Dizionario configurazione validato Pydantic
+        
+    Returns:
+        Stringa YAML con commenti inseriti
+    """
+    
+    content_yaml = yaml.dump(config, sort_keys=False)
+    
+    # Aggiungi header informativo
+    content_yaml = f"""# GUIDA ALLA CONFIGURAZIONE
+# https://github.com/robyquin/axios-get/blob/master/docs/Configurazione.md
+# Questo file è scritto in YAML, se lo modifichi manualmente presta attenzione all'indentazione e alla sintassi specifica.
+# Il testo che segue il carattere # è un commento e quindi nell'esecuzione verrà ignorato
+# ATTENZIONE: questo file può contenere in chiaro le credenziali Axios e, se configurati, la password SMTP e il token Telegram.
+# Non condividerlo; limita l'accesso al file e alle copie di backup.
+
+{content_yaml}"""
+    
+    # Commenti per le chiavi principali
+    content_yaml = re.sub(r'(version:.*)', r"\1 # Versione della configurazione", content_yaml)
+    content_yaml = re.sub(r'(credenziali:.*)', r"\1 # Gruppo credenziali: raccoglie informazioni per l'accesso al portale, la definizione degli studenti e per ciascuno la propria configurazione di notifica", content_yaml)
+    content_yaml = re.sub(r'(- customerid:.*)', r"\1 # CF Istituto/Cliente", content_yaml)
+    content_yaml = re.sub(r'(\s+username:.*)', r"\1 # Codice Utente o mail personale", content_yaml)
+    content_yaml = re.sub(r'(\s+password:.*)', r"\1 # Password di accesso", content_yaml)
+    content_yaml = re.sub(r'(\s+alunni:.*)', r"\1 # Gruppo alunni: definisce nome studente, tipologia di notifica e relativi parametri", content_yaml)
+    
+    # Commenti per ConfigurazioneAlunno
+    content_yaml = re.sub(r'(\s+NOME_ALUNNO_.:.*)', r"\1 # Inserisci qui il nome dello studente che trovi nel menu a tendina sul portale AxiosFamiglia", content_yaml)
+    content_yaml = re.sub(r'(\s+tipo:.*)', r"\1 # Tipi di notifiche disponibili: smtp, html, screenshot, telegram", content_yaml)
+    content_yaml = re.sub(r'(\s+param:.*)', r"\1 # Parametro caratteristico della notifica scelta [default: eredita il parametro dalla configurazione generale]", content_yaml)
+    content_yaml = re.sub(r'(\s+nome_alternativo:.*)', r"\1 # Nome alternativo dello studente (opzionale)", content_yaml)
+    
+    # Commenti per params_notifiche
+    content_yaml = re.sub(r'(params_notifiche:.*)', r"\1 # Gruppo parametri globali di notifica: raccoglie informazioni generali per rendere possibile la tipologia di notifica", content_yaml)
+    content_yaml = re.sub(r'(\s+(html|screenshot):.*)', r"\1 # Gruppo di configurazione globale per la notifica \2", content_yaml)
+    content_yaml = re.sub(r'(\s+(smtp):.*)', r"\1 # Gruppo di configurazione globale per la notifica \2 (https://github.com/robyquin/axios-get/blob/master/docs/Telegram_token_bot.md)", content_yaml)
+    content_yaml = re.sub(r'(\s+(telegram):.*)', r"\1 # Gruppo di configurazione globale per la notifica \2 (https://github.com/robyquin/axios-get/blob/master/docs/Telegram_token_bot.md)", content_yaml)
+    
+    content_yaml = re.sub(r'(\s+path:.*)', r"\1 # Specifica qui il percorso relativo o assoluto della cartella di destinazione", content_yaml)
+    content_yaml = re.sub(r'(\s+n_allegati:.*)', r"\1 # Specifica il numero di screenshot da allegare alla notifica [>=0]", content_yaml)
+    
+    # Commenti per SMTP
+    content_yaml = re.sub(r'(\s+smtp_server:.*)', r"\1 # Server SMTP (es. smtp.example.com)", content_yaml)
+    content_yaml = re.sub(r'(\s+smtp_port:.*)', r"\1 # Porta SMTP (es. 587, 465)", content_yaml)
+    content_yaml = re.sub(r'(\s+smtp_username:.*)', r"\1 # Username SMTP", content_yaml)
+    content_yaml = re.sub(r'(\s+smtp_password:.*)', r"\1 # Password SMTP", content_yaml)
+    content_yaml = re.sub(r'(\s+destinatari:.*)', r"\1 # Lista di destinatari email", content_yaml)
+    
+    # Commenti per Telegram
+    content_yaml = re.sub(r'(\s+BOT_TOKEN:.*)', r"\1 # Token del Bot Telegram (da @BotFather)", content_yaml)
+    content_yaml = re.sub(r'(\s+CHAT_ID:.*)', r"\1 # ID della chat del destinatario (da @userinfobot)", content_yaml)
+    
+    return content_yaml
+
 def file_config_default() -> str:
     """
     Crea il contenuto yaml di default
@@ -80,34 +139,12 @@ def file_config_default() -> str:
         }
     }
 
-    content_yaml = yaml.dump(config_default, sort_keys=False)
-    content_yaml = f"""# GUIDA ALLA CONFIGURAZIONE
-# https://github.com/robyquin/axios-get/blob/master/docs/Configurazione.md
-# Questo file è scritto in YAML, se lo modifichi manualmente presta attenzione all'indentazione e alla sintassi specifica.
-# Il testo che segue il carattere # è un commento e quindi nell'esecuzione verrà ignorato
-# ATTENZIONE: questo file può contenere in chiaro le credenziali Axios e, se configurati, la password SMTP e il token Telegram.
-# Non condividerlo; limita l'accesso al file e alle copie di backup.\n\n{content_yaml}"""
+    content_yaml = format_yaml_with_comments(config_default)
 
-    content_yaml = re.sub(r'(version:.*)', '\\1 # Versione della release', content_yaml)
-    content_yaml = re.sub(r'(credenziali:.*)', '\\1 # Gruppo credenziali: raccoglie informazioni per l\'accesso al portale, la definizione degli studenti e per ciascuno la propria configurazione di notifica', content_yaml)
-    content_yaml = re.sub(r'(- customerid:.*)', '\\1 # CF Istituto/Cliente', content_yaml)
-    content_yaml = re.sub(r'(\s+username:.*)', '\\1 # Codice Utente o mail personale', content_yaml)
-    content_yaml = re.sub(r'(\s+alunni:.*)', '\\1 # Gruppo alunni: definisce nome studente, tipologia di notifica e relativi parametri', content_yaml)
-    content_yaml = re.sub(r'(\s+NOME_ALUNNO_A:.*)', '\\1 # Inserisci qui il nome dello studente che trovi nel menu a tendina sul portale AxiosFamiglia', content_yaml)
-    content_yaml = re.sub(r'(\s+tipo:.*)', "\\1 # Tipi di notifiche disponibili: html, screenshot, smtp, telegram", content_yaml)
-    content_yaml = re.sub(r'(\s+param:.*)', "\\1 # Parametro caratteristico della notifica scelta [default: eredita il parametro dalla configurazione generale]", content_yaml)
-
-    content_yaml = re.sub(r'(params_notifiche:.*)', '\\1 # Gruppo parametri globali di notifica: raccoglie informazioni generali per rendere possibile la tipologia di notifica', content_yaml)
-    content_yaml = re.sub(r'(\s+(html|screenshot):.*)', '\\1 # Gruppo di configurazione globale per la notifica \\2', content_yaml)
-    content_yaml = re.sub(r'(\s+(telegram):.*)', '\\1 # Gruppo di configurazione globale per la notifica \\2 (https://github.com/robyquin/axios-get/blob/master/docs/Telegram_token_bot.md)', content_yaml)
-    content_yaml = re.sub(r'(\s+(smtp):.*)', '\\1 # Gruppo di configurazione globale per la notifica \\2 (https://github.com/robyquin/axios-get/blob/master/docs/SMTP_server.md)', content_yaml)
-    content_yaml = re.sub(r'(\s+path:.*)', '\\1 # Specifica qui il percorso relativo o assoluto della cartella di destinazione', content_yaml)
-    content_yaml = re.sub(r'(\s+n_allegati:.*)', '\\1 # Specifica il numero di screenshot da allegare alla notifica [>=0]', content_yaml)
-
-    content_yaml = re.sub(r'(NOME_ALUNNO_[B-D]:.*)', '# \\1 # Inserisci qui il nome dello studente successivo che trovi nel menu', content_yaml)
+    content_yaml = re.sub(r'(NOME_ALUNNO_[B-D]:.*)', '# \\1', content_yaml)
     content_yaml = re.sub(r'(tipo: (html|screenshot|telegram))', '# \\1', content_yaml)
     content_yaml = re.sub(r'(param: (\.|CHAT_ID))', '# \\1', content_yaml)
-    content_yaml = re.sub(r'(- EMAIL_ALTRI.*)', '# \\1 # Specifica, come un elenco, altri destinatari della email', content_yaml)
+    content_yaml = re.sub(r'(- EMAIL_ALTRI.*)', '# \\1', content_yaml)
 
     return content_yaml
 

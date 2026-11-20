@@ -19,7 +19,7 @@ import yaml
 import re
 from pydantic import ValidationError
 
-from AxiosGetCompiti import file_config_default
+from AxiosGetCompiti import file_config_default, format_yaml_with_comments
 from moduli.model_config import ConfigCredenzialiYaml
 
 class ApplicationGUIConfigurator():
@@ -143,17 +143,28 @@ class ApplicationGUIConfigurator():
         if not self.verifica_yaml():
             if not messagebox.askyesno("Attenzione", "YAML non valido. Salvare comunque?"):
                 return
+
         if (getattr(sys, 'frozen', False)):
             # Se l'applicazione è compilata con PyInstaller
             DIR=str(os.path.dirname(sys.executable))
         else:
             DIR=str(Path(os.path.dirname(__file__)).absolute())
-        # percorso = filedialog.asksaveasfilename(defaultextension=".yml", filetypes=[("YAML", "*.yml *.yaml")])
+
         percorso = os.path.join(DIR, "credenziali.yml")
         if percorso:
-            with open(percorso, "w", encoding="utf-8") as f:
-                f.write(self.text_area.get("1.0", "end-1c"))
-            self.lbl_stato.config(text=f"Salvato in: {percorso}", fg="blue")
+            try:
+                config_default = yaml.safe_load(self.text_area.get("1.0", "end-1c"))
+                config_validato = ConfigCredenzialiYaml.model_validate(config_default)
+                
+                # Genera YAML con commenti
+                content_con_commenti = format_yaml_with_comments(config_validato.model_dump())
+                
+                with open(percorso, "w", encoding="utf-8") as f:
+                    f.write(content_con_commenti)
+                self.lbl_stato.config(text=f"Salvato in: {percorso}", fg="blue")
+            except Exception as e:
+                messagebox.showerror("Errore salvataggio", f"Impossibile formattare il file:\n{e}")
+                return
 
     def carica_file(self, percorso=None):
         if (percorso is None):
