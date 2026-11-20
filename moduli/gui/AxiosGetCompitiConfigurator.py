@@ -24,7 +24,7 @@ from moduli.model_config import ConfigCredenzialiYaml
 
 class ApplicationGUIConfigurator():
 
-    def __init__(self):
+    def __init__(self, root):
         self.percorso_configurazione = None
 
         # Finestra 5x2
@@ -32,6 +32,9 @@ class ApplicationGUIConfigurator():
 
         self.window.title("Axios-get Configuratore")
         self.window.geometry("800x400") 
+
+        self.window.grab_set()
+        self.window.transient(root)
 
         # Pulsanti
         button_open = ttk.Button(self.window, text="Apri .yml", command=self.carica_file)
@@ -48,9 +51,9 @@ class ApplicationGUIConfigurator():
         self.text_area.grid(row=0, column=1, rowspan=4, sticky="nsew", padx=5, pady=5)
 
         # Configurazione colori dei Tag
-        self.text_area.tag_configure("chiave", foreground="#569cd6", font=("Consolas", 9, "bold")) # Blu
-        self.text_area.tag_configure("stringa", foreground="#ce9178")                               # Arancione
-        self.text_area.tag_configure("numero_bool", foreground="#b5cea8")                           # Verde chiaro
+        self.text_area.tag_configure("chiave", foreground="#46acff", font=("Consolas", 9, "bold")) # Blu
+        self.text_area.tag_configure("stringa", foreground="#fda33d")                               # Arancione
+        self.text_area.tag_configure("numero_bool", foreground="#ffdc43")                           # Giallo
         self.text_area.tag_configure("commento", foreground="#6a9955", font=("Consolas", 9, "italic")) # Verde scuro
 
         # Collega la colorazione a ogni tasto rilasciato
@@ -75,6 +78,8 @@ class ApplicationGUIConfigurator():
 
         self.window.columnconfigure(1, weight=1)
         self.window.rowconfigure(3, weight=1)
+        
+        root.wait_window(self.window)
 
     def evidenzia_sintassi(self, event=None):
         """Scansiona il testo e applica i colori YAML tramite i Tag."""
@@ -86,16 +91,18 @@ class ApplicationGUIConfigurator():
 
         # 2. Regole Regex per gli elementi YAML
         regole = [
+            # Ipotizzo che ci sia di default una stringa
+            (r":(.*)$", "stringa", 1),
+            # Elementi di una lista (elementi non chiavi)
+            (r"(?m)^[ \t\-]*([a-zA-Z0-9_\-\.]+)[^:]+$", "stringa", 1),
+            # Numeri interi o decimali dopo i due punti
+            (r":\s*(\-{0,1}\d+(\.\d+){0,1})[^\.]", "numero_bool", 0),
             # Chiavi (es. "nome:" o "- nome:")
-            (r"(?m)^[\s\-]*([a-zA-Z0-9_\-\.\s]+)\s*:", "chiave", 1),
+            (r"(?m)^[ \t\-]*([a-zA-Z0-9_\-\.]+)\s*:", "chiave", 1),
             # Valori booleani o nulli
             (r":\s*\b(true|false|yes|no|null|~)\b", "numero_bool", 1),
-            # Numeri interi o decimali dopo i due punti
-            (r":\s*(-?\d+(?:\.\d+)?)\b", "numero_bool", 1),
-            # Stringhe tra virgolette singole o doppie
-            (r"([\"'])(?:(?=(\\?))\2.)*?\1", "stringa", 0),
             # Commenti che iniziano con #
-            (r"#.*$", "commento", 0),
+            (r"(?m)#.*$", "commento", 0),
         ]
 
         # 3. Applica i tag alle corrispondenze trovate
