@@ -92,7 +92,7 @@ class ApplicationGUI:
         self.label_credit.insert("end", "Axios - get\n", "Bold")
         self.label_credit.insert("end", "Autore: Roberto Quintiliani\n")
         self.label_credit.insert("end", "Licenza: Open Source (MIT)\n")
-        self.label_credit.insert("end", "Progetto: https://github.com / robyquin / axios - get")
+        self.label_credit.insert("end", "Progetto: https://github.com/robyquin/axios - get")
         self.label_credit.grid(row=3, column=1, sticky="ew", padx=5, pady=5)
         self.label_credit.config(state="disabled")
 

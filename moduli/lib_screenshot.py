@@ -92,7 +92,7 @@ class ScreenShot():
 
         lines = html.split('\n')
         lines.append("<credit>⚡ Generato automaticamente con Axios - Get</credit>")
-        lines.append("<credit>🔗 https://github.com / robyquin / axios - get - Open Source (MIT)</credit>")
+        lines.append("<credit>🔗 https://github.com/robyquin/axios - get - Open Source (MIT)</credit>")
         y_app = 50
         filename = "testo_formattato"
         for l0 in lines:

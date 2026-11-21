@@ -36,7 +36,7 @@ def format_yaml_with_comments(config: dict) -> str:
 
     # Aggiungi header informativo
     content_yaml = f"""# GUIDA ALLA CONFIGURAZIONE
-# https://github.com / robyquin / axios - get / blob / master / docs / Configurazione.md
+# https://github.com/robyquin/axios - get/blob/master/docs/Configurazione.md
 # Questo file è scritto in YAML, se lo modifichi manualmente presta attenzione all'indentazione e alla sintassi specifica.
 # Il testo che segue il carattere # è un commento e quindi nell'esecuzione verrà ignorato
 # ATTENZIONE: questo file può contenere in chiaro le credenziali Axios e, se configurati, la password SMTP e il token Telegram.
@@ -47,7 +47,7 @@ def format_yaml_with_comments(config: dict) -> str:
     # Commenti per le chiavi principali
     content_yaml = re.sub(r'(version:.*)', r"\1 # Versione della configurazione", content_yaml)
     content_yaml = re.sub(r'(credenziali:.*)', r"\1 # Gruppo credenziali: raccoglie informazioni per l'accesso al portale, la definizione degli studenti e per ciascuno la propria configurazione di notifica", content_yaml)
-    content_yaml = re.sub(r'(- customerid:.*)', r"\1 # CF Istituto / Cliente", content_yaml)
+    content_yaml = re.sub(r'(- customerid:.*)', r"\1 # CF Istituto/Cliente", content_yaml)
     content_yaml = re.sub(r'(\s + username:.*)', r"\1 # Codice Utente o mail personale", content_yaml)
     content_yaml = re.sub(r'(\s + password:.*)', r"\1 # Password di accesso", content_yaml)
     content_yaml = re.sub(r'(\s + alunni:.*)', r"\1 # Gruppo alunni: definisce nome studente, tipologia di notifica e relativi parametri", content_yaml)
@@ -61,8 +61,8 @@ def format_yaml_with_comments(config: dict) -> str:
     # Commenti per params_notifiche
     content_yaml = re.sub(r'(params_notifiche:.*)', r"\1 # Gruppo parametri globali di notifica: raccoglie informazioni generali per rendere possibile la tipologia di notifica", content_yaml)
     content_yaml = re.sub(r'(\s+(html|screenshot):.*)', r"\1 # Gruppo di configurazione globale per la notifica \2", content_yaml)
-    content_yaml = re.sub(r'(\s+(smtp):.*)', r"\1 # Gruppo di configurazione globale per la notifica \2 (https://github.com / robyquin / axios - get / blob / master / docs / Telegram_token_bot.md)", content_yaml)
-    content_yaml = re.sub(r'(\s+(telegram):.*)', r"\1 # Gruppo di configurazione globale per la notifica \2 (https://github.com / robyquin / axios - get / blob / master / docs / Telegram_token_bot.md)", content_yaml)
+    content_yaml = re.sub(r'(\s+(smtp):.*)', r"\1 # Gruppo di configurazione globale per la notifica \2 (https://github.com/robyquin/axios - get/blob/master/docs/Telegram_token_bot.md)", content_yaml)
+    content_yaml = re.sub(r'(\s+(telegram):.*)', r"\1 # Gruppo di configurazione globale per la notifica \2 (https://github.com/robyquin/axios - get/blob/master/docs/Telegram_token_bot.md)", content_yaml)
 
     content_yaml = re.sub(r'(\s + path:.*)', r"\1 # Specifica qui il percorso relativo o assoluto della cartella di destinazione", content_yaml)
     content_yaml = re.sub(r'(\s + n_allegati:.*)', r"\1 # Specifica il numero di screenshot da allegare alla notifica [>=0]", content_yaml)

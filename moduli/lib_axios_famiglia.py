@@ -168,13 +168,13 @@ class LibAxiosFamiglia():
                 self.session.headers['Referer'] = "https://registrofamiglie.axioscloud.it/"
                 link_sequence = [
                     ['GET', 'https://registrofamiglie.axioscloud.it/', {}, '00_home.html'],
-                    ['POST', 'https://registrofamiglie.axioscloud.it / Pages / SD / SD_Login.aspx', {}, '01_login.html', {'customerid': self.customerid, 'username': self.username, 'password': self.password, 'customeridSpid': ''}, '', False]
+                    ['POST', 'https://registrofamiglie.axioscloud.it/Pages/SD/SD_Login.aspx', {}, '01_login.html', {'customerid': self.customerid, 'username': self.username, 'password': self.password, 'customeridSpid': ''}, '', False]
                 ]
             elif (prefix == AxiosView.materiale):
                 self.session.headers['Referer'] = "https://collabora.axioscloud.it/"
                 link_sequence = [
                     ['GET', 'https://collabora.axioscloud.it/', {}, '00_home.html'],
-                    ['POST', 'https://collabora.axioscloud.it / Pages / SD / SD_Login.aspx', {}, '01_login.html', {'customerid': self.customerid, 'username': self.username, 'password': self.password, 'customeridSpid': ''}, '', False]
+                    ['POST', 'https://collabora.axioscloud.it/Pages/SD/SD_Login.aspx', {}, '01_login.html', {'customerid': self.customerid, 'username': self.username, 'password': self.password, 'customeridSpid': ''}, '', False]
                 ]
             self.__get_session("", link_sequence, prefix)
 
@@ -190,12 +190,12 @@ class LibAxiosFamiglia():
             if (prefix == AxiosView.registro):
                 self.session.headers['Referer'] = "https://registrofamiglie.axioscloud.it/"
                 link_sequence = [
-                    ['GET', 'https://registrofamiglie.axioscloud.it / Pages / SD / SD_Logout.aspx', {}, '06_logout.html']
+                    ['GET', 'https://registrofamiglie.axioscloud.it/Pages/SD/SD_Logout.aspx', {}, '06_logout.html']
                 ]
             elif (prefix == AxiosView.materiale):
                 self.session.headers['Referer'] = "https://collabora.axioscloud.it/"
                 link_sequence = [
-                    ['GET', 'https://collabora.axioscloud.it / Pages / SD / SD_Logout.aspx', {}, '08_logout.html']
+                    ['GET', 'https://collabora.axioscloud.it/Pages/SD/SD_Logout.aspx', {}, '08_logout.html']
                 ]
             self.__get_session("", link_sequence, prefix)
 
@@ -212,12 +212,12 @@ class LibAxiosFamiglia():
         self.session.headers['Referer'] = "https://registrofamiglie.axioscloud.it/"
 
         link_registrofamiglie = [
-            ['GET', 'https://registrofamiglie.axioscloud.it / Pages / SD / SD_Dashboard.aspx', {}, '02_dashboard.html'],
-            ['GET', 'https://registrofamiglie.axioscloud.it / Pages / APP / APP_Ajax_Get.aspx', {'Action': 'DashboardLoad'}, '03_load_dashboard.html'],
-            ['POST', 'https://registrofamiglie.axioscloud.it / Pages / APP / APP_Ajax_Get.aspx', {'Action': 'FAMILY_CHANGE_ALUNNO'}, '03_FAMILY_CHANGE_ALUNNO.json', 'set_in_session', 'json', False],
-            ['POST', 'https://registrofamiglie.axioscloud.it / Pages / APP / APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_COMPITI_LISTA'}, '04_compiti.json', {"draw": 1, "columns": {}, "order": [], "start": 0, "length": 50, "search": {"value": "", "regex": False}, "iMatId": ""}, 'json', True],
-            ['POST', 'https://registrofamiglie.axioscloud.it / Pages / APP / APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_ARGOMENTI_LISTA'}, '04_argomenti.json', {"draw": 1, "columns": {}, "order": [], "start": 0, "length": 50, "search": {"value": "", "regex": False}, "iMatId": ""}, 'json', True],
-            ['GET', 'https://registrofamiglie.axioscloud.it / Pages / APP / APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_NOTE', 'Others': 2}, '05_annotazioni.json']
+            ['GET', 'https://registrofamiglie.axioscloud.it/Pages/SD/SD_Dashboard.aspx', {}, '02_dashboard.html'],
+            ['GET', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'DashboardLoad'}, '03_load_dashboard.html'],
+            ['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_CHANGE_ALUNNO'}, '03_FAMILY_CHANGE_ALUNNO.json', 'set_in_session', 'json', False],
+            ['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_COMPITI_LISTA'}, '04_compiti.json', {"draw": 1, "columns": {}, "order": [], "start": 0, "length": 50, "search": {"value": "", "regex": False}, "iMatId": ""}, 'json', True],
+            ['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_ARGOMENTI_LISTA'}, '04_argomenti.json', {"draw": 1, "columns": {}, "order": [], "start": 0, "length": 50, "search": {"value": "", "regex": False}, "iMatId": ""}, 'json', True],
+            ['GET', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_NOTE', 'Others': 2}, '05_annotazioni.json']
         ]
 
         self.__get_session(Alunno, link_registrofamiglie, AxiosView.registro)
@@ -246,9 +246,9 @@ class LibAxiosFamiglia():
         self.session.headers['User - Agent'] = self.DefaultUserAgent
         self.session.headers['Referer'] = "https://collabora.axioscloud.it/"
         link_collabora = [
-            ['GET', 'https://collabora.axioscloud.it / Pages / SD / SD_Dashboard.aspx', {}, '02_dashboard.html'],
-            ['GET', 'https://collabora.axioscloud.it / Pages / APP / APP_Ajax_Get.aspx', {'Action': 'DashboardLoad'}, '03_load_dashboard.html'],
-            ['POST', 'https://collabora.axioscloud.it / Pages / APP / APP_Ajax_Get.aspx', {'Action': 'MATERIALE_CONDIVISO_ALUNNO'}, '04_MATERIALE_CONDIVISO_ALUNNO.json', 'set_in_session', '', False]
+            ['GET', 'https://collabora.axioscloud.it/Pages/SD/SD_Dashboard.aspx', {}, '02_dashboard.html'],
+            ['GET', 'https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'DashboardLoad'}, '03_load_dashboard.html'],
+            ['POST', 'https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_CONDIVISO_ALUNNO'}, '04_MATERIALE_CONDIVISO_ALUNNO.json', 'set_in_session', '', False]
         ]
 
         self.__get_session(Alunno, link_collabora, AxiosView.materiale)
@@ -315,7 +315,7 @@ class LibAxiosFamiglia():
                                 log.warning(f"Aggiungi nella configurazione corrispondente di {Alunno} un campo 'nome_alternativo' scegliendo uno tra questi:\n - {"\n - ".join(self.alunni[prefix].keys())}")
                                 log.warning("L'elaborazione del contenuto del materiale didattico verrà momentaneamente disabilitata!")
                             else:
-                                log.warning(f"Nel file di configurazione, dovresti verificare / controllare la corrispondenza con uno di questi:\n - {"\n - ".join(self.alunni[prefix].keys())}")
+                                log.warning(f"Nel file di configurazione, dovresti verificare/controllare la corrispondenza con uno di questi:\n - {"\n - ".join(self.alunni[prefix].keys())}")
                             break
                         elif (self.nome_alternativo_alunno in self.alunni[prefix].keys()):
                             Alunno = self.nome_alternativo_alunno
@@ -328,9 +328,9 @@ class LibAxiosFamiglia():
                         link[UrlIdType.data] = {"alunnoId": self.alunni[prefix][Alunno]}
 
                 if (link[UrlIdType.type_data] == 'json'):
-                    res = self.session.post(link[UrlIdType.url], json=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content - Type': 'application / x-www - form - urlencoded'}, timeout=(10, 30))
+                    res = self.session.post(link[UrlIdType.url], json=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content - Type': 'application/x-www - form - urlencoded'}, timeout=(10, 30))
                 else:
-                    res = self.session.post(link[UrlIdType.url], data=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content - Type': 'application / x-www - form - urlencoded'}, timeout=(10, 30))
+                    res = self.session.post(link[UrlIdType.url], data=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content - Type': 'application/x-www - form - urlencoded'}, timeout=(10, 30))
 
                 get_error = re.search(r"SweetMessage.error\('(.*)'\);", res.text)
                 if (get_error is None):
@@ -353,7 +353,7 @@ class LibAxiosFamiglia():
                                 m = re.search(r"<legend.*?>(.*?)</legend>", text)
                                 self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<h2>{m.group(1)}</h2>")
                                 new_link_collabora = [
-                                    ['POST', 'https://collabora.axioscloud.it / Pages / APP / APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_FOLDERS_SHARED'}, '05_MATERIALE_DIDATTICO_FOLDERS_SHARED.json', MATERIALE_CONDIVISO_ALUNNO, '', False]
+                                    ['POST', 'https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_FOLDERS_SHARED'}, '05_MATERIALE_DIDATTICO_FOLDERS_SHARED.json', MATERIALE_CONDIVISO_ALUNNO, '', False]
                                 ]
                                 self.__get_session(Alunno, new_link_collabora, prefix)
                             else:
@@ -368,7 +368,7 @@ class LibAxiosFamiglia():
                                     MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF = f"{m1[0][0]}"
                                     self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<h3 class='professore'>📂 {MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF}</h3>")
                                 new_link_collabora = [
-                                    ['POST', 'https://collabora.axioscloud.it / Pages / APP / APP_Ajax_Get.aspx', {'Action': 'MATERIALE_CONDIVISO_CON_ME_DETAIL'}, f'06_MATERIALE_CONDIVISO_CON_ME_DETAIL_{FOLDERS_SHARED[0]}_{FOLDERS_SHARED[1]}.json', {'fiDocId' : FOLDERS_SHARED[0], 'fnId': FOLDERS_SHARED[1]}, 'json', False]
+                                    ['POST', 'https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_CONDIVISO_CON_ME_DETAIL'}, f'06_MATERIALE_CONDIVISO_CON_ME_DETAIL_{FOLDERS_SHARED[0]}_{FOLDERS_SHARED[1]}.json', {'fiDocId' : FOLDERS_SHARED[0], 'fnId': FOLDERS_SHARED[1]}, 'json', False]
                                 ]
                                 self.__get_session(Alunno, new_link_collabora, prefix)
                         elif (link[UrlIdType.params]['Action'] == 'MATERIALE_CONDIVISO_CON_ME_DETAIL'):
@@ -380,7 +380,7 @@ class LibAxiosFamiglia():
                             m = re.findall(r"data - nrow='(.*?)' data - others='(.*?)'", text)
                             for ll in m:
                                 new_link_collabora = [
-                                    ['POST', 'https://collabora.axioscloud.it / Pages / APP / APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'}, f'07_MATERIALE_DIDATTICO_CONDIVISO_CONTENT_{str(ll[1])}_{str(ll[0])}.json', {"folderId": str(ll[1]), "nRow": str(ll[0]), "uteCanWrite": ""}, 'json', False]
+                                    ['POST', 'https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'}, f'07_MATERIALE_DIDATTICO_CONDIVISO_CONTENT_{str(ll[1])}_{str(ll[0])}.json', {"folderId": str(ll[1]), "nRow": str(ll[0]), "uteCanWrite": ""}, 'json', False]
                                 ]
                                 self.__get_session(Alunno, new_link_collabora, prefix)
                         elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'):
@@ -441,7 +441,7 @@ class LibAxiosFamiglia():
 
         :param compiti: Dizionario di compiti
         :type compiti: dict
-        :param argomenti: Dizionario degli argomenti / lezioni
+        :param argomenti: Dizionario degli argomenti/lezioni
         :type argomenti: dict
         :param Alunno: Nome dell'alunno
         :type Alunno: str
@@ -564,7 +564,7 @@ class LibAxiosFamiglia():
             modifiche.append("<i>Materiale Didattico</i>")
 
         linee_notifica.append(f"<hr>\n<p style=\"font - size: 11px\">Aggiornamento del {oggi_long} con modifiche su {" e su ".join(modifiche)}</p>")
-        linee_notifica.append("<hr><p style=\"font - size: 11px; text - align: center\">⚡ Generato automaticamente da <a href='https://github.com / robyquin / axios - get'>Axios - Get</a> - Open Source (MIT)</p>")
+        linee_notifica.append("<hr><p style=\"font - size: 11px; text - align: center\">⚡ Generato automaticamente da <a href='https://github.com/robyquin/axios - get'>Axios - Get</a> - Open Source (MIT)</p>")
         linee_notifica.append("</body>")
         linee_notifica.append("</html>")
 

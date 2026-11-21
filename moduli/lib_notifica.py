@@ -44,7 +44,7 @@ class Notifica():
 
         :param html: corpo del messaggio di notifica
         :type html: str
-        :param alunno: nome dell'alunno / a
+        :param alunno: nome dell'alunno/a
         :type alunno: str
         """
         pass
@@ -207,8 +207,8 @@ class NotificaTelegram(Notifica):
         html = re.sub("<br>", "", html)
         html = re.sub("\n{3, }", "\n\n", html, flags=re.DOTALL)
 
-        link = f"https://api.telegram.org / bot{BOT_TOKEN}/sendMessage"
-        link_screenshot = f'https://api.telegram.org / bot{BOT_TOKEN}/sendPhoto'
+        link = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+        link_screenshot = f'https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto'
 
         parametri = {
             "chat_id": str(CHAT_ID),
@@ -234,7 +234,7 @@ class NotificaTelegram(Notifica):
                                 'caption': f'Pagina diario {DD}/{MM}/{YY}'
                             }
                             files = {
-                                'photo': (filename, dati_bytesio.getvalue(), 'image / png')
+                                'photo': (filename, dati_bytesio.getvalue(), 'image/png')
                             }
                             risposta_allegato = requests.post(link_screenshot, data=payload, files=files, timeout=(10, 30)).json()
                             if (risposta_allegato.get("ok")):
@@ -251,7 +251,7 @@ class NotificaTelegram(Notifica):
                                 'caption': f'Pagina diario {filename}'
                             }
                             files = {
-                                'photo': (filename, dati_bytesio.getvalue(), 'image / png')
+                                'photo': (filename, dati_bytesio.getvalue(), 'image/png')
                             }
                             risposta_allegato = requests.post(link_screenshot, data=payload, files=files, timeout=(10, 30)).json()
                             if (risposta_allegato.get("ok")):
