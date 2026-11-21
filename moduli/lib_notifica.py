@@ -66,7 +66,7 @@ class NotificaFileHTML(Notifica):
         try:
             # 'with' assicura che il file venga chiuso automaticamente alla fine,
             # anche se si verifica un errore durante la scrittura.
-            with open(absolute_path, "w", encoding="utf - 8") as file:
+            with open(absolute_path, "w", encoding="utf-8") as file:
                 file.write(html)
             log.info(f"Notifica Html salvata con successo: {absolute_path}")
         except Exception as e:
@@ -108,7 +108,7 @@ class NotificaMail(Notifica):
         # 2. Creazione del contenuto dell'email
         msg = EmailMessage()
         msg["Subject"] = "Diario Axios - " + oggi
-        msg["From"] = f"Axios - Get <{username}>"
+        msg["From"] = f"Axios-Get <{username}>"
         msg["To"] = ", ".join(receiver_email)
         msg.set_content(html, subtype='html')
 
@@ -147,7 +147,7 @@ class NotificaMail(Notifica):
                 with smtplib.SMTP(smtp_server, port, timeout=30) as server:
                     server.ehlo()  # Identifica il client presso il server SMTP
                     server.starttls(context=context)  # Aggiorna la connessione a TLS in modo sicuro
-                    server.ehlo()  # Re - identifica il client all'interno della connessione crittografata
+                    server.ehlo()  # Re-identifica il client all'interno della connessione crittografata
 
                     server.login(username, password)
                     server.send_message(msg)

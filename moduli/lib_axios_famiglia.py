@@ -160,7 +160,7 @@ class LibAxiosFamiglia():
         Effettua il login all'istituto.
         """
         log.info(f"Login all'Istituto: {self.customerid}")
-        self.session.headers['User - Agent'] = self.DefaultUserAgent
+        self.session.headers['User-Agent'] = self.DefaultUserAgent
         prefixes = [AxiosView.registro, AxiosView.materiale]
         for prefix in prefixes:
             link_sequence = []
@@ -183,7 +183,7 @@ class LibAxiosFamiglia():
         Effettua il logout dall'istituto.
         """
         log.info(f"Logout all'Istituto: {self.customerid}")
-        self.session.headers['User - Agent'] = self.DefaultUserAgent
+        self.session.headers['User-Agent'] = self.DefaultUserAgent
         prefixes = [AxiosView.registro, AxiosView.materiale]
         for prefix in prefixes:
             link_sequence = []
@@ -208,7 +208,7 @@ class LibAxiosFamiglia():
         """
         log.info(f"Elaborazione del Diario di {Alunno}")
 
-        self.session.headers['User - Agent'] = self.DefaultUserAgent
+        self.session.headers['User-Agent'] = self.DefaultUserAgent
         self.session.headers['Referer'] = "https://registrofamiglie.axioscloud.it/"
 
         link_registrofamiglie = [
@@ -230,7 +230,7 @@ class LibAxiosFamiglia():
         if (self.sha1_REGISTRO != self.sha1_REGISTRO_old or self.sha1_MD != self.sha1_MD_old and self.COMPITI != {}):
             self.notifica.send_notifica(self.prepara_notifica(self.COMPITI, self.ARGOMENTI, Alunno), Alunno)
             log.debug(f"Registro {self.sha1_REGISTRO} {self.sha1_REGISTRO_old}")
-            log.debug(f"Materiale - Dit {self.sha1_MD} {self.sha1_MD_old}")
+            log.debug(f"Materiale-Dit {self.sha1_MD} {self.sha1_MD_old}")
         else:
             log.info("Nessuna notifica: non ci sono modifiche!")
 
@@ -243,7 +243,7 @@ class LibAxiosFamiglia():
         """
         log.info(f"Elaborazione del Materiale Didattico di {Alunno}")
 
-        self.session.headers['User - Agent'] = self.DefaultUserAgent
+        self.session.headers['User-Agent'] = self.DefaultUserAgent
         self.session.headers['Referer'] = "https://collabora.axioscloud.it/"
         link_collabora = [
             ['GET', 'https://collabora.axioscloud.it/Pages/SD/SD_Dashboard.aspx', {}, '02_dashboard.html'],
@@ -260,14 +260,14 @@ class LibAxiosFamiglia():
         if (len(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES) > 0):
             dir_alunno = AxiosView.materiale
             if (Alunno != "" and self.alunni.get(AxiosView.materiale, {}).get(Alunno, None) is not None):
-                dir_alunno = f'{AxiosView.materiale}_{Alunno}_{hashlib.md5(self.alunni[AxiosView.materiale][Alunno].encode('utf - 8')).hexdigest()}'
-            matdit_compiti_alunno = os.path.join(self.dir_istituto, dir_alunno, 'materiale - didattico.html')
+                dir_alunno = f'{AxiosView.materiale}_{Alunno}_{hashlib.md5(self.alunni[AxiosView.materiale][Alunno].encode('utf-8')).hexdigest()}'
+            matdit_compiti_alunno = os.path.join(self.dir_istituto, dir_alunno, 'materiale-didattico.html')
             text_MD = "\n".join(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES)
-            self.sha1_MD = hashlib.sha1(text_MD.encode('utf - 8')).hexdigest()
+            self.sha1_MD = hashlib.sha1(text_MD.encode('utf-8')).hexdigest()
             if (os.path.exists(matdit_compiti_alunno)):
-                with open(matdit_compiti_alunno, 'r', encoding='utf - 8', newline='') as f:
-                    self.sha1_MD_old = hashlib.sha1(f.read().encode('utf - 8')).hexdigest()
-            with open(matdit_compiti_alunno, 'w', encoding='utf - 8', newline="\n") as fp:
+                with open(matdit_compiti_alunno, 'r', encoding='utf-8', newline='') as f:
+                    self.sha1_MD_old = hashlib.sha1(f.read().encode('utf-8')).hexdigest()
+            with open(matdit_compiti_alunno, 'w', encoding='utf-8', newline="\n") as fp:
                 fp.write(text_MD)
                 fp.close()
 
@@ -293,7 +293,7 @@ class LibAxiosFamiglia():
         for link in link_sequence:
             dir_alunno = prefix
             if (Alunno != "" and self.alunni.get(prefix, {}).get(Alunno, None) is not None):
-                dir_alunno = f'{prefix}_{Alunno}_{hashlib.md5(self.alunni[prefix][Alunno].encode('utf - 8')).hexdigest()}'
+                dir_alunno = f'{prefix}_{Alunno}_{hashlib.md5(self.alunni[prefix][Alunno].encode('utf-8')).hexdigest()}'
             registo_compiti_alunno = os.path.join(self.dir_istituto, dir_alunno, link[UrlIdType.filename])
             if (link[UrlIdType.method] == 'GET'):
                 res = self.session.get(link[UrlIdType.url], params=link[UrlIdType.params], allow_redirects=True, timeout=(10, 30))
@@ -302,7 +302,7 @@ class LibAxiosFamiglia():
                     if (link[UrlIdType.params]['Action'] == 'DashboardLoad'):
                         text = res.text
                         if (prefix == AxiosView.registro):
-                            m = re.findall(r"<a.*data - action='FAMILY_CHANGE_ALUNNO'.*?data - others='(.*?)'.*?<b>(.*?)</b>.*?</a>", text)
+                            m = re.findall(r"<a.*data-action='FAMILY_CHANGE_ALUNNO'.*?data-others='(.*?)'.*?<b>(.*?)</b>.*?</a>", text)
                             for elm in m:
                                 self.alunni[prefix][elm[1]] = elm[0]
                         elif (prefix == AxiosView.materiale):
@@ -328,16 +328,16 @@ class LibAxiosFamiglia():
                         link[UrlIdType.data] = {"alunnoId": self.alunni[prefix][Alunno]}
 
                 if (link[UrlIdType.type_data] == 'json'):
-                    res = self.session.post(link[UrlIdType.url], json=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content - Type': 'application/x-www - form - urlencoded'}, timeout=(10, 30))
+                    res = self.session.post(link[UrlIdType.url], json=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content-Type': 'application/x-www-form-urlencoded'}, timeout=(10, 30))
                 else:
-                    res = self.session.post(link[UrlIdType.url], data=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content - Type': 'application/x-www - form - urlencoded'}, timeout=(10, 30))
+                    res = self.session.post(link[UrlIdType.url], data=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content-Type': 'application/x-www-form-urlencoded'}, timeout=(10, 30))
 
                 get_error = re.search(r"SweetMessage.error\('(.*)'\);", res.text)
                 if (get_error is None):
                     if ('Action' in link[UrlIdType.params].keys()):
                         if (link[UrlIdType.params]['Action'] == 'FAMILY_REGISTRO_CLASSE_COMPITI_LISTA'):
                             self.COMPITI = json.loads(res.text)
-                            self.sha1_REGISTRO = hashlib.sha1(res.text.encode('utf - 8')).hexdigest()
+                            self.sha1_REGISTRO = hashlib.sha1(res.text.encode('utf-8')).hexdigest()
                             self.sha1_REGISTRO_old = ""
                             if (os.path.exists(registo_compiti_alunno)):
                                 with open(registo_compiti_alunno, "rb") as f:
@@ -377,7 +377,7 @@ class LibAxiosFamiglia():
                             m = re.findall('<a.*?>(.*?)</a>', text)
                             for ll in m:
                                 self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<h4>{ll}</h4>")
-                            m = re.findall(r"data - nrow='(.*?)' data - others='(.*?)'", text)
+                            m = re.findall(r"data-nrow='(.*?)' data-others='(.*?)'", text)
                             for ll in m:
                                 new_link_collabora = [
                                     ['POST', 'https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'}, f'07_MATERIALE_DIDATTICO_CONDIVISO_CONTENT_{str(ll[1])}_{str(ll[0])}.json', {"folderId": str(ll[1]), "nRow": str(ll[0]), "uteCanWrite": ""}, 'json', False]
@@ -386,7 +386,7 @@ class LibAxiosFamiglia():
                         elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'):
                             jj = json.loads(res.text)
                             text = jj['html']
-                            m = re.findall('<td.*?>(.*?)<div.*?<button.*?data - source - filename=\'(.*?)\'.*?</button>.*?<small>(.*?)</small>.*?</td>', text)
+                            m = re.findall('<td.*?>(.*?)<div.*?<button.*?data-source-filename=\'(.*?)\'.*?</button>.*?<small>(.*?)</small>.*?</td>', text)
                             self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append("<ul>")
                             for ll in m:
                                 self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<li class='file'><b>{ll[0]}</b><div>{ll[1]} - {ll[2]}</div></li>")
@@ -400,7 +400,7 @@ class LibAxiosFamiglia():
                 dir_registro_alunno = os.path.join(self.dir_istituto, dir_alunno)
                 if (not os.path.exists(dir_registro_alunno)):
                     os.makedirs(dir_registro_alunno)
-                with open(registo_compiti_alunno, 'w', encoding='utf - 8') as fp:
+                with open(registo_compiti_alunno, 'w', encoding='utf-8') as fp:
                     fp.write(res.text)
                     fp.close()
                     log.debug(f"Salvataggio: {registo_compiti_alunno}")
@@ -456,10 +456,10 @@ class LibAxiosFamiglia():
 
         dir_alunno = AxiosView.registro
         if (Alunno != "" and self.alunni[AxiosView.registro].get(Alunno, None) is not None):
-            dir_alunno = f'{AxiosView.registro}_{Alunno}_{hashlib.md5(self.alunni[AxiosView.registro][Alunno].encode('utf - 8')).hexdigest()}'
+            dir_alunno = f'{AxiosView.registro}_{Alunno}_{hashlib.md5(self.alunni[AxiosView.registro][Alunno].encode('utf-8')).hexdigest()}'
 
         if (os.path.exists(os.path.join(self.dir_istituto, dir_alunno, 'notifica.html'))):
-            with open(os.path.join(self.dir_istituto, dir_alunno, 'notifica.html'), 'r', encoding='utf - 8') as f_notify:
+            with open(os.path.join(self.dir_istituto, dir_alunno, 'notifica.html'), 'r', encoding='utf-8') as f_notify:
                 old_compiti = f_notify.read().replace('\r', '').split("\n")
 
         # FILTRO PER DATA
@@ -503,7 +503,7 @@ class LibAxiosFamiglia():
                             log.debug(f"Inserimento annotazione {arg_a} - Giorno mancante")
                             break
 
-        linee_notifica = ["<html>", "<head><style> hr { border: 0; border - top: 1px solid #e1e4e8; margin: 30px 0 15px 0;} h2 { background - color: beige; border: 1px solid #e1e4e8; text - align: center; } li.compiti {list - style - type: '📗 '; margin - bottom:10px;} li.verifica {list - style - type: '💥 '; margin - bottom:10px;} li.annotazione {list - style - type: '📚 '; margin - bottom:10px;} li.file {list - style - type: '🔗 ';}</style></head>", "<body>", f"<h1>Compiti per {Alunno}</h1>", f"<p>Ciao <i>{Alunno}</i>, <br>\nricorda sempre di verificare e integrare questi compiti con quelli scritti in classe sul tuo diario cartaceo.</p>", "<p>Buon lavoro</p>"]
+        linee_notifica = ["<html>", "<head><style> hr { border: 0; border-top: 1px solid #e1e4e8; margin: 30px 0 15px 0;} h2 { background-color: beige; border: 1px solid #e1e4e8; text-align: center; } li.compiti {list-style-type: '📗 '; margin-bottom:10px;} li.verifica {list-style-type: '💥 '; margin-bottom:10px;} li.annotazione {list-style-type: '📚 '; margin-bottom:10px;} li.file {list-style-type: '🔗 ';}</style></head>", "<body>", f"<h1>Compiti per {Alunno}</h1>", f"<p>Ciao <i>{Alunno}</i>,<br>\nricorda sempre di verificare e integrare questi compiti con quelli scritti in classe sul tuo diario cartaceo.</p>", "<p>Buon lavoro</p>"]
         giorno_app = ""
         materia = ""
         testo_list = []
@@ -563,15 +563,15 @@ class LibAxiosFamiglia():
         if (self.sha1_MD != self.sha1_MD_old):
             modifiche.append("<i>Materiale Didattico</i>")
 
-        linee_notifica.append(f"<hr>\n<p style=\"font - size: 11px\">Aggiornamento del {oggi_long} con modifiche su {" e su ".join(modifiche)}</p>")
-        linee_notifica.append("<hr><p style=\"font - size: 11px; text - align: center\">⚡ Generato automaticamente da <a href='https://github.com/robyquin/axios - get'>Axios - Get</a> - Open Source (MIT)</p>")
+        linee_notifica.append(f"<hr>\n<p style=\"font-size: 11px\">Aggiornamento del {oggi_long} con modifiche su {" e su ".join(modifiche)}</p>")
+        linee_notifica.append("<hr><p style=\"font-size: 11px; text-align: center\">⚡ Generato automaticamente da <a href='https://github.com/robyquin/axios-get'>Axios-Get</a> - Open Source (MIT)</p>")
         linee_notifica.append("</body>")
         linee_notifica.append("</html>")
 
         str_notifica = "\n".join(linee_notifica).replace('\r', '')
         linee_notifica = str_notifica.split("\n")
 
-        with open(os.path.join(self.dir_istituto, dir_alunno, 'notifica.html'), 'w', encoding='utf - 8') as f_notify:
+        with open(os.path.join(self.dir_istituto, dir_alunno, 'notifica.html'), 'w', encoding='utf-8') as f_notify:
             f_notify.write("\n".join(linee_notifica))
 
         if (len(old_compiti) > 0):

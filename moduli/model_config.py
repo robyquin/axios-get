@@ -89,7 +89,7 @@ class ConfigCredenzialiYaml(BaseModel):
         """
         Verifica la coerenza trasversale dei parametri di configurazione.
 
-        :return: ConfigCredenzialiYaml - Risultato dell'operazione
+        :return: ConfigCredenzialiYaml-Risultato dell'operazione
         :rtype: ConfigCredenzialiYaml
 
         :raises ValueError: Se un canale di notifica non è configurato

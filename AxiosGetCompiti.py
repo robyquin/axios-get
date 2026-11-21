@@ -36,7 +36,7 @@ def format_yaml_with_comments(config: dict) -> str:
 
     # Aggiungi header informativo
     content_yaml = f"""# GUIDA ALLA CONFIGURAZIONE
-# https://github.com/robyquin/axios - get/blob/master/docs/Configurazione.md
+# https://github.com/robyquin/axios-get/blob/master/docs/Configurazione.md
 # Questo file è scritto in YAML, se lo modifichi manualmente presta attenzione all'indentazione e alla sintassi specifica.
 # Il testo che segue il carattere # è un commento e quindi nell'esecuzione verrà ignorato
 # ATTENZIONE: questo file può contenere in chiaro le credenziali Axios e, se configurati, la password SMTP e il token Telegram.
@@ -61,8 +61,8 @@ def format_yaml_with_comments(config: dict) -> str:
     # Commenti per params_notifiche
     content_yaml = re.sub(r'(params_notifiche:.*)', r"\1 # Gruppo parametri globali di notifica: raccoglie informazioni generali per rendere possibile la tipologia di notifica", content_yaml)
     content_yaml = re.sub(r'(\s+(html|screenshot):.*)', r"\1 # Gruppo di configurazione globale per la notifica \2", content_yaml)
-    content_yaml = re.sub(r'(\s+(smtp):.*)', r"\1 # Gruppo di configurazione globale per la notifica \2 (https://github.com/robyquin/axios - get/blob/master/docs/Telegram_token_bot.md)", content_yaml)
-    content_yaml = re.sub(r'(\s+(telegram):.*)', r"\1 # Gruppo di configurazione globale per la notifica \2 (https://github.com/robyquin/axios - get/blob/master/docs/Telegram_token_bot.md)", content_yaml)
+    content_yaml = re.sub(r'(\s+(smtp):.*)', r"\1 # Gruppo di configurazione globale per la notifica \2 (https://github.com/robyquin/axios-get/blob/master/docs/Telegram_token_bot.md)", content_yaml)
+    content_yaml = re.sub(r'(\s+(telegram):.*)', r"\1 # Gruppo di configurazione globale per la notifica \2 (https://github.com/robyquin/axios-get/blob/master/docs/Telegram_token_bot.md)", content_yaml)
 
     content_yaml = re.sub(r'(\s + path:.*)', r"\1 # Specifica qui il percorso relativo o assoluto della cartella di destinazione", content_yaml)
     content_yaml = re.sub(r'(\s + n_allegati:.*)', r"\1 # Specifica il numero di screenshot da allegare alla notifica [>=0]", content_yaml)
@@ -125,7 +125,7 @@ def file_config_default() -> str:
                 'smtp_username': 'Username',
                 'smtp_password': 'PaSsWoRd',
                 'destinatari': [
-                    'EMAIL_GENITORE - TUTORE',
+                    'EMAIL_GENITORE-TUTORE',
                     'EMAIL_ALTRI'
                 ],
                 'n_allegati': 0
@@ -143,7 +143,7 @@ def file_config_default() -> str:
 
     content_yaml = format_yaml_with_comments(config_default)
 
-    content_yaml = re.sub(r'(NOME_ALUNNO_[B - D]:.*)', '# \\1', content_yaml)
+    content_yaml = re.sub(r'(NOME_ALUNNO_[B-D]:.*)', '# \\1', content_yaml)
     content_yaml = re.sub(r'(tipo: (html|screenshot|telegram))', '# \\1', content_yaml)
     content_yaml = re.sub(r'(param: (\.|CHAT_ID))', '# \\1', content_yaml)
     content_yaml = re.sub(r'(- EMAIL_ALTRI.*)', '# \\1', content_yaml)
@@ -162,7 +162,7 @@ def run_axios_get_compiti(DIR: str):
     """
 
     if (os.path.exists(os.path.join(DIR, "credenziali.yml"))):
-        with open(os.path.join(DIR, "credenziali.yml"), "r", encoding="utf - 8") as file:
+        with open(os.path.join(DIR, "credenziali.yml"), "r", encoding="utf-8") as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
 
         if (config.get("version", None) is None):
@@ -197,7 +197,7 @@ def run_axios_get_compiti(DIR: str):
                         new_config['params_notifiche'][tipo_notifica] = config.get(tipo_notifica)
                     else:
                         new_config['params_notifiche'][tipo_notifica] = config.get(tipo_notifica)
-            with open(os.path.join(DIR, f"credenziali_v{__version__}.yml"), "w", encoding="utf - 8") as file_config:
+            with open(os.path.join(DIR, f"credenziali_v{__version__}.yml"), "w", encoding="utf-8") as file_config:
                 file_config.write(yaml.dump(new_config, sort_keys=False))
             log.info(f"Salvataggio file: {os.path.join(DIR, f"credenziali_v{__version__}.yml")}")
             log.warning(f"Verifica che i dati siano corretti, poi rinomina credenziali_v{__version__}.yml in credenziali.yml per renderlo effettivo!")
@@ -215,9 +215,9 @@ def run_axios_get_compiti(DIR: str):
                     # La patch della versione è diversa e va aggiornata
                     log.info(f"Aggiornamento automatico di patch da {config['version']} a {__version__}")
                     config['version'] = __version__
-                    with open(os.path.join(DIR, "credenziali.yml"), "w", encoding="utf - 8") as file_config:
+                    with open(os.path.join(DIR, "credenziali.yml"), "w", encoding="utf-8") as file_config:
                         file_config.write(yaml.dump(config, sort_keys=False))
-                log.info(f"Axios - Get v{__version__}")
+                log.info(f"Axios-Get v{__version__}")
                 log.info("INIZIO ELABORAZIONE")
                 try:
                     LibAxiosFamiglia(DIR, config)
@@ -227,7 +227,7 @@ def run_axios_get_compiti(DIR: str):
                     log.info("FINE ELABORAZIONE")
     else:
         try:
-            with open(os.path.join(DIR, "credenziali_default.yml"), "w", encoding="utf - 8") as file_config:
+            with open(os.path.join(DIR, "credenziali_default.yml"), "w", encoding="utf-8") as file_config:
                 file_config.write(file_config_default())
             raise FileNotFoundError(os.path.join(DIR, "credenziali_default.yml"))
         except FileNotFoundError as e:
