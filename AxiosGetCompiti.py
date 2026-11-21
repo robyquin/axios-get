@@ -23,13 +23,13 @@ from moduli.logging_config import log
 
 def format_yaml_with_comments(config: dict) -> str:
     """
-    Formatta un dizionario YAML aggiungendo commenti descrittivi simili a file_config_default.
+    Formatta un dizionario YAML aggiungendo commenti descrittivi.
 
-    Args:
-        config: Dizionario configurazione validato Pydantic
+    :param config: Dizionario configurazione validato
+    :type config: dict
 
-    Returns:
-        Stringa YAML con commenti inseriti
+    :return: Stringa YAML con commenti inseriti
+    :rtype: str
     """
 
     content_yaml = yaml.dump(config, sort_keys=False)
@@ -83,7 +83,7 @@ def format_yaml_with_comments(config: dict) -> str:
 
 def file_config_default() -> str:
     """
-    Crea il contenuto yaml di default
+    Crea il contenuto yaml di default.
 
     :return: contenuto yaml di default
     :rtype: str
@@ -151,7 +151,15 @@ def file_config_default() -> str:
     return content_yaml
 
 
-def run_axios_get_compiti(DIR):
+def run_axios_get_compiti(DIR: str):
+    """
+    Esegue il processo Axios Get Compiti.
+
+    :param DIR: Percorso di salvataggio log e errori
+    :type DIR: str
+
+    :raises FileNotFoundError: Se il file di configurazione non esiste
+    """
 
     if (os.path.exists(os.path.join(DIR, "credenziali.yml"))):
         with open(os.path.join(DIR, "credenziali.yml"), "r", encoding="utf - 8") as file:

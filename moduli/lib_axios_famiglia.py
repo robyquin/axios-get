@@ -24,13 +24,16 @@ from .logging_config import log
 
 
 class AxiosView(StrEnum):
+    """
+    Definizione Viste Axios.
+    """
     registro = "registrofamiglie"
     materiale = "collabora"
 
 
 class UrlIdType(IntEnum):
     """
-    Definizione di corrispondeza nomi e posizione dell'array Link.
+    Definizione di corrispondenza nomi e posizione dell'array Link.
     """
     method = 0
     url = 1
@@ -66,7 +69,7 @@ class LibAxiosFamiglia():
     """
     def __init__(self, DIR: str, config: dict) -> None:
         self.DIR = DIR
-        self.DefaultUserAgent = "Mozilla / 5.0 (Windows NT 10.0; Win64; x64; rv:156.0) Gecko / 20100101 Firefox / 156.0"
+        self.DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:156.0) Gecko/20100101 Firefox/156.0"
         if (len(config['credenziali']) == 1):
             log.info("Presente una sola configurazione di istituto")
         else:
@@ -147,9 +150,15 @@ class LibAxiosFamiglia():
             raise RuntimeError(f"Esito positivo parziale con {cnt_warning} warnings!")
 
     def __delete__(self, instance):
+        """
+        Chiude la sessione HTTP quando l'oggetto viene eliminato.
+        """
         self.session.close()
 
     def _login(self):
+        """
+        Effettua il login all'istituto.
+        """
         log.info(f"Login all'Istituto: {self.customerid}")
         self.session.headers['User - Agent'] = self.DefaultUserAgent
         prefixes = [AxiosView.registro, AxiosView.materiale]
@@ -170,6 +179,9 @@ class LibAxiosFamiglia():
             self.__get_session("", link_sequence, prefix)
 
     def _logout(self):
+        """
+        Effettua il logout dall'istituto.
+        """
         log.info(f"Logout all'Istituto: {self.customerid}")
         self.session.headers['User - Agent'] = self.DefaultUserAgent
         prefixes = [AxiosView.registro, AxiosView.materiale]
@@ -259,7 +271,21 @@ class LibAxiosFamiglia():
                 fp.write(text_MD)
                 fp.close()
 
-    def __get_session(self, Alunno, link_sequence, prefix) -> bool:
+    def __get_session(self, Alunno: str, link_sequence: list, prefix: str) -> None:
+        """
+        Gestisce la sessione HTTP per le richieste.
+
+        :param Alunno: Nome dell'alunno
+        :type Alunno: str
+
+        :param link_sequence: Sequenza di link da processare
+        :type link_sequence: list
+
+        :param prefix: Tipo di sessione (registro o materiale)
+        :type prefix: str
+
+        :raises Exception: In caso di errore durante le richieste
+        """
         get_error = None
         if (os.path.exists(os.path.join(self.DIR, prefix + "_" + Alunno))):
             shutil.move(os.path.join(self.DIR, prefix + "_" + Alunno), self.dir_istituto)

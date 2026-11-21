@@ -24,12 +24,15 @@ from moduli.logging_config import logging, log
 from AxiosGetCompiti import run_axios_get_compiti
 from moduli.gui.AxiosGetCompitiConfigurator import ApplicationGUIConfigurator
 
-logger = log
-
 
 class GuiHandler(logging.Handler):
+    """
+    Inizializza GuiHandler.
 
-    def __init__(self, event_queue):
+    :param event_queue: Eventi del queue
+    :type event_queue: Queue
+    """
+    def __init__(self, event_queue: Queue):
         super().__init__()
         self.event_queue = event_queue
 
@@ -44,8 +47,15 @@ class GuiHandler(logging.Handler):
 
 
 class ApplicationGUI:
+    """
+    Inizializza l'applicazione GUI.
 
-    def __init__(self, logger, run_function):
+    :param logger: Logger per i messaggi
+    :type logger: logging.Logger
+    :param run_function: Funzione da eseguire
+    :type run_function: callable
+    """
+    def __init__(self, logger: logging.Logger, run_function: callable):
         self.logger = logger
         self.run_function = run_function
 
@@ -101,7 +111,9 @@ class ApplicationGUI:
         self.root.after(100, self.check_events)
 
     def start(self):
-
+        """
+        Avvia il processo di elaborazione.
+        """
         self.start_button.config(state="disabled")
         self.status_label.config(text="Elaborazione in corso...", fg="orange")
 
@@ -115,7 +127,9 @@ class ApplicationGUI:
         ).start()
 
     def run_worker(self):
-
+        """
+        Esegue il worker in background.
+        """
         success = False
 
         try:
@@ -132,7 +146,9 @@ class ApplicationGUI:
             })
 
     def check_events(self):
-
+        """
+        Controlla gli eventi del queue.
+        """
         while not self.event_queue.empty():
             event = self.event_queue.get()
             # Fine elaborazione
@@ -175,9 +191,15 @@ class ApplicationGUI:
         self.root.after(100, self.check_events)
 
     def run(self):
+        """
+        Esegue il ciclo principale dell'applicazione.
+        """
         self.root.mainloop()
 
     def avvia_configuratore(self):
+        """
+        Avvia il configuratore YAML.
+        """
         if (getattr(sys, 'frozen', False)):
             # Se l'applicazione è compilata con PyInstaller
             DIR = str(os.path.dirname(sys.executable))
@@ -194,7 +216,9 @@ class ApplicationGUI:
 
 
 def main():
-
+    """
+    Punto di ingresso principale.
+    """
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -227,6 +251,8 @@ def main():
     file_handler.setLevel(logging.DEBUG)
     log.addHandler(file_handler)
 
+    logger = log
+
     if (args.silent):
         logger.info("Avvio in modalità silent")
         run_axios_get_compiti(DIR)
@@ -248,5 +274,5 @@ if __name__ == "__main__":
     try:
         sys.exit(main())
     except Exception:
-        logger.exception("Errore fatale applicazione")
+        log.exception("Errore fatale applicazione")
         sys.exit(1)

@@ -22,8 +22,16 @@ from moduli.model_config import ConfigCredenzialiYaml
 
 
 class ApplicationGUIConfigurator():
+    """
+    Interfaccia grafica del configuratore.
 
-    def __init__(self, DIR, root):
+    :param DIR: Percorso di salvataggio log e errori
+    :type DIR: str
+
+    :param root: Radice principale della finestra Tkinter
+    :type root: tk.Tk
+    """
+    def __init__(self, DIR: str, root: tk.Tk):
         self.percorso_configurazione = None
         self.DIR = DIR
         self.root = root
@@ -80,7 +88,7 @@ class ApplicationGUIConfigurator():
         self.window.columnconfigure(1, weight=1)
         self.window.rowconfigure(3, weight=1)
 
-    def evidenzia_sintassi(self, event=None):
+    def evidenzia_sintassi(self, event = None):
         """Scansiona il testo e applica i colori YAML tramite i Tag."""
         # 1. Rimuove tutti i tag esistenti prima di ricalcolarli
         for tag in ["chiave", "stringa", "numero_bool", "commento"]:
@@ -111,7 +119,13 @@ class ApplicationGUIConfigurator():
                 end = f"1.0 + {match.end(gruppo)} chars"
                 self.text_area.tag_add(tag, start, end)
 
-    def verifica_yaml(self):
+    def verifica_yaml(self) -> bool:
+        """
+        Verifica la correttezza della sintassi YAML e della validità del modello.
+
+        :return: True se valido, False in caso di errore
+        :rtype: bool
+        """
         contenuto = self.text_area.get("1.0", "end - 1c")
         if not contenuto.strip():
             self.lbl_stato.config(text="Stato: Il file è vuoto", fg="orange")
@@ -145,7 +159,13 @@ class ApplicationGUIConfigurator():
             print(f"Errore imprevisto: {type(e).__name__}: {e}")
             return False
 
-    def salva_file(self):
+    def salva_file(self) -> bool:
+        """
+        Salva il contenuto dell'area di testo in un file YAML valido con commenti.
+
+        :return: True se salvato con successo, False in caso di errore
+        :rtype: bool
+        """
         if not self.verifica_yaml():
             if not messagebox.askyesno("Attenzione", "YAML non valido. Salvare comunque?"):
                 return
@@ -166,7 +186,13 @@ class ApplicationGUIConfigurator():
                 messagebox.showerror("Errore salvataggio", f"Impossibile formattare il file:\n{e}")
                 return
 
-    def carica_file(self, percorso=None):
+    def carica_file(self, percorso: str = None):
+        """
+        Carica un file YAML dal percorso specificato o dalla dialog di selezione.
+
+        :param percorso: Percorso del file da caricare (opzionale)
+        :type percorso: str
+        """
         if (percorso is None):
             percorso = filedialog.askopenfilename(filetypes=[("YAML", "*.yml *.yaml")])
         self.percorso_configurazione = percorso
@@ -178,7 +204,13 @@ class ApplicationGUIConfigurator():
             self.verifica_yaml()
             self.root.wait_window(self.window)
 
-    def run(self, path_config_file=None):
+    def run(self, path_config_file: str = None):
+        """
+        Avvia l'interfaccia grafica e gestisce il ciclo principale.
+
+        :param path_config_file: Percorso del file di configurazione da caricare all'avvio (opzionale)
+        :type path_config_file: str
+        """
         if (path_config_file is not None):
             self.carica_file(percorso=path_config_file)
         self.window.mainloop()
