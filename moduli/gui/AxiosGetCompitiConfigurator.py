@@ -8,9 +8,7 @@ AxiosGetCompiti Configuratore.
 
 """
 
-import sys
 import os
-from pathlib import Path
 
 import tkinter as tk
 from tkinter import ttk
@@ -22,9 +20,18 @@ from pydantic import ValidationError
 from AxiosGetCompiti import file_config_default, format_yaml_with_comments
 from moduli.model_config import ConfigCredenzialiYaml
 
-class ApplicationGUIConfigurator():
 
-    def __init__(self, DIR, root):
+class ApplicationGUIConfigurator():
+    """
+    Interfaccia grafica del configuratore.
+
+    :param DIR: Percorso di salvataggio log e errori
+    :type DIR: str
+
+    :param root: Radice principale della finestra Tkinter
+    :type root: tk.Tk
+    """
+    def __init__(self, DIR: str, root: tk.Tk):
         self.percorso_configurazione = None
         self.DIR = DIR
         self.root = root
@@ -53,10 +60,10 @@ class ApplicationGUIConfigurator():
         self.text_area.grid(row=0, column=1, rowspan=4, sticky="nsew", padx=5, pady=5)
 
         # Configurazione colori dei Tag
-        self.text_area.tag_configure("chiave", foreground="#46acff", font=("Consolas", 9, "bold")) # Blu
+        self.text_area.tag_configure("chiave", foreground="#46acff", font=("Consolas", 9, "bold"))  # Blu
         self.text_area.tag_configure("stringa", foreground="#fda33d")                               # Arancione
         self.text_area.tag_configure("numero_bool", foreground="#ffdc43")                           # Giallo
-        self.text_area.tag_configure("commento", foreground="#6a9955", font=("Consolas", 9, "italic")) # Verde scuro
+        self.text_area.tag_configure("commento", foreground="#6a9955", font=("Consolas", 9, "italic"))  # Verde scuro
 
         # Collega la colorazione a ogni tasto rilasciato
         self.text_area.bind("<KeyRelease>", self.evidenzia_sintassi)
@@ -64,14 +71,14 @@ class ApplicationGUIConfigurator():
         # Testo iniziale
         esempio = file_config_default()
         self.text_area.insert("1.0", esempio)
-        self.evidenzia_sintassi() # Colora subito all'avvio
+        self.evidenzia_sintassi()  # Colora subito all'avvio
 
         self.label_credit = tk.Text(self.window, font=("Consolas", 8), wrap=tk.WORD, relief="flat", bd=0, height=4, bg=self.window.cget("bg"))
         self.label_credit.tag_config("Bold", foreground="#569cd6", font=("Consolas", 8, "bold"))
-        self.label_credit.insert("end","Axios-get\n", "Bold")
-        self.label_credit.insert("end","Autore: Roberto Quintiliani\n")
-        self.label_credit.insert("end","Licenza: Open Source (MIT)\n")
-        self.label_credit.insert("end","Progetto: https://github.com/robyquin/axios-get")
+        self.label_credit.insert("end", "Axios-get\n", "Bold")
+        self.label_credit.insert("end", "Autore: Roberto Quintiliani\n")
+        self.label_credit.insert("end", "Licenza: Open Source (MIT)\n")
+        self.label_credit.insert("end", "Progetto: https://github.com/robyquin/axios-get")
         self.label_credit.grid(row=4, column=1, sticky="ew", padx=5, pady=5)
         self.label_credit.config(state="disabled")
 
@@ -112,7 +119,13 @@ class ApplicationGUIConfigurator():
                 end = f"1.0 + {match.end(gruppo)} chars"
                 self.text_area.tag_add(tag, start, end)
 
-    def verifica_yaml(self):
+    def verifica_yaml(self) -> bool:
+        """
+        Verifica la correttezza della sintassi YAML e della validità del modello.
+
+        :return: True se valido, False in caso di errore
+        :rtype: bool
+        """
         contenuto = self.text_area.get("1.0", "end-1c")
         if not contenuto.strip():
             self.lbl_stato.config(text="Stato: Il file è vuoto", fg="orange")
@@ -146,7 +159,13 @@ class ApplicationGUIConfigurator():
             print(f"Errore imprevisto: {type(e).__name__}: {e}")
             return False
 
-    def salva_file(self):
+    def salva_file(self) -> bool:
+        """
+        Salva il contenuto dell'area di testo in un file YAML valido con commenti.
+
+        :return: True se salvato con successo, False in caso di errore
+        :rtype: bool
+        """
         if not self.verifica_yaml():
             if not messagebox.askyesno("Attenzione", "YAML non valido. Salvare comunque?"):
                 return
@@ -156,10 +175,10 @@ class ApplicationGUIConfigurator():
             try:
                 config_default = yaml.safe_load(self.text_area.get("1.0", "end-1c"))
                 config_validato = ConfigCredenzialiYaml.model_validate(config_default)
-                
+
                 # Genera YAML con commenti
                 content_con_commenti = format_yaml_with_comments(config_validato.model_dump())
-                
+
                 with open(percorso, "w", encoding="utf-8") as f:
                     f.write(content_con_commenti)
                 self.lbl_stato.config(text=f"Salvato in: {percorso}", fg="blue")
@@ -167,7 +186,13 @@ class ApplicationGUIConfigurator():
                 messagebox.showerror("Errore salvataggio", f"Impossibile formattare il file:\n{e}")
                 return
 
-    def carica_file(self, percorso=None):
+    def carica_file(self, percorso: str = None):
+        """
+        Carica un file YAML dal percorso specificato o dalla dialog di selezione.
+
+        :param percorso: Percorso del file da caricare (opzionale)
+        :type percorso: str
+        """
         if (percorso is None):
             percorso = filedialog.askopenfilename(filetypes=[("YAML", "*.yml *.yaml")])
         self.percorso_configurazione = percorso
@@ -179,7 +204,13 @@ class ApplicationGUIConfigurator():
             self.verifica_yaml()
             self.root.wait_window(self.window)
 
-    def run(self, path_config_file=None):
+    def run(self, path_config_file: str = None):
+        """
+        Avvia l'interfaccia grafica e gestisce il ciclo principale.
+
+        :param path_config_file: Percorso del file di configurazione da caricare all'avvio (opzionale)
+        :type path_config_file: str
+        """
         if (path_config_file is not None):
             self.carica_file(percorso=path_config_file)
         self.window.mainloop()

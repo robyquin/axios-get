@@ -19,6 +19,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 from .logging_config import log
 
+
 class ScreenShot():
     """
     Classe di gestione della conversione della notifica in immagine
@@ -46,30 +47,30 @@ class ScreenShot():
 
         buffer_memoria = io.BytesIO()
 
-        image = Image.new("RGBA", (width, height),  (0, 0, 0, 0))
+        image = Image.new("RGBA", (width, height), (0, 0, 0, 0))
         draw = ImageDraw.Draw(image)
 
-        html = re.sub("<head>(.*?)</head>","",html)
-        html = re.sub("<.{0,1}html>","",html)
-        html = re.sub("<.{0,1}body>","",html)
-        html = re.sub("<h1.*?>(.*?)</h1>\n+",r"<h1>\g<1></h1>\n\n",html, flags=re.DOTALL)
-        html = re.sub("<h2.*?>(.*?)</h2>\n*",r"<h2>\g<1></h2>\n\n",html, flags=re.DOTALL)
-        html = re.sub("<h3.*?>(.*?)</h3>\n*",r"<h3>\g<1></h3>\n\n",html, flags=re.DOTALL)
-        html = re.sub("<h4.*?>(.*?)</h4>\n*",r"<h4>\g<1></h4>\n\n",html, flags=re.DOTALL)
-        html = re.sub("<hr>","\n---\n",html)
-        html = re.sub("<a.*?href='(.*?)'.*?>(.*?)</a>",r" \g<1>",html)
+        html = re.sub("<head>(.*?)</head>", "", html)
+        html = re.sub("<.{0,1}html>", "", html)
+        html = re.sub("<.{0,1}body>", "", html)
+        html = re.sub("<h1.*?>(.*?)</h1>\n+", r"<h1>\g<1></h1>\n\n", html, flags=re.DOTALL)
+        html = re.sub("<h2.*?>(.*?)</h2>\n*", r"<h2>\g<1></h2>\n\n", html, flags=re.DOTALL)
+        html = re.sub("<h3.*?>(.*?)</h3>\n*", r"<h3>\g<1></h3>\n\n", html, flags=re.DOTALL)
+        html = re.sub("<h4.*?>(.*?)</h4>\n*", r"<h4>\g<1></h4>\n\n", html, flags=re.DOTALL)
+        html = re.sub("<hr>", "\n---\n", html)
+        html = re.sub("<a.*?href='(.*?)'.*?>(.*?)</a>", r" \g<1>", html)
         html = re.sub(r'<li.*?>(.*?)</li>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
         html = re.sub(r'<div.*?>(.*?)</div>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
         html = re.sub(r'<p.*?>(.*?)</p>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
-        html = re.sub("<li.*?class='compiti'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*",r"{\g<2>}📖 \g<3>\n",html)
-        html = re.sub("<li.*?class='verifica'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*",r"{\g<2>}💥 \g<3>\n",html)
-        html = re.sub("<li.*?class='annotazione'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*",r"{\g<2>}📚 \g<3>\n",html)
-        html = re.sub("<li.*?class='file'.*?>(.*?)</li>\n*",r"🔗 \g<1>\n",html)
-        html = re.sub("<div>(.*?)</div>\n*",r"\n\g<1>\n\n",html)
+        html = re.sub("<li.*?class='compiti'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*", r"{\g<2>}📖 \g<3>\n", html)
+        html = re.sub("<li.*?class='verifica'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*", r"{\g<2>}💥 \g<3>\n", html)
+        html = re.sub("<li.*?class='annotazione'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*", r"{\g<2>}📚 \g<3>\n", html)
+        html = re.sub("<li.*?class='file'.*?>(.*?)</li>\n*", r"🔗 \g<1>\n", html)
+        html = re.sub("<div>(.*?)</div>\n*", r"\n\g<1>\n\n", html)
         html = re.sub("<.{0,1}ul.*?>", "\n", html)
-        html = re.sub("<p.*?>(.*?)</p>",r"\n\g<1>",html)
-        html = re.sub("<b.*?>(.*?)</b>",r"\g<1>",html)
-        html = re.sub("<i.*?>(.*?)</i>",r"\g<1>",html)
+        html = re.sub("<p.*?>(.*?)</p>", r"\n\g<1>", html)
+        html = re.sub("<b.*?>(.*?)</b>", r"\g<1>", html)
+        html = re.sub("<i.*?>(.*?)</i>", r"\g<1>", html)
         html = re.sub("<br>", "", html)
         html = re.sub("\n{2,}", "\n", html, flags=re.DOTALL)
 
@@ -101,16 +102,16 @@ class ScreenShot():
             space_lines = 10
 
             if (l0.startswith("{green}")):
-                l0 = re.sub("^{green}","", l0)
+                l0 = re.sub("^{green}", "", l0)
                 color = green
             elif (l0.startswith("{orange}")):
-                l0 = re.sub("^{orange}","", l0)
+                l0 = re.sub("^{orange}", "", l0)
                 color = orange
             else:
-                l0 = re.sub("^{}","", l0)
+                l0 = re.sub("^{}", "", l0)
                 color = black
 
-            if(re.search(r"<h2.*?>(.*?)</h2>", l0) is not None):
+            if (re.search(r"<h2.*?>(.*?)</h2>", l0) is not None):
                 m = re.search(r"<h2.*?>(.*?)</h2>", l0)
                 font = font_h2
                 l0 = m.group(1)
@@ -125,37 +126,37 @@ class ScreenShot():
                     width_wrap = 40
                     filename = "Materiale_didattico"
                 sw = 0.75
-            elif(re.search(r"<h3.*?>(.*?)</h3>", l0) is not None):
+            elif (re.search(r"<h3.*?>(.*?)</h3>", l0) is not None):
                 m = re.search(r"<h3.*?>(.*?)</h3>", l0)
                 font = font_h3
-                l0 = "  "+m.group(1)
+                l0 = "  " + m.group(1)
                 sw = 0.5
-            elif(re.search(r"<h4.*?>(.*?)</h4>", l0) is not None):
+            elif (re.search(r"<h4.*?>(.*?)</h4>", l0) is not None):
                 m = re.search(r"<h4.*?>(.*?)</h4>", l0)
                 font = font_h3
-                l0 = "  "+m.group(1)
+                l0 = "  " + m.group(1)
                 sw = 0.5
-            elif(re.search(r"<credit.*?>(.*?)</credit>", l0) is not None):
+            elif (re.search(r"<credit.*?>(.*?)</credit>", l0) is not None):
                 m = re.search(r"<credit.*?>(.*?)</credit>", l0)
                 font = font_credit
-                l0 = "  "+m.group(1)
+                l0 = "  " + m.group(1)
                 sw = 0.25
                 align_text = "center"
                 space_lines = 2
             else:
-                l0 = "        "+l0
+                l0 = "        " + l0
                 sw = 0
                 font = font_text
 
             bbox = draw.textbbox((0, 0), textwrap.fill(html_unescape(l0), width=width_wrap, subsequent_indent='        '), font=font, align=align_text, stroke_width=sw, spacing=space_lines)
             # text_width = (bbox[2] - bbox[0])
             text_height = (bbox[3] - bbox[1])
-            if (align_text=="center"):
+            if (align_text == "center"):
                 x = LARGHEZZA_FISSA // 2 - (bbox[2] - bbox[0]) // 2
             else:
                 x = 50
             y = y_app
-            y_app = y + text_height + space_lines*3
+            y_app = y + text_height + space_lines * 3
             draw.text(
                 (x, y),
                 textwrap.fill(html_unescape(l0), width=width_wrap, subsequent_indent='        '),
@@ -167,12 +168,12 @@ class ScreenShot():
             )
 
         bbox = image.getbbox()
-        draw.rounded_rectangle([(0, 0), (LARGHEZZA_FISSA-3, bbox[3]+30+25-3)], radius=50, fill=None, outline='black', width=3, corners=None)
+        draw.rounded_rectangle([(0, 0), (LARGHEZZA_FISSA - 3, bbox[3] + 30 + 25 - 3)], radius=50, fill=None, outline='black', width=3, corners=None)
 
         if bbox:
             altezza_finale = bbox[3]
-            immagine_finale = Image.new("RGBA", (LARGHEZZA_FISSA, altezza_finale+30+25), color='beige')
-            immagine_crop = image.crop((0, 0, LARGHEZZA_FISSA, altezza_finale+30+25))
+            immagine_finale = Image.new("RGBA", (LARGHEZZA_FISSA, altezza_finale + 30 + 25), color='beige')
+            immagine_crop = image.crop((0, 0, LARGHEZZA_FISSA, altezza_finale + 30 + 25))
             immagine_finale.paste(immagine_crop, (0, 0), immagine_crop)
 
             immagine_finale.save(buffer_memoria, format='PNG')

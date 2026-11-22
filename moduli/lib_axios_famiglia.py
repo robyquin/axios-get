@@ -22,13 +22,18 @@ import requests
 from . import lib_notifica
 from .logging_config import log
 
+
 class AxiosView(StrEnum):
+    """
+    Definizione Viste Axios.
+    """
     registro = "registrofamiglie"
     materiale = "collabora"
 
+
 class UrlIdType(IntEnum):
     """
-    Definizione di corrispondeza nomi e posizione dell'array Link.
+    Definizione di corrispondenza nomi e posizione dell'array Link.
     """
     method = 0
     url = 1
@@ -38,7 +43,8 @@ class UrlIdType(IntEnum):
     type_data = 5
     redirect = 6
 
-DOW_Tr = { 
+
+DOW_Tr = {
     'Mon': 'Lun',
     'Tue': 'Mar',
     'Wed': 'Mer',
@@ -47,6 +53,7 @@ DOW_Tr = {
     'Sat': 'Sab',
     'Sun': 'Dom'
 }
+
 
 class LibAxiosFamiglia():
     """
@@ -64,7 +71,7 @@ class LibAxiosFamiglia():
         self.DIR = DIR
         self.DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:156.0) Gecko/20100101 Firefox/156.0"
         if (len(config['credenziali']) == 1):
-            log.info(f"Presente una sola configurazione di istituto")
+            log.info("Presente una sola configurazione di istituto")
         else:
             log.info(f"Presenti {len(config['credenziali'])} configurazione di istituto")
 
@@ -74,25 +81,25 @@ class LibAxiosFamiglia():
             self.username = str(credenziali['username'])
             self.password = str(credenziali['password'])
 
-            self.dir_istituto = os.path.join(DIR, "Istituto_"+str(self.customerid))
+            self.dir_istituto = os.path.join(DIR, "Istituto_" + str(self.customerid))
             if (not os.path.exists(self.dir_istituto)):
                 os.makedirs(self.dir_istituto)
 
-            if(self.customerid != '' and self.username != '' and self.password != '' ):
+            if (self.customerid != '' and self.username != '' and self.password != ''):
                 self.session = requests.session()
             else:
                 raise Exception("Controlla il file di configurazione: una delle credenziali di Axios è vuota")
 
             try:
                 if (len(credenziali['alunni']) == 1):
-                    log.info(f"{idx_istituto+1}. Elaborazione Istituto **{str(self.customerid)}** con un solo studente")
+                    log.info(f"{idx_istituto + 1}. Elaborazione Istituto **{str(self.customerid)}** con un solo studente")
                 else:
-                    log.info(f"{idx_istituto+1}. Elaborazione Istituto **{str(self.customerid)}** con {len(credenziali['alunni'])} studenti")
+                    log.info(f"{idx_istituto + 1}. Elaborazione Istituto **{str(self.customerid)}** con {len(credenziali['alunni'])} studenti")
                 self._login()
                 for idx_alunno, item in enumerate(credenziali['alunni'].items()):
                     try:
                         alunno, param = item
-                        log.info(f"- {idx_istituto+1}.{idx_alunno+1}. per **{alunno}** verrà utilizzata la notificata **{param['tipo']}**")
+                        log.info(f"- {idx_istituto + 1}.{idx_alunno + 1}. per **{alunno}** verrà utilizzata la notificata **{param['tipo']}**")
                         self.nome_alternativo_alunno = ""
                         self.alunni = {}
                         self.alunni[AxiosView.registro] = {}
@@ -106,7 +113,7 @@ class LibAxiosFamiglia():
                         self.sha1_MD_old = ""
                         self.notifica = None
                         tipo_notifica = param['tipo']
-                        if(tipo_notifica in config['params_notifiche'].keys()):
+                        if (tipo_notifica in config['params_notifiche'].keys()):
                             if (tipo_notifica == 'html'):
                                 parametro = param.get('param', config.get('params_notifiche').get(tipo_notifica).get('path', '.'))
                                 self.notifica = lib_notifica.NotificaFileHTML(DIR, config['params_notifiche'], parametro)
@@ -127,25 +134,31 @@ class LibAxiosFamiglia():
                                 except Exception as e:
                                     log.warning(f"Si è verificato un errore imprevisto nel processare il materiale didattico dello studente {alunno}: {e}")
                                     self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES = []
-                                    cnt_warning +=1
+                                    cnt_warning += 1
                                 self.get_session_registrofamiglie(alunno)
                             else:
                                 log.error("Error: occorre configurare e selezionare un tipo di notifica")
                     except Exception as e:
                         log.warning(f"Si è verificato un errore imprevisto nel processare lo studente {alunno}: {e}")
-                        cnt_warning +=1
+                        cnt_warning += 1
                 self._logout()
             except Exception as e:
                 log.warning(f"Si è verificato un errore imprevisto nel processare l'Istituto {self.customerid}: {e}")
-                cnt_warning +=1
+                cnt_warning += 1
         if (cnt_warning > 0):
             log.warning(f"Elaborazione terminata con {cnt_warning} errori; controlla il log")
             raise RuntimeError(f"Esito positivo parziale con {cnt_warning} warnings!")
 
     def __delete__(self, instance):
+        """
+        Chiude la sessione HTTP quando l'oggetto viene eliminato.
+        """
         self.session.close()
 
     def _login(self):
+        """
+        Effettua il login all'istituto.
+        """
         log.info(f"Login all'Istituto: {self.customerid}")
         self.session.headers['User-Agent'] = self.DefaultUserAgent
         prefixes = [AxiosView.registro, AxiosView.materiale]
@@ -154,18 +167,21 @@ class LibAxiosFamiglia():
             if (prefix == AxiosView.registro):
                 self.session.headers['Referer'] = "https://registrofamiglie.axioscloud.it/"
                 link_sequence = [
-                    ['GET','https://registrofamiglie.axioscloud.it/', {}, '00_home.html'],
-                    ['POST','https://registrofamiglie.axioscloud.it/Pages/SD/SD_Login.aspx', {}, '01_login.html', {'customerid': self.customerid, 'username': self.username, 'password': self.password, 'customeridSpid': '' }, '', False]
+                    ['GET', 'https://registrofamiglie.axioscloud.it/', {}, '00_home.html'],
+                    ['POST', 'https://registrofamiglie.axioscloud.it/Pages/SD/SD_Login.aspx', {}, '01_login.html', {'customerid': self.customerid, 'username': self.username, 'password': self.password, 'customeridSpid': ''}, '', False]
                 ]
             elif (prefix == AxiosView.materiale):
                 self.session.headers['Referer'] = "https://collabora.axioscloud.it/"
                 link_sequence = [
-                    ['GET','https://collabora.axioscloud.it/', {}, '00_home.html'],
-                    ['POST', 'https://collabora.axioscloud.it/Pages/SD/SD_Login.aspx', {}, '01_login.html', {'customerid': self.customerid, 'username': self.username, 'password': self.password, 'customeridSpid': '' }, '', False]
+                    ['GET', 'https://collabora.axioscloud.it/', {}, '00_home.html'],
+                    ['POST', 'https://collabora.axioscloud.it/Pages/SD/SD_Login.aspx', {}, '01_login.html', {'customerid': self.customerid, 'username': self.username, 'password': self.password, 'customeridSpid': ''}, '', False]
                 ]
             self.__get_session("", link_sequence, prefix)
 
     def _logout(self):
+        """
+        Effettua il logout dall'istituto.
+        """
         log.info(f"Logout all'Istituto: {self.customerid}")
         self.session.headers['User-Agent'] = self.DefaultUserAgent
         prefixes = [AxiosView.registro, AxiosView.materiale]
@@ -196,12 +212,12 @@ class LibAxiosFamiglia():
         self.session.headers['Referer'] = "https://registrofamiglie.axioscloud.it/"
 
         link_registrofamiglie = [
-            ['GET','https://registrofamiglie.axioscloud.it/Pages/SD/SD_Dashboard.aspx', {}, '02_dashboard.html'],
-            ['GET','https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'DashboardLoad'}, '03_load_dashboard.html'],
-            ['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_CHANGE_ALUNNO'}, '03_FAMILY_CHANGE_ALUNNO.json', 'set_in_session', 'json', False ],
-            ['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_COMPITI_LISTA'}, '04_compiti.json', {"draw":1,"columns":{},"order":[],"start":0,"length":50,"search":{"value":"","regex":False},"iMatId":""}, 'json', True],
-            ['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_ARGOMENTI_LISTA'}, '04_argomenti.json', {"draw":1,"columns":{},"order":[],"start":0,"length":50,"search":{"value":"","regex":False},"iMatId":""}, 'json', True],
-            ['GET','https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_NOTE', 'Others': 2}, '05_annotazioni.json']
+            ['GET', 'https://registrofamiglie.axioscloud.it/Pages/SD/SD_Dashboard.aspx', {}, '02_dashboard.html'],
+            ['GET', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'DashboardLoad'}, '03_load_dashboard.html'],
+            ['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_CHANGE_ALUNNO'}, '03_FAMILY_CHANGE_ALUNNO.json', 'set_in_session', 'json', False],
+            ['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_COMPITI_LISTA'}, '04_compiti.json', {"draw": 1, "columns": {}, "order": [], "start": 0, "length": 50, "search": {"value": "", "regex": False}, "iMatId": ""}, 'json', True],
+            ['POST', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_ARGOMENTI_LISTA'}, '04_argomenti.json', {"draw": 1, "columns": {}, "order": [], "start": 0, "length": 50, "search": {"value": "", "regex": False}, "iMatId": ""}, 'json', True],
+            ['GET', 'https://registrofamiglie.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'FAMILY_REGISTRO_CLASSE_NOTE', 'Others': 2}, '05_annotazioni.json']
         ]
 
         self.__get_session(Alunno, link_registrofamiglie, AxiosView.registro)
@@ -230,9 +246,9 @@ class LibAxiosFamiglia():
         self.session.headers['User-Agent'] = self.DefaultUserAgent
         self.session.headers['Referer'] = "https://collabora.axioscloud.it/"
         link_collabora = [
-            ['GET','https://collabora.axioscloud.it/Pages/SD/SD_Dashboard.aspx', {}, '02_dashboard.html'],
-            ['GET','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'DashboardLoad'}, '03_load_dashboard.html'],
-            ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_CONDIVISO_ALUNNO'}, '04_MATERIALE_CONDIVISO_ALUNNO.json', 'set_in_session', '', False]
+            ['GET', 'https://collabora.axioscloud.it/Pages/SD/SD_Dashboard.aspx', {}, '02_dashboard.html'],
+            ['GET', 'https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'DashboardLoad'}, '03_load_dashboard.html'],
+            ['POST', 'https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_CONDIVISO_ALUNNO'}, '04_MATERIALE_CONDIVISO_ALUNNO.json', 'set_in_session', '', False]
         ]
 
         self.__get_session(Alunno, link_collabora, AxiosView.materiale)
@@ -243,26 +259,40 @@ class LibAxiosFamiglia():
 
         if (len(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES) > 0):
             dir_alunno = AxiosView.materiale
-            if (Alunno != "" and self.alunni.get(AxiosView.materiale, {}).get(Alunno, None) != None):
+            if (Alunno != "" and self.alunni.get(AxiosView.materiale, {}).get(Alunno, None) is not None):
                 dir_alunno = f'{AxiosView.materiale}_{Alunno}_{hashlib.md5(self.alunni[AxiosView.materiale][Alunno].encode('utf-8')).hexdigest()}'
             matdit_compiti_alunno = os.path.join(self.dir_istituto, dir_alunno, 'materiale-didattico.html')
             text_MD = "\n".join(self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES)
             self.sha1_MD = hashlib.sha1(text_MD.encode('utf-8')).hexdigest()
-            if(os.path.exists(matdit_compiti_alunno)):
+            if (os.path.exists(matdit_compiti_alunno)):
                 with open(matdit_compiti_alunno, 'r', encoding='utf-8', newline='') as f:
                     self.sha1_MD_old = hashlib.sha1(f.read().encode('utf-8')).hexdigest()
             with open(matdit_compiti_alunno, 'w', encoding='utf-8', newline="\n") as fp:
                 fp.write(text_MD)
                 fp.close()
 
-    def __get_session(self, Alunno, link_sequence, prefix) -> bool:
+    def __get_session(self, Alunno: str, link_sequence: list, prefix: str) -> None:
+        """
+        Gestisce la sessione HTTP per le richieste.
+
+        :param Alunno: Nome dell'alunno
+        :type Alunno: str
+
+        :param link_sequence: Sequenza di link da processare
+        :type link_sequence: list
+
+        :param prefix: Tipo di sessione (registro o materiale)
+        :type prefix: str
+
+        :raises Exception: In caso di errore durante le richieste
+        """
         get_error = None
-        if (os.path.exists(os.path.join(self.DIR, prefix+"_"+Alunno))):
-            shutil.move(os.path.join(self.DIR, prefix+"_"+Alunno), self.dir_istituto)
-            os.rename(os.path.join(self.dir_istituto, prefix+"_"+Alunno), os.path.join(self.dir_istituto, "_"+prefix+"_"+Alunno))
+        if (os.path.exists(os.path.join(self.DIR, prefix + "_" + Alunno))):
+            shutil.move(os.path.join(self.DIR, prefix + "_" + Alunno), self.dir_istituto)
+            os.rename(os.path.join(self.dir_istituto, prefix + "_" + Alunno), os.path.join(self.dir_istituto, "_" + prefix + "_" + Alunno))
         for link in link_sequence:
             dir_alunno = prefix
-            if (Alunno != "" and self.alunni.get(prefix, {}).get(Alunno, None) != None):
+            if (Alunno != "" and self.alunni.get(prefix, {}).get(Alunno, None) is not None):
                 dir_alunno = f'{prefix}_{Alunno}_{hashlib.md5(self.alunni[prefix][Alunno].encode('utf-8')).hexdigest()}'
             registo_compiti_alunno = os.path.join(self.dir_istituto, dir_alunno, link[UrlIdType.filename])
             if (link[UrlIdType.method] == 'GET'):
@@ -279,7 +309,7 @@ class LibAxiosFamiglia():
                             m = re.findall(r"<button.*?utId = '(.*?)'>.*?<div class='details'><div class='desc'>(.*?)</div></div></button>", text)
                             for elm in m:
                                 self.alunni[prefix][elm[1]] = elm[0]
-                        if (not Alunno in self.alunni[prefix].keys() and not self.nome_alternativo_alunno in self.alunni[prefix].keys()):
+                        if (Alunno not in self.alunni[prefix].keys() and self.nome_alternativo_alunno not in self.alunni[prefix].keys()):
                             log.warning(f"Il nome '{Alunno}' non trovato nella lista alunni!")
                             if (prefix == AxiosView.materiale):
                                 log.warning(f"Aggiungi nella configurazione corrispondente di {Alunno} un campo 'nome_alternativo' scegliendo uno tra questi:\n - {"\n - ".join(self.alunni[prefix].keys())}")
@@ -293,23 +323,23 @@ class LibAxiosFamiglia():
             else:
                 if ('Action' in link[UrlIdType.params].keys()):
                     if (link[UrlIdType.params]['Action'] == 'MATERIALE_CONDIVISO_ALUNNO'):
-                        link[UrlIdType.data] = {"fiAlunno": self.alunni[prefix][Alunno], "fuiAlunno":""}
+                        link[UrlIdType.data] = {"fiAlunno": self.alunni[prefix][Alunno], "fuiAlunno": ""}
                     elif (link[UrlIdType.params]['Action'] == 'FAMILY_CHANGE_ALUNNO'):
                         link[UrlIdType.data] = {"alunnoId": self.alunni[prefix][Alunno]}
 
-                if (link[UrlIdType.type_data]=='json'):
+                if (link[UrlIdType.type_data] == 'json'):
                     res = self.session.post(link[UrlIdType.url], json=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content-Type': 'application/x-www-form-urlencoded'}, timeout=(10, 30))
                 else:
                     res = self.session.post(link[UrlIdType.url], data=link[UrlIdType.data], params=link[UrlIdType.params], allow_redirects=link[UrlIdType.redirect], headers={'Content-Type': 'application/x-www-form-urlencoded'}, timeout=(10, 30))
 
                 get_error = re.search(r"SweetMessage.error\('(.*)'\);", res.text)
-                if (get_error == None):
+                if (get_error is None):
                     if ('Action' in link[UrlIdType.params].keys()):
                         if (link[UrlIdType.params]['Action'] == 'FAMILY_REGISTRO_CLASSE_COMPITI_LISTA'):
                             self.COMPITI = json.loads(res.text)
                             self.sha1_REGISTRO = hashlib.sha1(res.text.encode('utf-8')).hexdigest()
                             self.sha1_REGISTRO_old = ""
-                            if(os.path.exists(registo_compiti_alunno)):
+                            if (os.path.exists(registo_compiti_alunno)):
                                 with open(registo_compiti_alunno, "rb") as f:
                                     self.sha1_REGISTRO_old = hashlib.file_digest(f, "sha1").hexdigest()
                         elif (link[UrlIdType.params]['Action'] == 'FAMILY_REGISTRO_CLASSE_ARGOMENTI_LISTA'):
@@ -323,7 +353,7 @@ class LibAxiosFamiglia():
                                 m = re.search(r"<legend.*?>(.*?)</legend>", text)
                                 self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<h2>{m.group(1)}</h2>")
                                 new_link_collabora = [
-                                    ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_FOLDERS_SHARED'}, '05_MATERIALE_DIDATTICO_FOLDERS_SHARED.json', MATERIALE_CONDIVISO_ALUNNO, '', False]
+                                    ['POST', 'https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_FOLDERS_SHARED'}, '05_MATERIALE_DIDATTICO_FOLDERS_SHARED.json', MATERIALE_CONDIVISO_ALUNNO, '', False]
                                 ]
                                 self.__get_session(Alunno, new_link_collabora, prefix)
                             else:
@@ -338,8 +368,8 @@ class LibAxiosFamiglia():
                                     MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF = f"{m1[0][0]}"
                                     self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<h3 class='professore'>📂 {MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF}</h3>")
                                 new_link_collabora = [
-                                        ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_CONDIVISO_CON_ME_DETAIL'}, f'06_MATERIALE_CONDIVISO_CON_ME_DETAIL_{FOLDERS_SHARED[0]}_{FOLDERS_SHARED[1]}.json', {'fiDocId' : FOLDERS_SHARED[0], 'fnId': FOLDERS_SHARED[1]}, 'json', False]
-                                    ]
+                                    ['POST', 'https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_CONDIVISO_CON_ME_DETAIL'}, f'06_MATERIALE_CONDIVISO_CON_ME_DETAIL_{FOLDERS_SHARED[0]}_{FOLDERS_SHARED[1]}.json', {'fiDocId' : FOLDERS_SHARED[0], 'fnId': FOLDERS_SHARED[1]}, 'json', False]
+                                ]
                                 self.__get_session(Alunno, new_link_collabora, prefix)
                         elif (link[UrlIdType.params]['Action'] == 'MATERIALE_CONDIVISO_CON_ME_DETAIL'):
                             jj = json.loads(res.text)
@@ -350,8 +380,8 @@ class LibAxiosFamiglia():
                             m = re.findall(r"data-nrow='(.*?)' data-others='(.*?)'", text)
                             for ll in m:
                                 new_link_collabora = [
-                                        ['POST','https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'}, f'07_MATERIALE_DIDATTICO_CONDIVISO_CONTENT_{str(ll[1])}_{str(ll[0])}.json', {"folderId": str(ll[1]),"nRow":str(ll[0]),"uteCanWrite":""}, 'json', False]
-                                    ]
+                                    ['POST', 'https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'}, f'07_MATERIALE_DIDATTICO_CONDIVISO_CONTENT_{str(ll[1])}_{str(ll[0])}.json', {"folderId": str(ll[1]), "nRow": str(ll[0]), "uteCanWrite": ""}, 'json', False]
+                                ]
                                 self.__get_session(Alunno, new_link_collabora, prefix)
                         elif (link[UrlIdType.params]['Action'] == 'MATERIALE_DIDATTICO_CONDIVISO_CONTENT'):
                             jj = json.loads(res.text)
@@ -386,7 +416,7 @@ class LibAxiosFamiglia():
                         log.error(f"Return ({errorcode}): {errormsg}")
                         get_error = errormsg
 
-            if (get_error != None):
+            if (get_error is not None):
                 raise Exception("{}".format(get_error))
 
     def __debug(self, res: requests.Response) -> None:
@@ -425,12 +455,12 @@ class LibAxiosFamiglia():
         oggi_long = datetime.strftime(datetime.now(), "%d/%m/%Y %H:%M:%S")
 
         dir_alunno = AxiosView.registro
-        if (Alunno != "" and self.alunni[AxiosView.registro].get(Alunno, None) != None):
+        if (Alunno != "" and self.alunni[AxiosView.registro].get(Alunno, None) is not None):
             dir_alunno = f'{AxiosView.registro}_{Alunno}_{hashlib.md5(self.alunni[AxiosView.registro][Alunno].encode('utf-8')).hexdigest()}'
 
-        if(os.path.exists(os.path.join(self.dir_istituto, dir_alunno, 'notifica.html'))):
+        if (os.path.exists(os.path.join(self.dir_istituto, dir_alunno, 'notifica.html'))):
             with open(os.path.join(self.dir_istituto, dir_alunno, 'notifica.html'), 'r', encoding='utf-8') as f_notify:
-                old_compiti = f_notify.read().replace('\r','').split("\n")
+                old_compiti = f_notify.read().replace('\r', '').split("\n")
 
         # FILTRO PER DATA
         # tomorrow = datetime.strftime(datetime.today() + timedelta(days=1), "%d/%m/%Y")
@@ -480,16 +510,16 @@ class LibAxiosFamiglia():
 
         linee_notifica.append("<!-- BEGIN COMPITI -->")
 
-        for c in range(len(new_compiti)-1, -1, -1):
+        for c in range(len(new_compiti) - 1, -1, -1):
             giorno = new_compiti[c]["giorno"]
             DayOfWeek = datetime.strptime(giorno, "%d/%m/%Y").strftime("%a")
-            if(c == (len(new_compiti)-1)):
+            if (c == (len(new_compiti) - 1)):
                 linee_notifica.append("<!-- BEGIN SCREENSHOT -->")
                 linee_notifica.append(f"<h2 class='diario'>📰 {DOW_Tr[DayOfWeek]}, {giorno}</h2>")
             else:
-                if(giorno != giorno_app):
+                if (giorno != giorno_app):
                     materia = ""
-                    if (len(testo_list)>0):
+                    if (len(testo_list) > 0):
                         linee_notifica.append(f"<ul>\n{"\n".join(testo_list)}\n</ul>")
                         linee_notifica.append("<!-- END SCREENSHOT -->")
                         testo_list = []
@@ -498,21 +528,21 @@ class LibAxiosFamiglia():
             giorno_app = giorno
 
             if (materia != new_compiti[c]["materia"]):
-                if (len(testo_list)>0):
+                if (len(testo_list) > 0):
                     linee_notifica.append(f"<ul>\n{"\n".join(testo_list)}\n</ul>")
                     testo_list = []
                 linee_notifica.append(f"<h3>{new_compiti[c]["materia"].capitalize()}</h3>")
 
             if (new_compiti[c].get("testo", "") != ""):
                 testo_list.append(f"<li class='compiti'>{new_compiti[c]["testo"].replace('\n', ' ')}</li>")
-            if(new_compiti[c].get("verifica", "") != ""):
+            if (new_compiti[c].get("verifica", "") != ""):
                 testo_list.append(f"<li class='verifica'><b>Verifica</b>: {new_compiti[c]["verifica"].replace('\n', ' ')}</li>")
-            if(new_compiti[c].get("note", "") != ""):
+            if (new_compiti[c].get("note", "") != ""):
                 testo_list.append(f"<li class='annotazione'><b>Annotazione</b>: {new_compiti[c]["note"].replace('\n', ' ')}</li>")
 
             materia = new_compiti[c]["materia"]
 
-        if (len(testo_list)>0):
+        if (len(testo_list) > 0):
             linee_notifica.append(f"<ul>\n{"\n".join(testo_list)}\n</ul>")
             linee_notifica.append("<!-- END SCREENSHOT -->")
             testo_list = []
@@ -538,13 +568,13 @@ class LibAxiosFamiglia():
         linee_notifica.append("</body>")
         linee_notifica.append("</html>")
 
-        str_notifica = "\n".join(linee_notifica).replace('\r','')
+        str_notifica = "\n".join(linee_notifica).replace('\r', '')
         linee_notifica = str_notifica.split("\n")
 
         with open(os.path.join(self.dir_istituto, dir_alunno, 'notifica.html'), 'w', encoding='utf-8') as f_notify:
             f_notify.write("\n".join(linee_notifica))
 
-        if (len(old_compiti) > 0 ):
+        if (len(old_compiti) > 0):
             linee_notifica = self.evidenzia_cambiamenti(old_compiti, linee_notifica)
 
         return "\n".join(linee_notifica)
@@ -564,22 +594,22 @@ class LibAxiosFamiglia():
         output = []
 
         start_new = 0
-        end_new = len(linee_file_new)-1
+        end_new = len(linee_file_new) - 1
 
         start_old = 0
-        end_old = len(linee_file_old)-1
+        end_old = len(linee_file_old) - 1
 
-        for l, line in enumerate(linee_file_new):
-            if("<!-- BEGIN COMPITI -->" in line):
-                start_new = l+1
-            if("<!-- END COMPITI -->" in line):
-                end_new = l
+        for nl, line in enumerate(linee_file_new):
+            if ("<!-- BEGIN COMPITI -->" in line):
+                start_new = nl + 1
+            if ("<!-- END COMPITI -->" in line):
+                end_new = nl
 
-        for l, line in enumerate(linee_file_old):
-            if("<!-- BEGIN COMPITI -->" in line):
-                start_old = l+1
-            if("<!-- END COMPITI -->" in line):
-                end_old = l
+        for nl, line in enumerate(linee_file_old):
+            if ("<!-- BEGIN COMPITI -->" in line):
+                start_old = nl + 1
+            if ("<!-- END COMPITI -->" in line):
+                end_old = nl
 
         corpo_compiti_new = linee_file_new[start_new:end_new]
         corpo_compiti_old = linee_file_old[start_old:end_old]
@@ -587,22 +617,22 @@ class LibAxiosFamiglia():
         matcher = difflib.SequenceMatcher(None, corpo_compiti_old, corpo_compiti_new)
 
         for tag, i1, i2, j1, j2 in matcher.get_opcodes():
-            if (tag=='equal'):
+            if (tag == 'equal'):
                 for riga in corpo_compiti_new[j1:j2]:
                     output.append(riga)
             else:
-                if (tag=='insert'):
+                if (tag == 'insert'):
                     for riga in corpo_compiti_new[j1:j2]:
-                        riga = re.sub(r'<((?![\/!])[^>]+(?<!\/))>','<\\1 style=\'color:green\'>', riga)
+                        riga = re.sub(r'<((?![\/!])[^>]+(?<!\/))>', '<\\1 style=\'color:green\'>', riga)
                         output.append(riga)
-                elif (tag=='replace'):
+                elif (tag == 'replace'):
                     for riga in corpo_compiti_new[j1:j2]:
-                        riga = re.sub(r'<((?![\/!])[^>]+(?<!\/))>','<\\1 style=\'color:orange\'>', riga)
+                        riga = re.sub(r'<((?![\/!])[^>]+(?<!\/))>', '<\\1 style=\'color:orange\'>', riga)
                         output.append(riga)
                 # elif (tag=='delete'):
                 #     output.append("<div style='color:red'>---</div>")
         if (start_new > 0):
             output[0:0] = linee_file_new[0:start_new]
-        if (end_new < len(linee_file_new)-1):
-            output.extend(linee_file_new[end_new:len(linee_file_new)-1])
+        if (end_new < len(linee_file_new) - 1):
+            output.extend(linee_file_new[end_new:len(linee_file_new) - 1])
         return output

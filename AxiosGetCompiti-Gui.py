@@ -24,11 +24,15 @@ from moduli.logging_config import logging, log
 from AxiosGetCompiti import run_axios_get_compiti
 from moduli.gui.AxiosGetCompitiConfigurator import ApplicationGUIConfigurator
 
-logger = log
 
 class GuiHandler(logging.Handler):
+    """
+    Inizializza GuiHandler.
 
-    def __init__(self, event_queue):
+    :param event_queue: Eventi del queue
+    :type event_queue: Queue
+    """
+    def __init__(self, event_queue: Queue):
         super().__init__()
         self.event_queue = event_queue
 
@@ -41,9 +45,17 @@ class GuiHandler(logging.Handler):
         except Exception:
             self.handleError(record)
 
-class ApplicationGUI:
 
-    def __init__(self, logger, run_function):
+class ApplicationGUI:
+    """
+    Inizializza l'applicazione GUI.
+
+    :param logger: Logger per i messaggi
+    :type logger: logging.Logger
+    :param run_function: Funzione da eseguire
+    :type run_function: callable
+    """
+    def __init__(self, logger: logging.Logger, run_function: callable):
         self.logger = logger
         self.run_function = run_function
 
@@ -72,15 +84,15 @@ class ApplicationGUI:
         self.log_text.tag_config("WARNING", foreground="orange")
         self.log_text.tag_config("ERROR", foreground="red")
         self.log_text.tag_config("DEBUG", foreground="gray")
-        self.log_text.tag_config("Bold", foreground="#569cd6", font=("Consolas", 10, "bold")) # Blu
+        self.log_text.tag_config("Bold", foreground="#569cd6", font=("Consolas", 10, "bold"))  # Blu
         self.log_text.config(state="disabled")
 
         self.label_credit = tk.Text(self.root, font=("Consolas", 8), wrap=tk.WORD, relief="flat", bd=0, height=4, bg=self.root.cget("bg"))
         self.label_credit.tag_config("Bold", foreground="#569cd6", font=("Consolas", 8, "bold"))
-        self.label_credit.insert("end","Axios-get\n", "Bold")
-        self.label_credit.insert("end","Autore: Roberto Quintiliani\n")
-        self.label_credit.insert("end","Licenza: Open Source (MIT)\n")
-        self.label_credit.insert("end","Progetto: https://github.com/robyquin/axios-get")
+        self.label_credit.insert("end", "Axios-get\n", "Bold")
+        self.label_credit.insert("end", "Autore: Roberto Quintiliani\n")
+        self.label_credit.insert("end", "Licenza: Open Source (MIT)\n")
+        self.label_credit.insert("end", "Progetto: https://github.com/robyquin/axios-get")
         self.label_credit.grid(row=3, column=1, sticky="ew", padx=5, pady=5)
         self.label_credit.config(state="disabled")
 
@@ -99,7 +111,9 @@ class ApplicationGUI:
         self.root.after(100, self.check_events)
 
     def start(self):
-
+        """
+        Avvia il processo di elaborazione.
+        """
         self.start_button.config(state="disabled")
         self.status_label.config(text="Elaborazione in corso...", fg="orange")
 
@@ -113,7 +127,9 @@ class ApplicationGUI:
         ).start()
 
     def run_worker(self):
-
+        """
+        Esegue il worker in background.
+        """
         success = False
 
         try:
@@ -130,7 +146,9 @@ class ApplicationGUI:
             })
 
     def check_events(self):
-
+        """
+        Controlla gli eventi del queue.
+        """
         while not self.event_queue.empty():
             event = self.event_queue.get()
             # Fine elaborazione
@@ -173,14 +191,20 @@ class ApplicationGUI:
         self.root.after(100, self.check_events)
 
     def run(self):
+        """
+        Esegue il ciclo principale dell'applicazione.
+        """
         self.root.mainloop()
 
     def avvia_configuratore(self):
+        """
+        Avvia il configuratore YAML.
+        """
         if (getattr(sys, 'frozen', False)):
             # Se l'applicazione è compilata con PyInstaller
-            DIR=str(os.path.dirname(sys.executable))
+            DIR = str(os.path.dirname(sys.executable))
         else:
-            DIR=str(Path(os.path.dirname(__file__)).absolute())
+            DIR = str(Path(os.path.dirname(__file__)).absolute())
 
         gui = ApplicationGUIConfigurator(DIR, self.root)
 
@@ -190,8 +214,11 @@ class ApplicationGUI:
         else:
             gui.run()
 
-def main():
 
+def main():
+    """
+    Punto di ingresso principale.
+    """
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -204,7 +231,7 @@ def main():
 
     if (getattr(sys, 'frozen', False)):
         # Se l'applicazione è compilata con PyInstaller
-        DIR=str(os.path.dirname(sys.executable))
+        DIR = str(os.path.dirname(sys.executable))
         if (os.path.exists(os.path.join(DIR, "schedula_axios-get.xml_tmp"))):
             content = ""
             with open(os.path.join(DIR, "schedula_axios-get.xml_tmp"), "r", encoding="utf-16") as file_schedule:
@@ -215,7 +242,7 @@ def main():
                 content = file_schedule.write(content)
                 os.remove(os.path.join(DIR, "schedula_axios-get.xml_tmp"))
     else:
-        DIR=str(Path(os.path.dirname(__file__)).absolute())
+        DIR = str(Path(os.path.dirname(__file__)).absolute())
 
     # Handler file senza colori
     file_handler = logging.FileHandler(filename=os.path.join(DIR, "output.log"), mode="w", encoding='utf-8')
@@ -223,6 +250,8 @@ def main():
     file_handler.setFormatter(file_formatter)
     file_handler.setLevel(logging.DEBUG)
     log.addHandler(file_handler)
+
+    logger = log
 
     if (args.silent):
         logger.info("Avvio in modalità silent")
@@ -239,10 +268,11 @@ def main():
         gui.run()
         return 0
 
+
 if __name__ == "__main__":
 
     try:
         sys.exit(main())
     except Exception:
-        logger.exception("Errore fatale applicazione")
+        log.exception("Errore fatale applicazione")
         sys.exit(1)
