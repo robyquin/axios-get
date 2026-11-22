@@ -48,15 +48,15 @@ def format_yaml_with_comments(config: dict) -> str:
     content_yaml = re.sub(r'(version:.*)', r"\1 # Versione della configurazione", content_yaml)
     content_yaml = re.sub(r'(credenziali:.*)', r"\1 # Gruppo credenziali: raccoglie informazioni per l'accesso al portale, la definizione degli studenti e per ciascuno la propria configurazione di notifica", content_yaml)
     content_yaml = re.sub(r'(- customerid:.*)', r"\1 # CF Istituto/Cliente", content_yaml)
-    content_yaml = re.sub(r'(\s + username:.*)', r"\1 # Codice Utente o mail personale", content_yaml)
-    content_yaml = re.sub(r'(\s + password:.*)', r"\1 # Password di accesso", content_yaml)
-    content_yaml = re.sub(r'(\s + alunni:.*)', r"\1 # Gruppo alunni: definisce nome studente, tipologia di notifica e relativi parametri", content_yaml)
+    content_yaml = re.sub(r'(\s+username:.*)', r"\1 # Codice Utente o mail personale", content_yaml)
+    content_yaml = re.sub(r'(\s+password:.*)', r"\1 # Password di accesso", content_yaml)
+    content_yaml = re.sub(r'(\s+alunni:.*)', r"\1 # Gruppo alunni: definisce nome studente, tipologia di notifica e relativi parametri", content_yaml)
 
     # Commenti per ConfigurazioneAlunno
-    content_yaml = re.sub(r'(\s + NOME_ALUNNO_.:.*)', r"\1 # Inserisci qui il nome dello studente che trovi nel menu a tendina sul portale AxiosFamiglia", content_yaml)
-    content_yaml = re.sub(r'(\s + tipo:.*)', r"\1 # Tipi di notifiche disponibili: smtp, html, screenshot, telegram", content_yaml)
-    content_yaml = re.sub(r'(\s + param:.*)', r"\1 # Parametro caratteristico della notifica scelta [default: eredita il parametro dalla configurazione generale]", content_yaml)
-    content_yaml = re.sub(r'(\s + nome_alternativo:.*)', r"\1 # Nome alternativo dello studente (opzionale)", content_yaml)
+    content_yaml = re.sub(r'(\s+NOME_ALUNNO_.:.*)', r"\1 # Inserisci qui il nome dello studente che trovi nel menu a tendina sul portale AxiosFamiglia", content_yaml)
+    content_yaml = re.sub(r'(\s+tipo:.*)', r"\1 # Tipi di notifiche disponibili: smtp, html, screenshot, telegram", content_yaml)
+    content_yaml = re.sub(r'(\s+param:.*)', r"\1 # Parametro caratteristico della notifica scelta [default: eredita il parametro dalla configurazione generale]", content_yaml)
+    content_yaml = re.sub(r'(\s+nome_alternativo:.*)', r"\1 # Nome alternativo dello studente (opzionale)", content_yaml)
 
     # Commenti per params_notifiche
     content_yaml = re.sub(r'(params_notifiche:.*)', r"\1 # Gruppo parametri globali di notifica: raccoglie informazioni generali per rendere possibile la tipologia di notifica", content_yaml)
@@ -64,19 +64,19 @@ def format_yaml_with_comments(config: dict) -> str:
     content_yaml = re.sub(r'(\s+(smtp):.*)', r"\1 # Gruppo di configurazione globale per la notifica \2 (https://github.com/robyquin/axios-get/blob/master/docs/Telegram_token_bot.md)", content_yaml)
     content_yaml = re.sub(r'(\s+(telegram):.*)', r"\1 # Gruppo di configurazione globale per la notifica \2 (https://github.com/robyquin/axios-get/blob/master/docs/Telegram_token_bot.md)", content_yaml)
 
-    content_yaml = re.sub(r'(\s + path:.*)', r"\1 # Specifica qui il percorso relativo o assoluto della cartella di destinazione", content_yaml)
-    content_yaml = re.sub(r'(\s + n_allegati:.*)', r"\1 # Specifica il numero di screenshot da allegare alla notifica [>=0]", content_yaml)
+    content_yaml = re.sub(r'(\s+path:.*)', r"\1 # Specifica qui il percorso relativo o assoluto della cartella di destinazione", content_yaml)
+    content_yaml = re.sub(r'(\s+n_allegati:.*)', r"\1 # Specifica il numero di screenshot da allegare alla notifica [>=0]", content_yaml)
 
     # Commenti per SMTP
-    content_yaml = re.sub(r'(\s + smtp_server:.*)', r"\1 # Server SMTP (es. smtp.example.com)", content_yaml)
-    content_yaml = re.sub(r'(\s + smtp_port:.*)', r"\1 # Porta SMTP (es. 587, 465)", content_yaml)
-    content_yaml = re.sub(r'(\s + smtp_username:.*)', r"\1 # Username SMTP", content_yaml)
-    content_yaml = re.sub(r'(\s + smtp_password:.*)', r"\1 # Password SMTP", content_yaml)
-    content_yaml = re.sub(r'(\s + destinatari:.*)', r"\1 # Lista di destinatari email", content_yaml)
+    content_yaml = re.sub(r'(\s+smtp_server:.*)', r"\1 # Server SMTP (es. smtp.example.com)", content_yaml)
+    content_yaml = re.sub(r'(\s+smtp_port:.*)', r"\1 # Porta SMTP (es. 587, 465)", content_yaml)
+    content_yaml = re.sub(r'(\s+smtp_username:.*)', r"\1 # Username SMTP", content_yaml)
+    content_yaml = re.sub(r'(\s+smtp_password:.*)', r"\1 # Password SMTP", content_yaml)
+    content_yaml = re.sub(r'(\s+destinatari:.*)', r"\1 # Lista di destinatari email", content_yaml)
 
     # Commenti per Telegram
-    content_yaml = re.sub(r'(\s + BOT_TOKEN:.*)', r"\1 # Token del Bot Telegram (da @BotFather)", content_yaml)
-    content_yaml = re.sub(r'(\s + CHAT_ID:.*)', r"\1 # ID della chat del destinatario (da @userinfobot)", content_yaml)
+    content_yaml = re.sub(r'(\s+BOT_TOKEN:.*)', r"\1 # Token del Bot Telegram (da @BotFather)", content_yaml)
+    content_yaml = re.sub(r'(\s+CHAT_ID:.*)', r"\1 # ID della chat del destinatario (da @userinfobot)", content_yaml)
 
     return content_yaml
 
