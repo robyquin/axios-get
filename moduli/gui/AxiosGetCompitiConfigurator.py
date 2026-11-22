@@ -88,7 +88,7 @@ class ApplicationGUIConfigurator():
         self.window.columnconfigure(1, weight=1)
         self.window.rowconfigure(3, weight=1)
 
-    def evidenzia_sintassi(self, event = None):
+    def evidenzia_sintassi(self, event=None):
         """Scansiona il testo e applica i colori YAML tramite i Tag."""
         # 1. Rimuove tutti i tag esistenti prima di ricalcolarli
         for tag in ["chiave", "stringa", "numero_bool", "commento"]:
