@@ -179,8 +179,8 @@ class NotificaTelegram(Notifica):
 
         # 2. Trasfomazione HTML in messaggio Telegram
         html = re.sub("<head>(.*?)</head>", "", html)
-        html = re.sub("<.{0, 1}html>", "", html)
-        html = re.sub("<.{0, 1}body>", "", html)
+        html = re.sub("<.{0,1}html>", "", html)
+        html = re.sub("<.{0,1}body>", "", html)
         html = re.sub("<!--.*?-->", "", html)
         html = re.sub("<h1.*?>(.*?)</h1>\n+", r"<u><b>\g<1></b></u>\n\n", html, flags=re.DOTALL)
         html = re.sub("<h2.*?>(.*?)</h2>\n*", r"<u><b>\g<1></b></u>\n\n", html, flags=re.DOTALL)
@@ -202,10 +202,10 @@ class NotificaTelegram(Notifica):
         html = re.sub("<li.*?class='annotazione'.*?>(.*?)</li>\n*", r"📚 \g<1>\n", html)
         html = re.sub("<li.*?class='file'.*?>(.*?)</li>\n*", r"🔗 \g<1>\n", html)
         html = re.sub("<div>(.*?)</div>\n*", r"\n\g<1>\n\n", html)
-        html = re.sub("<.{0, 1}ul.*?>", "\n", html)
+        html = re.sub("<.{0,1}ul.*?>", "\n", html)
         html = re.sub("<p.*?>(.*?)</p>", r"\n\g<1>", html)
         html = re.sub("<br>", "", html)
-        html = re.sub("\n{3, }", "\n\n", html, flags=re.DOTALL)
+        html = re.sub("\n{3,}", "\n\n", html, flags=re.DOTALL)
 
         link = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
         link_screenshot = f'https://api.telegram.org/bot{BOT_TOKEN}/sendPhoto'

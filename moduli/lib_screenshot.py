@@ -51,8 +51,8 @@ class ScreenShot():
         draw = ImageDraw.Draw(image)
 
         html = re.sub("<head>(.*?)</head>", "", html)
-        html = re.sub("<.{0, 1}html>", "", html)
-        html = re.sub("<.{0, 1}body>", "", html)
+        html = re.sub("<.{0,1}html>", "", html)
+        html = re.sub("<.{0,1}body>", "", html)
         html = re.sub("<h1.*?>(.*?)</h1>\n+", r"<h1>\g<1></h1>\n\n", html, flags=re.DOTALL)
         html = re.sub("<h2.*?>(.*?)</h2>\n*", r"<h2>\g<1></h2>\n\n", html, flags=re.DOTALL)
         html = re.sub("<h3.*?>(.*?)</h3>\n*", r"<h3>\g<1></h3>\n\n", html, flags=re.DOTALL)
@@ -62,17 +62,17 @@ class ScreenShot():
         html = re.sub(r'<li.*?>(.*?)</li>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
         html = re.sub(r'<div.*?>(.*?)</div>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
         html = re.sub(r'<p.*?>(.*?)</p>', lambda m: m.group(0).replace('\n', ' '), html, flags=re.DOTALL)
-        html = re.sub("<li.*?class='compiti'.*?(style='color:(.*?)'?){0, 1}>(.*?)</li>\n*", r"{\g<2>}📖 \g<3>\n", html)
-        html = re.sub("<li.*?class='verifica'.*?(style='color:(.*?)'?){0, 1}>(.*?)</li>\n*", r"{\g<2>}💥 \g<3>\n", html)
-        html = re.sub("<li.*?class='annotazione'.*?(style='color:(.*?)'?){0, 1}>(.*?)</li>\n*", r"{\g<2>}📚 \g<3>\n", html)
+        html = re.sub("<li.*?class='compiti'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*", r"{\g<2>}📖 \g<3>\n", html)
+        html = re.sub("<li.*?class='verifica'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*", r"{\g<2>}💥 \g<3>\n", html)
+        html = re.sub("<li.*?class='annotazione'.*?(style='color:(.*?)'?){0,1}>(.*?)</li>\n*", r"{\g<2>}📚 \g<3>\n", html)
         html = re.sub("<li.*?class='file'.*?>(.*?)</li>\n*", r"🔗 \g<1>\n", html)
         html = re.sub("<div>(.*?)</div>\n*", r"\n\g<1>\n\n", html)
-        html = re.sub("<.{0, 1}ul.*?>", "\n", html)
+        html = re.sub("<.{0,1}ul.*?>", "\n", html)
         html = re.sub("<p.*?>(.*?)</p>", r"\n\g<1>", html)
         html = re.sub("<b.*?>(.*?)</b>", r"\g<1>", html)
         html = re.sub("<i.*?>(.*?)</i>", r"\g<1>", html)
         html = re.sub("<br>", "", html)
-        html = re.sub("\n{2, }", "\n", html, flags=re.DOTALL)
+        html = re.sub("\n{2,}", "\n", html, flags=re.DOTALL)
 
         orange = "orange"
         green = "green"

@@ -103,7 +103,7 @@ class ApplicationGUIConfigurator():
             # Elementi di una lista (elementi non chiavi)
             (r"(?m)^[ \t\-]*([a-zA-Z0-9_\-\.]+)[^:]+$", "stringa", 1),
             # Numeri interi o decimali dopo i due punti
-            (r":\s*(\-{0, 1}\d+(\.\d+){0, 1})[^\.]", "numero_bool", 0),
+            (r":\s*(\-{0,1}\d+(\.\d+){0,1})[^\.]", "numero_bool", 0),
             # Chiavi (es. "nome:" o "- nome:")
             (r"(?m)^[ \t\-]*([a-zA-Z0-9_\-\.]+)\s*:", "chiave", 1),
             # Valori booleani o nulli
