@@ -8,11 +8,13 @@ Modulo di rappresentazione del file YAML di configurazione.
 
 """
 
+import re
 from typing import Literal
-from pydantic import BaseModel, Field, model_validator
+from dataclasses import dataclass
 
 
-class ConfigurazioneAlunno(BaseModel):
+@dataclass
+class ConfigurazioneAlunno:
     """
     Definizione della configurazione alunno
     """
@@ -21,14 +23,18 @@ class ConfigurazioneAlunno(BaseModel):
     nome_alternativo: str | None = None
 
 
-class RegistroAlunni(BaseModel):
+
+
+@dataclass
+class RegistroAlunni:
     """
     Definizione del dizionario alunni
     """
     alunni: dict[str, ConfigurazioneAlunno]
 
 
-class ConfigurazioneIstituto(BaseModel):
+@dataclass
+class ConfigurazioneIstituto:
     """
     Definizione della lista configurazione degli istituti
     """
@@ -37,15 +43,23 @@ class ConfigurazioneIstituto(BaseModel):
     password: str
     alunni: dict[str, ConfigurazioneAlunno]
 
+    def __post_init__(self):
+        if isinstance(self.customerid, str) and not isinstance(self.customerid, int):
+            raise TypeError("customerid deve essere una stringa o un intero")
+        if isinstance(self.username, str) and not isinstance(self.username, int):
+            raise TypeError("username deve essere una stringa o un intero")
 
-class ConfigNotificaLocale(BaseModel):
+
+@dataclass
+class ConfigNotificaLocale:
     """
     Definizione della configurazione delle notifiche locali: Html e Screenshot
     """
     path: str
 
 
-class ConfigNotificaSmtp(BaseModel):
+@dataclass
+class ConfigNotificaSmtp:
     """
     Definizione della configurazione della notifica SMTP
     """
@@ -54,19 +68,31 @@ class ConfigNotificaSmtp(BaseModel):
     smtp_username: str
     smtp_password: str
     destinatari: list[str]
-    n_allegati: int = Field(ge=0)
+    n_allegati: int
+
+    def __post_init__(self):
+        if self.n_allegati < 0:
+            raise ValueError("Numero di allegati deve essere >= 0")
 
 
-class ConfigNotificaTelegram(BaseModel):
+@dataclass
+class ConfigNotificaTelegram:
     """
     Definizione della configurazione della notifica Telegram
     """
     BOT_TOKEN: str
+    n_allegati: int
     CHAT_ID: str | None = None
-    n_allegati: int = Field(ge=0)
+
+    def __post_init__(self):
+        if self.n_allegati < 0:
+            raise ValueError("Numero di allegati deve essere >= 0")
+        if self.CHAT_ID is not None and not isinstance(self.CHAT_ID, str):
+            raise TypeError("CHAT_ID deve essere una stringa o None")
 
 
-class ParamsNotifiche(BaseModel):
+@dataclass
+class ParamsNotifiche:
     """
     Definizione della configurazione dei parametri globali delle notifiche
     """
@@ -75,16 +101,32 @@ class ParamsNotifiche(BaseModel):
     smtp: ConfigNotificaSmtp | None = None
     telegram: ConfigNotificaTelegram | None = None
 
+    def __post_init__(self):
+        if self.html is not None and not isinstance(self.html, ConfigNotificaLocale):
+            raise TypeError("html deve essere una stringa o None")
+        if self.screenshot is not None and not isinstance(self.screenshot, ConfigNotificaLocale):
+            raise TypeError("screenshot deve essere una stringa o None")
+        if self.smtp is not None and not isinstance(self.smtp, ConfigNotificaSmtp):
+            raise TypeError("smtp deve essere una ConfigNotificaSmtp o None")
+        if self.telegram is not None and not isinstance(self.telegram, ConfigNotificaTelegram):
+            raise TypeError("telegram deve essere una ConfigNotificaTelegram o None")
 
-class ConfigCredenzialiYaml(BaseModel):
+
+@dataclass
+class ConfigCredenzialiYaml:
     """
     Definizione della configurazione completa
     """
-    version: str = Field(pattern=r"^\d+\.\d+\.\d+\w*$")
+    version: str
     credenziali: list[ConfigurazioneIstituto]
     params_notifiche: ParamsNotifiche
 
-    @model_validator(mode='after')
+    def __post_init__(self):
+        if not re.fullmatch(r"^\d+\.\d+\.\d+\w*$", self.version):
+            raise ValueError("version non rispetta il formato")
+        self.verifica_coerenza_notifiche()
+
+    # @model_validator(mode='after')
     def verifica_coerenza_notifiche(self) -> 'ConfigCredenzialiYaml':
         """
         Verifica la coerenza trasversale dei parametri di configurazione.
