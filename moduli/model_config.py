@@ -10,7 +10,7 @@ Modulo di rappresentazione del file YAML di configurazione.
 
 import re
 from typing import Literal
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 
 @dataclass
@@ -139,10 +139,9 @@ class ConfigCredenzialiYaml:
         errori = []
 
         for credenziali_config in self.credenziali:
-            for nome_alunno, config in credenziali_config.alunni.items():
-                canale = config.tipo
-
-                if getattr(self.params_notifiche, canale) is None:
+            for nome_alunno, config in credenziali_config['alunni'].items():
+                canale = config['tipo']
+                if dict(self.params_notifiche).get(canale, None) is None:
                     errori.append(
                         f"L'alunno '{nome_alunno}' usa il tipo '{canale}', "
                         f"ma '{canale}' non è configurato in 'params_notifiche'."
@@ -150,3 +149,9 @@ class ConfigCredenzialiYaml:
         if errori:
             raise ValueError(" | ".join(errori))
         return self
+
+if __name__ == "__main__":
+    import yaml
+    with open("./credenziali.yml", 'r') as yml_f:
+        config_default = yaml.safe_load(yml_f.read())
+        ConfigCredenzialiYaml(**config_default)
