@@ -180,11 +180,18 @@ class ConfigCredenzialiYaml:
     params_notifiche: ParamsNotifiche
 
     def __post_init__(self):
-        if not re.fullmatch(r"^\d+\.\d+\.\d+\w*$", self.version):
-            raise ValueError("version non rispetta il formato")
+
+        if isinstance(self.version, str):
+            if not re.fullmatch(r"^\d+\.\d+\.\d+\w*$", self.version):
+                raise ValueError("[ConfigCredenzialiYaml].version non rispetta il formato [int].[int].[int]")
+        else:
+            raise TypeError(f"[ConfigCredenzialiYaml].version `{type(self.version).__name__}`, ma deve essere una stringa")
+        
         for c in self.credenziali:
             ConfigurazioneIstituto(**dict(c))
+        
         ParamsNotifiche(**dict(self.params_notifiche))
+        
         self.verifica_coerenza_notifiche()
 
     def verifica_coerenza_notifiche(self) -> 'ConfigCredenzialiYaml':
