@@ -101,7 +101,7 @@ class ApplicationGUIConfigurator():
             # Ipotizzo che ci sia di default una stringa
             (r":(.*)$", "stringa", 1),
             # Elementi di una lista (elementi non chiavi)
-            (r"(?m)^[ \t\-]*([a-zA-Z0-9_\-\.]+)[^:]+$", "stringa", 1),
+            (r"(?m)^[ \t\-]*([a-zA-Z0-9_\-\.\@]+)[^:]*$", "stringa", 1),
             # Numeri interi o decimali dopo i due punti
             (r":\s*(\-{0,1}\d+(\.\d+){0,1})[^\.]", "numero_bool", 0),
             # Chiavi (es. "nome:" o "- nome:")
