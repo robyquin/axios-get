@@ -142,7 +142,7 @@ class ConfigNotificaSmtp:
                     if (not isinstance(d, str)):
                         raise TypeError(f"[ConfigNotificaSmtp].destinatario ==> {d} `{type(self.d).__name__}`, ma deve essere una stringa")
                     else:
-                        if (not re.fullmatch(r"^\w+@\w+\.\w+$", d)):
+                        if (not re.fullmatch(r"^[\w\.]+@[\w\.]+$", d)):
                             raise ValueError(f"[ConfigNotificaSmtp].destinatario ==> {d} non sembra essere un indirizzo email")
             else:
                 raise TypeError(f"[ConfigNotificaSmtp].destinatari `{type(self.destinatari).__name__}`, ma deve essere una lista")
