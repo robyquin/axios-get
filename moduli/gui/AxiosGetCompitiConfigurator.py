@@ -15,7 +15,7 @@ from tkinter import ttk
 from tkinter import filedialog, messagebox, scrolledtext
 import yaml
 import re
-from pydantic import ValidationError
+from dataclasses import asdict
 
 from AxiosGetCompiti import file_config_default, format_yaml_with_comments
 from moduli.model_config import ConfigCredenzialiYaml
@@ -101,7 +101,7 @@ class ApplicationGUIConfigurator():
             # Ipotizzo che ci sia di default una stringa
             (r":(.*)$", "stringa", 1),
             # Elementi di una lista (elementi non chiavi)
-            (r"(?m)^[ \t\-]*([a-zA-Z0-9_\-\.]+)[^:]+$", "stringa", 1),
+            (r"(?m)^[ \t\-]*([a-zA-Z0-9_\-\.\@]+)[^:]*$", "stringa", 1),
             # Numeri interi o decimali dopo i due punti
             (r":\s*(\-{0,1}\d+(\.\d+){0,1})[^\.]", "numero_bool", 0),
             # Chiavi (es. "nome:" o "- nome:")
@@ -133,26 +133,18 @@ class ApplicationGUIConfigurator():
         try:
             config_default = yaml.safe_load(contenuto)
             self.lbl_stato.config(text="Stato: YAML valido ✔", fg="green")
-            ConfigCredenzialiYaml.model_validate(config_default)
+            ConfigCredenzialiYaml(**config_default)
             return True
         except yaml.YAMLError as e:
             self.lbl_stato.config(text=f"Stato: Errore di sintassi {e} ✖", fg="red")
             # messagebox.showerror("Errore di sintassi YAML", f"Dettagli:\n\n{e}")
             return False
-        except ValidationError as e:
-            for dettagli_e in e.errors():
-                loc = ".".join(str(x) for x in dettagli_e.get('loc', ['unknown']))
-                msg = dettagli_e.get('msg', 'Unknown error')
-                if dettagli_e.get('type') == 'missing_field':
-                    self.lbl_stato.config(text=f"Manca il campo: {loc} ✖", fg="red")
-                elif dettagli_e.get('type') == 'extra_forbidden':
-                    self.lbl_stato.config(text=f"Campo non permesso: {loc} ✖", fg="red")
-                else:
-                    self.lbl_stato.config(text=f"{dettagli_e.get('type')} {loc}: {msg} ✖", fg="red")
-            return False
         except ValueError as e:
             # Eccezione custom (coerenza notifiche non configurata)
-            self.lbl_stato.config(text=f"Errore di coerenza: {e} ✖", fg="red")
+            self.lbl_stato.config(text=f"ValueErrore: {e} ✖", fg="red")
+            return False
+        except TypeError as e:
+            self.lbl_stato.config(text=f"TypeError: {e} ✖", fg="red")
             return False
         except Exception as e:
             # Altri errori (file non trovato, permessi, ecc.)
@@ -174,10 +166,9 @@ class ApplicationGUIConfigurator():
         if percorso:
             try:
                 config_default = yaml.safe_load(self.text_area.get("1.0", "end-1c"))
-                config_validato = ConfigCredenzialiYaml.model_validate(config_default)
-
+                config_validato = ConfigCredenzialiYaml(**config_default)
                 # Genera YAML con commenti
-                content_con_commenti = format_yaml_with_comments(config_validato.model_dump())
+                content_con_commenti = format_yaml_with_comments(asdict(config_validato))
 
                 with open(percorso, "w", encoding="utf-8") as f:
                     f.write(content_con_commenti)
