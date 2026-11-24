@@ -9,8 +9,7 @@ Modulo di rappresentazione del file YAML di configurazione.
 """
 
 import re
-from typing import Literal
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 
 
 @dataclass
@@ -18,19 +17,18 @@ class ConfigurazioneAlunno:
     """
     Definizione della configurazione alunno
     """
-    tipo: Literal['smtp', 'html', 'screenshot', 'telegram']
+    tipo: str
     param: str
     nome_alternativo: str | None = None
 
-
-
-
-@dataclass
-class RegistroAlunni:
-    """
-    Definizione del dizionario alunni
-    """
-    alunni: dict[str, ConfigurazioneAlunno]
+    def __post_init__(self):
+        if self.nome_alternativo is not None and not isinstance(self.nome_alternativo, str):
+            raise ValueError("nome_alternativo deve essere una stringa o None")
+        if isinstance(self.tipo, str):
+            if self.tipo not in ['smtp', 'html', 'screenshot', 'telegram']:
+                raise ValueError("il valore tipo deve essere una tra queste: 'smtp', 'html', 'screenshot', 'telegram'")
+        else:
+            raise ValueError("il valore tipo deve essere una stringa tra queste: 'smtp', 'html', 'screenshot', 'telegram'")
 
 
 @dataclass
@@ -45,9 +43,11 @@ class ConfigurazioneIstituto:
 
     def __post_init__(self):
         if isinstance(self.customerid, str) and not isinstance(self.customerid, int):
-            raise TypeError("customerid deve essere una stringa o un intero")
+            raise ValueError("customerid deve essere una stringa o un intero")
         if isinstance(self.username, str) and not isinstance(self.username, int):
-            raise TypeError("username deve essere una stringa o un intero")
+            raise ValueError("username deve essere una stringa o un intero")
+        for nome_alunno, config_alunno in self.alunni.items():
+           ConfigurazioneAlunno(**dict(config_alunno))
 
 
 @dataclass
@@ -85,10 +85,12 @@ class ConfigNotificaTelegram:
     CHAT_ID: str | None = None
 
     def __post_init__(self):
+        if not isinstance(self.BOT_TOKEN, str):
+            raise ValueError("BOT_TOKEN deve essere una stringa")
         if self.n_allegati < 0:
             raise ValueError("Numero di allegati deve essere >= 0")
         if self.CHAT_ID is not None and not isinstance(self.CHAT_ID, str):
-            raise TypeError("CHAT_ID deve essere una stringa o None")
+            raise ValueError("CHAT_ID deve essere una stringa o None")
 
 
 @dataclass
@@ -102,14 +104,14 @@ class ParamsNotifiche:
     telegram: ConfigNotificaTelegram | None = None
 
     def __post_init__(self):
-        if self.html is not None and not isinstance(self.html, ConfigNotificaLocale):
-            raise TypeError("html deve essere una stringa o None")
-        if self.screenshot is not None and not isinstance(self.screenshot, ConfigNotificaLocale):
-            raise TypeError("screenshot deve essere una stringa o None")
-        if self.smtp is not None and not isinstance(self.smtp, ConfigNotificaSmtp):
-            raise TypeError("smtp deve essere una ConfigNotificaSmtp o None")
-        if self.telegram is not None and not isinstance(self.telegram, ConfigNotificaTelegram):
-            raise TypeError("telegram deve essere una ConfigNotificaTelegram o None")
+        if self.html is not None and not isinstance(self.html, dict):
+            raise ValueError("html deve essere una ConfigNotificaLocale o None")
+        if self.screenshot is not None and not isinstance(self.screenshot, dict):
+            raise ValueError("screenshot deve essere una ConfigNotificaLocale o None")
+        if self.smtp is not None and not isinstance(self.smtp, dict):
+            raise ValueError("smtp deve essere una ConfigNotificaSmtp o None")
+        if self.telegram is not None and not isinstance(self.telegram, dict):
+            raise ValueError("telegram deve essere una ConfigNotificaTelegram o None")
 
 
 @dataclass
@@ -124,6 +126,9 @@ class ConfigCredenzialiYaml:
     def __post_init__(self):
         if not re.fullmatch(r"^\d+\.\d+\.\d+\w*$", self.version):
             raise ValueError("version non rispetta il formato")
+        for c in self.credenziali:
+            ConfigurazioneIstituto(**dict(c))
+        ParamsNotifiche(**dict(self.params_notifiche))
         self.verifica_coerenza_notifiche()
 
     # @model_validator(mode='after')
@@ -154,4 +159,11 @@ if __name__ == "__main__":
     import yaml
     with open("./credenziali.yml", 'r') as yml_f:
         config_default = yaml.safe_load(yml_f.read())
-        ConfigCredenzialiYaml(**config_default)
+        try:
+            ConfigCredenzialiYaml(**config_default)
+        except ValueError as e:
+            print(f"ValueErrore: {e} ✖")
+        except TypeError as e:
+            print(f"TypeError: {e} ✖")
+        except Exception as e:
+            print(f"Errore: {e} ✖")
