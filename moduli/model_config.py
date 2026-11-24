@@ -22,13 +22,18 @@ class ConfigurazioneAlunno:
     nome_alternativo: str | None = None
 
     def __post_init__(self):
-        if self.nome_alternativo is not None and not isinstance(self.nome_alternativo, str):
-            raise ValueError("nome_alternativo deve essere una stringa o None")
+        
         if isinstance(self.tipo, str):
             if self.tipo not in ['smtp', 'html', 'screenshot', 'telegram']:
-                raise ValueError("il valore tipo deve essere una tra queste: 'smtp', 'html', 'screenshot', 'telegram'")
+                raise ValueError(f"[ConfigurazioneAlunno].tipo = '{self.tipo}', ma deve essere una tra queste: 'smtp', 'html', 'screenshot', 'telegram'")
         else:
-            raise ValueError("il valore tipo deve essere una stringa tra queste: 'smtp', 'html', 'screenshot', 'telegram'")
+            raise TypeError(f"[ConfigurazioneAlunno].tipo `{type(self.tipo).__name__}`, ma deve essere una stringa")
+        
+        if not isinstance(self.param, str):
+            raise TypeError(f"[ConfigurazioneAlunno].param `{type(self.param).__name__}`, ma deve essere una stringa")
+        
+        if self.nome_alternativo is not None and not isinstance(self.nome_alternativo, str):
+            raise TypeError(f"[ConfigurazioneAlunno].nome_alternativo `{type(self.nome_alternativo).__name__}`, ma deve essere una stringa o null")
 
 
 @dataclass
@@ -42,10 +47,15 @@ class ConfigurazioneIstituto:
     alunni: dict[str, ConfigurazioneAlunno]
 
     def __post_init__(self):
-        if isinstance(self.customerid, str) and not isinstance(self.customerid, int):
-            raise ValueError("customerid deve essere una stringa o un intero")
-        if isinstance(self.username, str) and not isinstance(self.username, int):
-            raise ValueError("username deve essere una stringa o un intero")
+        if not isinstance(self.customerid, str) and not isinstance(self.customerid, int):
+            raise TypeError(f"[ConfigurazioneIstituto].customerid `{type(self.customerid).__name__}`, ma deve essere una stringa o un intero")
+        
+        if not isinstance(self.username, str) and not isinstance(self.username, int):
+            raise TypeError(f"[ConfigurazioneIstituto].username `{type(self.username).__name__}`, ma deve essere una stringa o un intero")
+
+        if not isinstance(self.password, str):
+            raise TypeError(f"[ConfigurazioneIstituto].password `{type(self.password).__name__}`, ma deve essere una stringa")
+        
         for nome_alunno, config_alunno in self.alunni.items():
            ConfigurazioneAlunno(**dict(config_alunno))
 
@@ -56,6 +66,11 @@ class ConfigNotificaLocale:
     Definizione della configurazione delle notifiche locali: Html e Screenshot
     """
     path: str
+
+    def __post_init__(self):
+
+        if not isinstance(self.path, str):
+            raise TypeError(f"[ConfigNotificaLocale].path `{type(self.path).__name__}`, ma deve essere una stringa")
 
 
 @dataclass
@@ -71,8 +86,31 @@ class ConfigNotificaSmtp:
     n_allegati: int
 
     def __post_init__(self):
-        if self.n_allegati < 0:
-            raise ValueError("Numero di allegati deve essere >= 0")
+
+        if not isinstance(self.smtp_server, str):
+            raise TypeError(f"[ConfigNotificaSmtp].smtp_server `{type(self.smtp_server).__name__}`, ma deve essere una stringa")
+
+        if not isinstance(self.smtp_port, int):
+            raise TypeError(f"[ConfigNotificaSmtp].smtp_port `{type(self.smtp_port).__name__}`, ma deve essere un intero")
+
+        if not isinstance(self.smtp_username, str):
+            raise TypeError(f"[ConfigNotificaSmtp].smtp_username `{type(self.smtp_username).__name__}`, ma deve essere una stringa")
+
+        if not isinstance(self.smtp_password, str):
+            raise TypeError(f"[ConfigNotificaSmtp].smtp_password `{type(self.smtp_password).__name__}`, ma deve essere una stringa")
+
+        for d in self.destinatari:
+            if not isinstance(d, str):
+                raise TypeError(f"[ConfigNotificaSmtp].destinatario ==> {d} `{type(self.d).__name__}`, ma deve essere una stringa")
+            else:
+                if ('@' not in d):
+                    raise ValueError(f"[ConfigNotificaSmtp].destinatario ==> {d} non è un indirizzo email")
+        
+        if isinstance(self.n_allegati, int):
+            if self.n_allegati < 0:
+                raise ValueError("[ConfigNotificaSmtp].n_allegati deve essere >= 0")
+        else:
+            raise TypeError(f"[ConfigNotificaSmtp].n_allegati `{type(self.n_allegati).__name__}`, ma deve essere un intero")
 
 
 @dataclass
@@ -85,12 +123,18 @@ class ConfigNotificaTelegram:
     CHAT_ID: str | None = None
 
     def __post_init__(self):
+
         if not isinstance(self.BOT_TOKEN, str):
-            raise ValueError("BOT_TOKEN deve essere una stringa")
-        if self.n_allegati < 0:
-            raise ValueError("Numero di allegati deve essere >= 0")
+            raise TypeError(f"[ConfigNotificaTelegram].BOT_TOKEN `{type(self.BOT_TOKEN).__name__}`, ma deve essere una stringa")
+        
+        if isinstance(self.n_allegati, int):
+            if self.n_allegati < 0:
+                raise ValueError("[ConfigNotificaTelegram].n_allegati deve essere >= 0")
+        else:
+            raise TypeError(f"[ConfigNotificaTelegram].n_allegati `{type(self.n_allegati).__name__}`, ma deve essere un intero")
+        
         if self.CHAT_ID is not None and not isinstance(self.CHAT_ID, str):
-            raise ValueError("CHAT_ID deve essere una stringa o None")
+            raise TypeError(f"[ConfigNotificaTelegram].CHAT_ID `{type(self.CHAT_ID).__name__}`, ma deve essere una stringa o null")
 
 
 @dataclass
@@ -104,14 +148,26 @@ class ParamsNotifiche:
     telegram: ConfigNotificaTelegram | None = None
 
     def __post_init__(self):
+
         if self.html is not None and not isinstance(self.html, dict):
-            raise ValueError("html deve essere una ConfigNotificaLocale o None")
+            raise TypeError(f"[ParamsNotifiche].html `{type(self.html).__name__}`, ma deve essere una ConfigNotificaLocale o null")
+        elif isinstance(self.html, dict):
+            ConfigNotificaLocale(**dict(self.html))
+
         if self.screenshot is not None and not isinstance(self.screenshot, dict):
-            raise ValueError("screenshot deve essere una ConfigNotificaLocale o None")
+            raise TypeError(f"[ParamsNotifiche].screenshot `{type(self.screenshot).__name__}`, ma deve essere una ConfigNotificaLocale o null")
+        elif isinstance(self.screenshot, dict):
+            ConfigNotificaLocale(**dict(self.screenshot))
+        
         if self.smtp is not None and not isinstance(self.smtp, dict):
-            raise ValueError("smtp deve essere una ConfigNotificaSmtp o None")
+            raise TypeError(f"[ParamsNotifiche].smtp `{type(self.smtp).__name__}`, ma deve essere una ConfigNotificaSmtp o null")
+        elif isinstance(self.smtp, dict):
+            ConfigNotificaSmtp(**dict(self.smtp))
+        
         if self.telegram is not None and not isinstance(self.telegram, dict):
-            raise ValueError("telegram deve essere una ConfigNotificaTelegram o None")
+            TypeError(f"[ParamsNotifiche].telegram `{type(self.telegram).__name__}`, ma deve essere una ConfigNotificaTelegram o null")
+        elif isinstance(self.telegram, dict):
+            ConfigNotificaTelegram(**dict(self.telegram))
 
 
 @dataclass
@@ -131,7 +187,6 @@ class ConfigCredenzialiYaml:
         ParamsNotifiche(**dict(self.params_notifiche))
         self.verifica_coerenza_notifiche()
 
-    # @model_validator(mode='after')
     def verifica_coerenza_notifiche(self) -> 'ConfigCredenzialiYaml':
         """
         Verifica la coerenza trasversale dei parametri di configurazione.
