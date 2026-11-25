@@ -77,21 +77,32 @@ Indica la versione del file di configurazione.
 
 ## Credenziali
 
-| Path                                       | Tipo dato | Valore                                                    | Descrizione                                                      |
-| ------------------------------------------ | --------- | --------------------------------------------------------- | ---------------------------------------------------------------- |
-| `credenziali`                              | lista     |                                                           | Lista di definizione delle credenziali di accesso ad **RF**.     |
-| `credenziali.[0].customerid`               | testo     | Richiesto                                                 | CF Istituto/Cliente                                              |
-| `credenziali.[0].username`                 | testo     | Richiesto                                                 | Codice Utente o mail personale                                   |
-| `credenziali.[0].password`                 | testo     | Richiesto                                                 | Password                                                         |
-| `credenziali.[0].alunni`                   | gruppo    |                                                           | Gruppo degli studenti/studentesse (prelevati da **RF**)          |
-| `credenziali.[0].alunni.NomeAlunnoA`       | gruppo    | Il primo Nome in **RF**                                   | Nome dello studente/studentessa soggetto a notifica              |
-| `credenziali.[0].alunni.NomeAlunnoA.tipo`  | testo     | **Nome** del gruppo di notifica                           | Definisce quale notifica adottare tra quelle configurate         |
-| `credenziali.[0].alunni.NomeAlunnoA.param` | testo     | **Parametro caratteristico** per la tipologia di notifica | Percorso, email studente, o CHAT_ID                              |
-| `credenziali.[0].alunni.NomeAlunnoB`       | gruppo    | Nomi successivi in **RF**                                 | Nomi degli studenti/studentesse soggetto a notifica, se presenti |
-| `credenziali.[0].alunni.NomeAlunnoB.tipo`  | testo     | **Nome** del gruppo di notifica                           | Definisce quale notifica adottare tra quelle configurate         |
-| `credenziali.[0].alunni.NomeAlunnoB.param` | testo     | **Parametro caratteristico** per la tipologia di notifica | Percorso, email studente, o CHAT_ID                              |
+| Path                                                  | Tipo dato | Valore                                                    | Descrizione                                                                                                  |
+| ----------------------------------------------------- | --------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `credenziali`                                         | lista     |                                                           | Lista di definizione delle credenziali di accesso ad **RF**.                                                 |
+| `credenziali.[0].customerid`                          | testo     | Richiesto                                                 | CF Istituto/Cliente                                                                                          |
+| `credenziali.[0].username`                            | testo     | Richiesto                                                 | Codice Utente o mail personale                                                                               |
+| `credenziali.[0].password`                            | testo     | Richiesto                                                 | Password                                                                                                     |
+| `credenziali.[0].alunni`                              | gruppo    |                                                           | Gruppo degli studenti/studentesse (prelevati da **RF**)                                                      |
+| `credenziali.[0].alunni.NomeAlunnoA`                  | gruppo    | Il primo Nome in **RF**                                   | Nome dello studente/studentessa soggetto a notifica                                                          |
+| `credenziali.[0].alunni.NomeAlunnoA.tipo`             | testo     | **Nome** del gruppo di notifica                           | Definisce quale notifica adottare tra quelle configurate                                                     |
+| `credenziali.[0].alunni.NomeAlunnoA.param`            | testo     | **Parametro caratteristico** per la tipologia di notifica | Percorso, email studente, o CHAT_ID                                                                          |
+| `credenziali.[0].alunni.NomeAlunnoA.nome_alternativo` | testo     | Il primo Nome in **Collabora**                            | Nome dello studente/studentessa prelevato da **Collabora**  (portale di codivisione del materiale didattico) |
+| `credenziali.[0].alunni.NomeAlunnoB`                  | gruppo    | Nomi successivi in **RF**                                 | Nomi degli studenti/studentesse soggetto a notifica, se presenti                                             |
+| `credenziali.[0].alunni.NomeAlunnoB.tipo`             | testo     | **Nome** del gruppo di notifica                           | Definisce quale notifica adottare tra quelle configurate                                                     |
+| `credenziali.[0].alunni.NomeAlunnoB.param`            | testo     | **Parametro caratteristico** per la tipologia di notifica | Percorso, email studente, o CHAT_ID                                                                          |
 
 **NOTA**: sia i nomi dei gruppo di notifica, che le indicazioni dei parametri caratteristici vengono indicati nelle sezioni successive
+
+### Dove trovare le informazioni sulle credenziali
+
+| Descrizione                                                                                                  |                                                                                     |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `customerid`, `username`, `password` sono le credenziali di accesso al portale **Registro Famiglie**         | ![Credenziali Login](info_credenziali/registrofamiglie_login.png)       |
+| `NomeAlunno` va sostituito con il nome che si trova nel menù della Dashboard del **Registro Famiglie**       | ![Nome alunno RegistroFamiglie](info_credenziali/registrofamiglie_alunno.png) |
+| `nome_alternativo` è il nome che trovate nel menù della Dashboard di **Collabora** o **Materiale didattico** | ![Nome alunno Materiale Didattico](info_credenziali/collabora_alunno.png) |
+
+**NOTA**: è stato necessario introdurre il `nome_alternativo` perché può capitare che il nominativo su **RF** e su **Collabora** siano differenti. Il parametro è facoltativo, ma consigliato qualora ci fosse del materiale condiviso con lo studente/studentessa, tale parametro mette in relazione le identità tra i due portali.
 
 ## Configurazione di notifica (`params_notifiche`)
 
