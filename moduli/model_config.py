@@ -35,6 +35,10 @@ class ConfigurazioneAlunno:
         if (self.param is not None):
             if (not isinstance(self.param, str)):
                 raise TypeError(f"[ConfigurazioneAlunno].param `{type(self.param).__name__}`, ma deve essere una stringa")
+            else:
+                if (self.tipo == 'smtp' and not re.fullmatch(r"^[\w\.]+@[\w\.]+$", self.param)):
+                    raise ValueError(f"[ConfigurazioneAlunno].param ==> {self.param} non sembra essere un indirizzo email")
+
         else:
             raise TypeError("[ConfigurazioneAlunno].param campo mancate, ma obbligatorio!")
         
@@ -71,11 +75,14 @@ class ConfigurazioneIstituto:
                 raise TypeError(f"[ConfigurazioneIstituto].password `{type(self.password).__name__}`, ma deve essere una stringa")
         else:
             raise TypeError("[ConfigurazioneIstituto].password campo mancate, ma obbligatorio!")
-        
+
         if (self.alunni is not None):
             if (isinstance(self.alunni, dict)):
-                for nome_alunno, config_alunno in self.alunni.items():
-                    ConfigurazioneAlunno(**dict(config_alunno))
+                if (len(self.alunni.items()) > 0):
+                    for nome_alunno, config_alunno in self.alunni.items():
+                        ConfigurazioneAlunno(**dict(config_alunno))
+                else:
+                    raise ValueError(f"[ConfigurazioneIstituto].alunni `{type(self.alunni).__name__}` vuoto, deve contenere almeno una configurazione alunno")
             else:
                 raise TypeError(f"[ConfigurazioneIstituto].alunni `{type(self.alunni).__name__}`, ma deve essere una dizionario")
         else:
@@ -140,7 +147,7 @@ class ConfigNotificaSmtp:
             if (isinstance(self.destinatari, list)):
                 for d in self.destinatari:
                     if (not isinstance(d, str)):
-                        raise TypeError(f"[ConfigNotificaSmtp].destinatario ==> {d} `{type(self.d).__name__}`, ma deve essere una stringa")
+                        raise TypeError(f"[ConfigNotificaSmtp].destinatario ==> {d} `{type(d).__name__}`, ma deve essere una stringa")
                     else:
                         if (not re.fullmatch(r"^[\w\.]+@[\w\.]+$", d)):
                             raise ValueError(f"[ConfigNotificaSmtp].destinatario ==> {d} non sembra essere un indirizzo email")
@@ -210,16 +217,21 @@ class ParamsNotifiche:
             raise TypeError(f"[ParamsNotifiche].screenshot `{type(self.screenshot).__name__}`, ma deve essere una ConfigNotificaLocale o null")
         elif (isinstance(self.screenshot, dict)):
             ConfigNotificaLocale(**dict(self.screenshot))
-        
+
         if (self.smtp is not None and not isinstance(self.smtp, dict)):
             raise TypeError(f"[ParamsNotifiche].smtp `{type(self.smtp).__name__}`, ma deve essere una ConfigNotificaSmtp o null")
         elif (isinstance(self.smtp, dict)):
             ConfigNotificaSmtp(**dict(self.smtp))
-        
+
         if (self.telegram is not None and not isinstance(self.telegram, dict)):
-            TypeError(f"[ParamsNotifiche].telegram `{type(self.telegram).__name__}`, ma deve essere una ConfigNotificaTelegram o null")
+            raise TypeError(f"[ParamsNotifiche].telegram `{type(self.telegram).__name__}`, ma deve essere una ConfigNotificaTelegram o null")
         elif (isinstance(self.telegram, dict)):
             ConfigNotificaTelegram(**dict(self.telegram))
+
+        if (self.html is None and self.screenshot is None and self.smtp is None and self.telegram is None):
+            raise ValueError(f"[ParamsNotifiche] deve essere presente almeno una configurazione tra queste: 'html', 'screenshot', 'smtp', 'telegram'")
+
+
 
 
 @dataclass
