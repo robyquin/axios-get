@@ -1,5 +1,5 @@
 """
-Test per la validazione dei dati in credenziali.yml (model_config.py)
+Test per la validazione dei dati in credenziali.yml (model_config.py).
 
 :Author: Roberto Quintiliani
 :Copyright: Copyright (c) Roberto Quintiliani
@@ -36,7 +36,16 @@ class TestModelConfig:
             pytest.param({'tipo': 'html', 'param': 1.2}, False, id="param-float"),
         ]
     )
-    def test_ConfigurazioneAlunno(self, conf, status):
+    def test_ConfigurazioneAlunno(self, conf: dict, status: bool):
+        """
+        test_ConfigurazioneAlunno.
+
+        :param conf: dizionario di configurazione test
+        :type conf: dict
+        :param status: valore booleano desiderato
+        :type status: bool
+        """
+
         from moduli.model_config import ConfigurazioneAlunno
         msg = ""
         try:
@@ -76,7 +85,16 @@ class TestModelConfig:
             pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'password': 'chiave-segreta'}, False, id="alunni-obbligatorio"),
         ]
     )
-    def test_ConfigurazioneIstituto(self, conf, status):
+    def test_ConfigurazioneIstituto(self, conf: dict, status: bool):
+        """
+        test_ConfigurazioneIstituto.
+
+        :param conf: dizionario di configurazione test
+        :type conf: dict
+        :param status: valore booleano desiderato
+        :type status: bool
+        """
+
         from moduli.model_config import ConfigurazioneIstituto
         msg = ""
         if (conf.get('alunni', None) is not None):
@@ -104,7 +122,16 @@ class TestModelConfig:
             pytest.param({'path': 12}, False, id="path-not-stringa")
         ]
     )
-    def test_ConfigNotificaLocale(self, conf, status):
+    def test_ConfigNotificaLocale(self, conf: dict, status: bool):
+        """
+        test_ConfigNotificaLocale.
+
+        :param conf: dizionario di configurazione test
+        :type conf: dict
+        :param status: valore booleano desiderato
+        :type status: bool
+        """
+
         from moduli.model_config import ConfigNotificaLocale
         msg = ""
         try:
@@ -144,7 +171,16 @@ class TestModelConfig:
             pytest.param({'smtp_server': 'stringa', 'smtp_port': 456, 'smtp_username': 'username', 'smtp_password': 'password', 'destinatari': ['nome@cognome'], 'n_allegati': 2}, True, id="destinatari-destinatario-email"),
         ]
     )
-    def test_ConfigNotificaSmtp(self, conf, status):
+    def test_ConfigNotificaSmtp(self, conf: dict, status: bool):
+        """
+        test_ConfigNotificaSmtp.
+
+        :param conf: dizionario di configurazione test
+        :type conf: dict
+        :param status: valore booleano desiderato
+        :type status: bool
+        """
+
         from moduli.model_config import ConfigNotificaSmtp
         msg = ""
         try:
@@ -174,7 +210,16 @@ class TestModelConfig:
             pytest.param({'BOT_TOKEN': 'stringa'}, False, id="n_allegati-obbligatorio"),
         ]
     )
-    def test_ConfigNotificaTelegram(self, conf, status):
+    def test_ConfigNotificaTelegram(self, conf: dict, status: bool):
+        """
+        test_ConfigNotificaTelegram.
+
+        :param conf: dizionario di configurazione test
+        :type conf: dict
+        :param status: valore booleano desiderato
+        :type status: bool
+        """
+
         from moduli.model_config import ConfigNotificaTelegram
         msg = ""
         try:
@@ -203,7 +248,16 @@ class TestModelConfig:
             pytest.param({'telegram': {}}, False, id="telegram-dict-not-ConfigNotificaTelegram"),
         ]
     )
-    def test_ParamsNotifiche(self, conf, status):
+    def test_ParamsNotifiche(self, conf: dict, status: bool):
+        """
+        test_ParamsNotifiche.
+
+        :param conf: dizionario di configurazione test
+        :type conf: dict
+        :param status: valore booleano desiderato
+        :type status: bool
+        """
+
         from moduli.model_config import ParamsNotifiche
         msg = ""
         try:
@@ -234,7 +288,15 @@ class TestModelConfig:
             pytest.param({'version': '1.1.1', 'credenziali': []}, False, id="params_notifiche-obbligatorio"),
         ]
     )
-    def test_ConfigCredenzialiYaml(self, conf, status):
+    def test_ConfigCredenzialiYaml(self, conf: dict, status: bool):
+        """test_ConfigCredenzialiYaml.
+
+        :param conf: dizionario di configurazione test
+        :type conf: dict
+        :param status: valore booleano desiderato
+        :type status: bool
+        """
+
         from moduli.model_config import ConfigCredenzialiYaml
         msg = ""
         try:

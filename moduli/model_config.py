@@ -14,9 +14,8 @@ from dataclasses import dataclass
 
 @dataclass
 class ConfigurazioneAlunno:
-    """
-    Definizione della configurazione alunno
-    """
+    """Definizione della configurazione alunno."""
+
     tipo: str | None = None
     param: str | None = None
     nome_alternativo: str | None = None
@@ -48,9 +47,8 @@ class ConfigurazioneAlunno:
 
 @dataclass
 class ConfigurazioneIstituto:
-    """
-    Definizione della lista configurazione degli istituti
-    """
+    """Definizione della lista configurazione degli istituti."""
+
     customerid: str | int | None = None
     username: str | int | None = None
     password: str | None = None
@@ -91,9 +89,8 @@ class ConfigurazioneIstituto:
 
 @dataclass
 class ConfigNotificaLocale:
-    """
-    Definizione della configurazione delle notifiche locali: Html e Screenshot
-    """
+    """Definizione della configurazione delle notifiche locali: Html e Screenshot."""
+
     path: str | None = None
 
     def __post_init__(self):
@@ -107,9 +104,8 @@ class ConfigNotificaLocale:
 
 @dataclass
 class ConfigNotificaSmtp:
-    """
-    Definizione della configurazione della notifica SMTP
-    """
+    """Definizione della configurazione della notifica SMTP."""
+
     smtp_server: str | None = None
     smtp_port: int | None = None
     smtp_username: str | None = None
@@ -168,9 +164,8 @@ class ConfigNotificaSmtp:
 
 @dataclass
 class ConfigNotificaTelegram:
-    """
-    Definizione della configurazione della notifica Telegram
-    """
+    """Definizione della configurazione della notifica Telegram."""
+
     BOT_TOKEN: str | None = None
     n_allegati: int | None = None
     CHAT_ID: str | None = None
@@ -198,9 +193,8 @@ class ConfigNotificaTelegram:
 
 @dataclass
 class ParamsNotifiche:
-    """
-    Definizione della configurazione dei parametri globali delle notifiche
-    """
+    """Definizione della configurazione dei parametri globali delle notifiche."""
+
     html: ConfigNotificaLocale | None = None
     screenshot: ConfigNotificaLocale | None = None
     smtp: ConfigNotificaSmtp | None = None
@@ -234,9 +228,8 @@ class ParamsNotifiche:
 
 @dataclass
 class ConfigCredenzialiYaml:
-    """
-    Definizione della configurazione completa
-    """
+    """Definizione della configurazione completa."""
+
     version: str | None = None
     credenziali: list[ConfigurazioneIstituto] | None = None
     params_notifiche: ParamsNotifiche | None = None

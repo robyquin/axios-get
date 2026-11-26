@@ -1,5 +1,5 @@
 """
-Test per la funzione prepara_notifica di lib_axios_famiglia.py
+Test per la funzione prepara_notifica di lib_axios_famiglia.py.
 
 :Author: Roberto Quintiliani
 :Copyright: Copyright (c) Roberto Quintiliani

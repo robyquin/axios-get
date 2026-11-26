@@ -32,11 +32,17 @@ class GuiHandler(logging.Handler):
     :param event_queue: Eventi del queue
     :type event_queue: Queue
     """
+
     def __init__(self, event_queue: Queue):
         super().__init__()
         self.event_queue = event_queue
 
-    def emit(self, record):
+    def emit(self, record: logging.LogRecord):
+        """Emettitore di segnale.
+
+        :param record: LogRecord
+        :type record: logging.LogRecord
+        """
         try:
             self.event_queue.put({
                 "level": record.levelname,
@@ -55,6 +61,7 @@ class ApplicationGUI:
     :param run_function: Funzione da eseguire
     :type run_function: callable
     """
+
     def __init__(self, logger: logging.Logger, run_function: callable):
         self.logger = logger
         self.run_function = run_function
@@ -111,9 +118,8 @@ class ApplicationGUI:
         self.root.after(100, self.check_events)
 
     def start(self):
-        """
-        Avvia il processo di elaborazione.
-        """
+        """Avvia il processo di elaborazione."""
+
         self.start_button.config(state="disabled")
         self.status_label.config(text="Elaborazione in corso...", fg="orange")
 
@@ -127,9 +133,8 @@ class ApplicationGUI:
         ).start()
 
     def run_worker(self):
-        """
-        Esegue il worker in background.
-        """
+        """Esegue il worker in background."""
+
         success = False
 
         try:
@@ -146,9 +151,8 @@ class ApplicationGUI:
             })
 
     def check_events(self):
-        """
-        Controlla gli eventi del queue.
-        """
+        """Controlla gli eventi del queue."""
+
         while not self.event_queue.empty():
             event = self.event_queue.get()
             # Fine elaborazione
@@ -191,15 +195,13 @@ class ApplicationGUI:
         self.root.after(100, self.check_events)
 
     def run(self):
-        """
-        Esegue il ciclo principale dell'applicazione.
-        """
+        """Esegue il ciclo principale dell'applicazione."""
+
         self.root.mainloop()
 
     def avvia_configuratore(self):
-        """
-        Avvia il configuratore YAML.
-        """
+        """Avvia il configuratore YAML."""
+
         if (getattr(sys, 'frozen', False)):
             # Se l'applicazione è compilata con PyInstaller
             DIR = str(os.path.dirname(sys.executable))
@@ -216,9 +218,8 @@ class ApplicationGUI:
 
 
 def main():
-    """
-    Punto di ingresso principale.
-    """
+    """Punto di ingresso principale."""
+
     parser = argparse.ArgumentParser()
 
     parser.add_argument(

@@ -24,7 +24,7 @@ from .logging_config import log
 
 class Notifica():
     """
-    Classe di definizione delle Notifiche
+    Classe di definizione delle Notifiche.
 
     :param DIR: percorso di salvataggio log e error
     :type DIR: str
@@ -33,6 +33,7 @@ class Notifica():
     :param parametro: parametro specifico per l'alunno
     :type parametro: int | str
     """
+
     def __init__(self, DIR: str, config: dict, parametro: int | str) -> None:
         self.DIR = DIR
         self.config = config
@@ -40,7 +41,7 @@ class Notifica():
 
     def send_notifica(self, html: str, alunno: str) -> None:
         """
-        Definisce il mezzo della notifica
+        Definisce il mezzo della notifica.
 
         :param html: corpo del messaggio di notifica
         :type html: str
@@ -52,12 +53,21 @@ class Notifica():
 
 class NotificaFileHTML(Notifica):
     """
-    Classe di definizione delle Notifiche FileHTML
+    Classe di definizione delle Notifiche FileHTML.
 
     Questa classe eredita da :class:`Notifica` e ne estende le funzionalità
     salvando il file nel absolute_path specifico.
     """
+
     def send_notifica(self, html: str, alunno: str) -> None:
+        """Definisce il mezzo della notifica.
+
+        :param html: corpo del messaggio di notifica
+        :type html: str
+        :param alunno: nome dell'alunno/a
+        :type alunno: str
+        :raises RuntimeError: Exception
+        """
         # 1. Configurazione dei parametri di collocazione
         path_file = self.param
         absolute_path = os.path.join(path_file, "compiti_" + alunno + ".html")
@@ -75,12 +85,22 @@ class NotificaFileHTML(Notifica):
 
 class NotificaMail(Notifica):
     """
-    Classe di definizione delle Notifiche Email
+    Classe di definizione delle Notifiche Email.
 
     Questa classe eredita da :class:`Notifica` e ne estende le funzionalità
     configurando il client SMTP.
     """
+
     def send_notifica(self, html: str, alunno: str) -> None:
+        """Definisce il mezzo della notifica.
+
+        :param html: corpo del messaggio di notifica
+        :type html: str
+        :param alunno: nome dell'alunno/a
+        :type alunno: str
+        :raises RuntimeError: Exception
+        """
+
         oggi = datetime.strftime(datetime.now(), "%d/%m/%Y")
 
         # 1. Configurazione dei parametri del server e delle credenziali
@@ -159,12 +179,21 @@ class NotificaMail(Notifica):
 
 class NotificaTelegram(Notifica):
     """
-    Classe di definizione delle Notifiche Telegram
+    Classe di definizione delle Notifiche Telegram.
 
     Questa classe eredita da :class:`Notifica` e ne estende le funzionalità
     inviando il messaggio in una chat di Telegram.
     """
+
     def send_notifica(self, html: str, alunno: str) -> None:
+        """Definisce il mezzo della notifica.
+
+        :param html: corpo del messaggio di notifica
+        :type html: str
+        :param alunno: nome dell'alunno/a
+        :type alunno: str
+        :raises RuntimeError: Exception
+        """
 
         # 1. Configurazione dei parametri del server e delle credenziali
         BOT_TOKEN = self.config['telegram']['BOT_TOKEN']
@@ -274,12 +303,21 @@ class NotificaTelegram(Notifica):
 
 class NotificaScreenShot(Notifica):
     """
-    Classe di definizione delle Notifiche ScreenShot
+    Classe di definizione delle Notifiche ScreenShot.
 
     Questa classe eredita da :class:`Notifica` e ne estende le funzionalità
     creando degli screenshot.
     """
+
     def send_notifica(self, html: str, alunno: str) -> None:
+        """Definisce il mezzo della notifica.
+
+        :param html: corpo del messaggio di notifica
+        :type html: str
+        :param alunno: nome dell'alunno/a
+        :type alunno: str
+        :raises RuntimeError: Exception
+        """
 
         path_screenshot = self.param
         if (not os.path.exists(os.path.join(path_screenshot, f"screenshot_{alunno}"))):

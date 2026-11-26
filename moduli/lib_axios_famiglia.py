@@ -24,17 +24,15 @@ from .logging_config import log
 
 
 class AxiosView(StrEnum):
-    """
-    Definizione Viste Axios.
-    """
+    """Definizione Viste Axios."""
+
     registro = "registrofamiglie"
     materiale = "collabora"
 
 
 class UrlIdType(IntEnum):
-    """
-    Definizione di corrispondenza nomi e posizione dell'array Link.
-    """
+    """Definizione di corrispondenza nomi e posizione dell'array Link."""
+
     method = 0
     url = 1
     params = 2
@@ -67,6 +65,7 @@ class LibAxiosFamiglia():
     :raises Exception: credenziali vuote.
     :raises RuntimeError: Elaborazione con esito positivi parziale.
     """
+
     def __init__(self, DIR: str, config: dict) -> None:
         self.DIR = DIR
         self.DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:156.0) Gecko/20100101 Firefox/156.0"
@@ -150,15 +149,13 @@ class LibAxiosFamiglia():
             raise RuntimeError(f"Esito positivo parziale con {cnt_warning} warnings!")
 
     def __delete__(self, instance):
-        """
-        Chiude la sessione HTTP quando l'oggetto viene eliminato.
-        """
+        """Chiude la sessione HTTP quando l'oggetto viene eliminato."""
+
         self.session.close()
 
     def _login(self):
-        """
-        Effettua il login all'istituto.
-        """
+        """Effettua il login all'istituto."""
+
         log.info(f"Login all'Istituto: {self.customerid}")
         self.session.headers['User-Agent'] = self.DefaultUserAgent
         prefixes = [AxiosView.registro, AxiosView.materiale]
@@ -179,9 +176,8 @@ class LibAxiosFamiglia():
             self.__get_session("", link_sequence, prefix)
 
     def _logout(self):
-        """
-        Effettua il logout dall'istituto.
-        """
+        """Effettua il logout dall'istituto."""
+
         log.info(f"Logout all'Istituto: {self.customerid}")
         self.session.headers['User-Agent'] = self.DefaultUserAgent
         prefixes = [AxiosView.registro, AxiosView.materiale]
@@ -201,7 +197,7 @@ class LibAxiosFamiglia():
 
     def get_session_registrofamiglie(self, Alunno: str) -> None:
         """
-        Gestisce una sessione di Registro Famiglie per l'alunno specificato
+        Gestisce una sessione di Registro Famiglie per l'alunno specificato.
 
         :param Alunno: Nome dell'alunno
         :type Alunno: str
@@ -236,7 +232,7 @@ class LibAxiosFamiglia():
 
     def get_session_collabora(self, Alunno: str) -> None:
         """
-        Gestisce una sessione di Collabora per l'alunno specificato
+        Gestisce una sessione di Collabora per l'alunno specificato.
 
         :param Alunno: Nome dell'alunno
         :type Alunno: str
@@ -421,7 +417,7 @@ class LibAxiosFamiglia():
 
     def __debug(self, res: requests.Response) -> None:
         """
-        Stampare input e output di una richiesta
+        Stampare input e output di una richiesta.
 
         :param res: Risposta
         :type res: requests.Response
@@ -437,7 +433,7 @@ class LibAxiosFamiglia():
 
     def prepara_notifica(self, compiti: dict, argomenti: dict, Alunno: str) -> str:
         """
-        Costruisce il testo della notifica dal dizionario compiti
+        Costruisce il testo della notifica dal dizionario compiti.
 
         :param compiti: Dizionario di compiti
         :type compiti: dict
@@ -581,7 +577,7 @@ class LibAxiosFamiglia():
 
     def evidenzia_cambiamenti(self, linee_file_old: list, linee_file_new: list) -> list:
         """
-        Mette in evidenza i cambiamenti: inserimenti e modifiche
+        Mette in evidenza i cambiamenti: inserimenti e modifiche.
 
         :param linee_file_old: contenuto dell'ultima notifica
         :type linee_file_old: list

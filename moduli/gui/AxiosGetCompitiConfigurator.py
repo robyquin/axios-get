@@ -31,6 +31,7 @@ class ApplicationGUIConfigurator():
     :param root: Radice principale della finestra Tkinter
     :type root: tk.Tk
     """
+
     def __init__(self, DIR: str, root: tk.Tk):
         self.percorso_configurazione = None
         self.DIR = DIR

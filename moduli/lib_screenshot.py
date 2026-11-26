@@ -22,17 +22,18 @@ from .logging_config import log
 
 class ScreenShot():
     """
-    Classe di gestione della conversione della notifica in immagine
+    Classe di gestione della conversione della notifica in immagine.
 
     :param DIR: percorso di salvataggio log e error
     :type DIR: str
     """
+
     def __init__(self, DIR: str) -> None:
         self.DIR = DIR
 
     def diario2image(self, html: str) -> tuple[io.BytesIO, str]:
         """
-        Converte codice HTML di notifica in immagine (ByteIO)
+        Converte codice HTML di notifica in immagine (ByteIO).
 
         :param html: codice html della notifica
         :type html: str
