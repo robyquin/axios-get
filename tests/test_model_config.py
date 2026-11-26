@@ -64,15 +64,15 @@ class TestModelConfig:
             pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'password': 'chiave-segreta', 'alunni': 1.5}, False, id="alunni-float"),
             pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'password': 'chiave-segreta', 'alunni': []}, False, id="alunni-list"),
             pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'password': 'chiave-segreta', 'alunni': {}}, False, id="alunni-dict-vuoto"),
-            pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'password': 'chiave-segreta', 'alunni': {'alunno_A' : 'stringa'}}, False, id="alunni-alunno-stringa"),
-            pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'password': 'chiave-segreta', 'alunni': {'alunno_A' : 12}}, False, id="alunni-alunno-int"),
-            pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'password': 'chiave-segreta', 'alunni': {'alunno_A' : 1.2}}, False, id="alunni-alunno-float"),
-            pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'password': 'chiave-segreta', 'alunni': {'alunno_A' : []}}, False, id="alunni-alunno-list"),
-            pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'password': 'chiave-segreta', 'alunni': {'alunno_A' : {}}}, True, id="alunni-alunno-dict"),
+            pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'password': 'chiave-segreta', 'alunni': {'alunno_A': 'stringa'}}, False, id="alunni-alunno-stringa"),
+            pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'password': 'chiave-segreta', 'alunni': {'alunno_A': 12}}, False, id="alunni-alunno-int"),
+            pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'password': 'chiave-segreta', 'alunni': {'alunno_A': 1.2}}, False, id="alunni-alunno-float"),
+            pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'password': 'chiave-segreta', 'alunni': {'alunno_A': []}}, False, id="alunni-alunno-list"),
+            pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'password': 'chiave-segreta', 'alunni': {'alunno_A': {}}}, True, id="alunni-alunno-dict"),
             # campi obbligatori
-            pytest.param({'username': 'number', 'password': 'chiave-segreta', 'alunni': {'alunno_A' : {}}}, False, id="customerid-obbligatorio"),
-            pytest.param({'customerid': 'codice_fiscale', 'password': 'chiave-segreta', 'alunni': {'alunno_A' : {}}}, False, id="username-obbligatorio"),
-            pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'alunni': {'alunno_A' : {}}}, False, id="password-obbligatorio"),
+            pytest.param({'username': 'number', 'password': 'chiave-segreta', 'alunni': {'alunno_A': {}}}, False, id="customerid-obbligatorio"),
+            pytest.param({'customerid': 'codice_fiscale', 'password': 'chiave-segreta', 'alunni': {'alunno_A': {}}}, False, id="username-obbligatorio"),
+            pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'alunni': {'alunno_A': {}}}, False, id="password-obbligatorio"),
             pytest.param({'customerid': 'codice_fiscale', 'username': 'number', 'password': 'chiave-segreta'}, False, id="alunni-obbligatorio"),
         ]
     )

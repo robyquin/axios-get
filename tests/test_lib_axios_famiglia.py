@@ -50,7 +50,7 @@ class TestPreparaNotifica:
     def test_prepara_notifica_creates_html_structure(self, expected_pattern):
         """Test che prepara_notifica crea la struttura HTML corretta."""
         from moduli.lib_axios_famiglia import LibAxiosFamiglia, AxiosView
-        
+
         oggi = datetime.now()
         domani = (oggi + timedelta(days=1)).strftime("%d/%m/%Y")
         domani2 = (oggi + timedelta(days=2)).strftime("%d/%m/%Y")
@@ -112,7 +112,7 @@ class TestPreparaNotifica:
     def test_prepara_notifica_creates_html_structure_cambiamenti(self, expected_pattern):
         """Test che prepara_notifica crea la struttura HTML corretta."""
         from moduli.lib_axios_famiglia import LibAxiosFamiglia, AxiosView
-        
+
         oggi = datetime.now()
         domani = (oggi + timedelta(days=1)).strftime("%d/%m/%Y")
         domani2 = (oggi + timedelta(days=2)).strftime("%d/%m/%Y")
@@ -189,7 +189,7 @@ class TestPreparaNotifica:
         """Test che i compiti passati non siano inclusi."""
 
         from moduli.lib_axios_famiglia import LibAxiosFamiglia, AxiosView
-                
+
         now = datetime.now()
         oggi = now.strftime("%d/%m/%Y")
         ieri = (now - timedelta(days=1)).strftime("%d/%m/%Y")
@@ -289,5 +289,6 @@ class TestPreparaNotifica:
         else:
             assert expected_pattern not in html_output
 
-if __name__ == "__main__":
+
+if (__name__ == "__main__"):
     pytest.main([__file__, "-v"])
