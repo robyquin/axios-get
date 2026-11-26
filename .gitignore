@@ -2,3 +2,4 @@ __pycache__
 *.json
 credenziali.yml
 py2win/
+excluded/
