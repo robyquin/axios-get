@@ -17,7 +17,9 @@ dependencies = [
 dev = [
   "pytest>=9.0.3",
   "flake8>=7.3.0",
-  "flake8-pyproject>=1.2.4"
+  "flake8-docstrings>=1.7.0",
+  "flake8-pyproject>=1.2.4",
+  "pydoclint>=0.12.0"
 ]
 
 [tool.pytest.ini_options]
@@ -33,5 +35,14 @@ exclude = [
     "excluded"
 ]
 extend-ignore = [
-    "E501"
+    "E501", # line too long
+    "D202", # No blank lines allowed after function docstring
+    "D401", # First line should be in imperative mood
+    "D105", # Missing docstring in magic method
+    "D107", # Missing docstring in __init__
 ]
+
+# Opzioni del plugin pydoclint dentro flake8
+style = "sphinx"
+allow-init-docstring = true
+check-arg-order = true
