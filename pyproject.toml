@@ -6,6 +6,19 @@ readme = "README.md"
 requires-python = ">=3.13"
 license = "MIT"
 license-files = ["LICENSE"]
+dependencies = [
+    "requests>=2.33.1",
+    "pyyaml>=6.0.3",
+    "pillow>=12.2.0",
+    "PIL"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=9.0.3",
+  "flake8>=7.3.0",
+  "flake8-pyproject>=1.2.4"
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
