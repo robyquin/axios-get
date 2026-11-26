@@ -13,7 +13,7 @@ Notifica ai tuoi figli/e i compiti loro assegnati sul registro elettronico.
 
 - Python 3.13 or later
 - Moduli:
-  - `yaml`
+  - `pyyaml`
   - `requests`
   - `pillow`
 
