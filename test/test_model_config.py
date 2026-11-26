@@ -15,10 +15,13 @@ from pathlib import Path
 # Aggiungi il percorso del progetto
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+
 class TestModelConfig:
     """Test per validazione dati di configurazione."""
 
-    @pytest.mark.parametrize("conf, status", [
+    @pytest.mark.parametrize(
+        "conf, status",
+        [
             pytest.param({}, False, id="vuoto"),
             pytest.param({'tipo': 'html'}, False, id="tipo_obbligatorio"),
             pytest.param({'param': 'stringa'}, False, id="param_obbligatorio"),
@@ -48,7 +51,9 @@ class TestModelConfig:
         else:
             assert not esito, msg
 
-    @pytest.mark.parametrize("conf, status", [
+    @pytest.mark.parametrize(
+        "conf, status",
+        [
             pytest.param({}, False, id="vuoto"),
             pytest.param({'customerid': 1.2}, False, id="customerid-float"),
             pytest.param({'customerid': 'codice_fiscale', 'username': 1.2}, False, id="username-float"),
@@ -91,7 +96,9 @@ class TestModelConfig:
         else:
             assert not esito, msg
 
-    @pytest.mark.parametrize("conf, status", [
+    @pytest.mark.parametrize(
+        "conf, status",
+        [
             pytest.param({}, False, id="path-obbligatorio"),
             pytest.param({'path': 'stringa'}, True, id="path-stringa"),
             pytest.param({'path': 12}, False, id="path-not-stringa")
@@ -112,7 +119,9 @@ class TestModelConfig:
         else:
             assert not esito, msg
 
-    @pytest.mark.parametrize("conf, status", [
+    @pytest.mark.parametrize(
+        "conf, status",
+        [
             pytest.param({}, False, id="vuoto"),
             pytest.param({'smtp_server': 12}, False, id="smtp_server-not-stringa"),
             pytest.param({'smtp_server': 'stringa', 'smtp_port': 'stringa'}, False, id="smtp_port-not-int"),
@@ -150,7 +159,9 @@ class TestModelConfig:
         else:
             assert not esito, msg
 
-    @pytest.mark.parametrize("conf, status", [
+    @pytest.mark.parametrize(
+        "conf, status",
+        [
             pytest.param({}, False, id="vuoto"),
             pytest.param({'BOT_TOKEN': 12}, False, id="BOT_TOKEN-not-stringa"),
             pytest.param({'BOT_TOKEN': 'stringa', 'n_allegati': 'stringa'}, False, id="n_allegati-not-int"),
@@ -178,7 +189,9 @@ class TestModelConfig:
         else:
             assert not esito, msg
 
-    @pytest.mark.parametrize("conf, status", [
+    @pytest.mark.parametrize(
+        "conf, status",
+        [
             pytest.param({}, False, id="vuoto"),
             pytest.param({'html': 'stringa'}, False, id="html-not-ConfigNotificaLocale"),
             pytest.param({'screenshot': 'stringa'}, False, id="screenshot-not-ConfigNotificaLocale"),
@@ -205,8 +218,9 @@ class TestModelConfig:
         else:
             assert not esito, msg
 
-
-    @pytest.mark.parametrize("conf, status", [
+    @pytest.mark.parametrize(
+        "conf, status",
+        [
             pytest.param({}, False, id="vuoto"),
             pytest.param({'version': 12}, False, id="version-not-string"),
             pytest.param({'version': 'stringa'}, False, id="version-not-format"),
@@ -234,6 +248,7 @@ class TestModelConfig:
             assert esito, msg
         else:
             assert not esito, msg
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
