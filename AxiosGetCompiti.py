@@ -96,19 +96,19 @@ def file_config_default() -> str:
                 'username': 'username',
                 'password': 'password',
                 'alunni': {
-                    'NOME_ALUNNO_A' : {
+                    'NOME_ALUNNO_A': {
                         'tipo': 'smtp',
                         'param': 'EMAIL_STUDENTE'
                     },
-                    'NOME_ALUNNO_B' : {
+                    'NOME_ALUNNO_B': {
                         'tipo': 'html',
                         'param': '.'
                     },
-                    'NOME_ALUNNO_C' : {
+                    'NOME_ALUNNO_C': {
                         'tipo': 'screenshot',
                         'param': '.'
                     },
-                    'NOME_ALUNNO_D' : {
+                    'NOME_ALUNNO_D': {
                         'tipo': 'telegram',
                         'param': 'CHAT_ID'
                     }

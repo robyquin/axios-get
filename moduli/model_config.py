@@ -41,7 +41,7 @@ class ConfigurazioneAlunno:
 
         else:
             raise TypeError("[ConfigurazioneAlunno].param campo mancate, ma obbligatorio!")
-        
+
         if (self.nome_alternativo is not None and not isinstance(self.nome_alternativo, str)):
             raise TypeError(f"[ConfigurazioneAlunno].nome_alternativo `{type(self.nome_alternativo).__name__}`, ma deve essere una stringa o null")
 
@@ -191,7 +191,7 @@ class ConfigNotificaTelegram:
                 raise TypeError(f"[ConfigNotificaTelegram].n_allegati `{type(self.n_allegati).__name__}`, ma deve essere un intero")
         else:
             raise TypeError("[ConfigNotificaTelegram].n_allegati campo mancate, ma obbligatorio!")
-        
+
         if (self.CHAT_ID is not None and not isinstance(self.CHAT_ID, str)):
             raise TypeError(f"[ConfigNotificaTelegram].CHAT_ID `{type(self.CHAT_ID).__name__}`, ma deve essere una stringa o null")
 
@@ -229,9 +229,7 @@ class ParamsNotifiche:
             ConfigNotificaTelegram(**dict(self.telegram))
 
         if (self.html is None and self.screenshot is None and self.smtp is None and self.telegram is None):
-            raise ValueError(f"[ParamsNotifiche] deve essere presente almeno una configurazione tra queste: 'html', 'screenshot', 'smtp', 'telegram'")
-
-
+            raise ValueError("[ParamsNotifiche] deve essere presente almeno una configurazione tra queste: 'html', 'screenshot', 'smtp', 'telegram'")
 
 
 @dataclass
@@ -261,7 +259,7 @@ class ConfigCredenzialiYaml:
             ParamsNotifiche(**dict(self.params_notifiche))
         else:
             raise TypeError("[ConfigCredenzialiYaml].params_notifiche campo mancate, ma obbligatorio!")
-        
+
         self.verifica_coerenza_notifiche()
 
     def verifica_coerenza_notifiche(self) -> 'ConfigCredenzialiYaml':

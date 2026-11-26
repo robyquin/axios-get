@@ -368,7 +368,7 @@ class LibAxiosFamiglia():
                                     MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF = f"{m1[0][0]}"
                                     self.MATERIALE_CONDIVISO_ALUNNO_TEXT_LINES.append(f"<h3 class='professore'>📂 {MATERIALE_DIDATTICO_FOLDERS_SHARED_PROF}</h3>")
                                 new_link_collabora = [
-                                    ['POST', 'https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_CONDIVISO_CON_ME_DETAIL'}, f'06_MATERIALE_CONDIVISO_CON_ME_DETAIL_{FOLDERS_SHARED[0]}_{FOLDERS_SHARED[1]}.json', {'fiDocId' : FOLDERS_SHARED[0], 'fnId': FOLDERS_SHARED[1]}, 'json', False]
+                                    ['POST', 'https://collabora.axioscloud.it/Pages/APP/APP_Ajax_Get.aspx', {'Action': 'MATERIALE_CONDIVISO_CON_ME_DETAIL'}, f'06_MATERIALE_CONDIVISO_CON_ME_DETAIL_{FOLDERS_SHARED[0]}_{FOLDERS_SHARED[1]}.json', {'fiDocId': FOLDERS_SHARED[0], 'fnId': FOLDERS_SHARED[1]}, 'json', False]
                                 ]
                                 self.__get_session(Alunno, new_link_collabora, prefix)
                         elif (link[UrlIdType.params]['Action'] == 'MATERIALE_CONDIVISO_CON_ME_DETAIL'):
