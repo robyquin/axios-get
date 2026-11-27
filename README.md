@@ -214,6 +214,58 @@ Il seguente file di configurazione imposta 5 attivazioni giornaliere di *AxiosGe
 </Task>
 ```
 
+## Update
+
+### Unix Like
+
+Per aggiornare il progetto:
+
+```bash
+cd axios-get
+git pull origin master
+```
+
+Se hai modificato il file `credenziali.yml`, **verifica che sia stato aggiornato correttamente** prima di procedere.
+
+### Windows
+
+#### Update da source
+
+```bash
+cd axios-get
+git pull origin master
+```
+
+#### Update da release
+
+1. Vai alla pagina delle [releases](https://github.com/robyquin/axios-get/releases)
+2. Scarica l'ultima release dal riquadro *assets*
+    - Se scegli il file **zip**, sostituisci i file della cartella di installazione con quelli scaricati.
+    - Se preferisci l'installer **exe**, lancialo e segui le istruzioni scegliendo la collocazione dell'installazione precedente.
+3. **Verifica che `credenziali.yml` sia preservato** (non sovrascritto)
+
+### Nota sulla configurazione
+
+- Il file `credenziali.yml` **non viene modificato automaticamente** dall'aggiornamento
+- Se il file non esiste dopo l'aggiornamento, rinomina `credenziali_default.yml` in `credenziali.yml`
+- In caso di dubbi sulla configurazione, consulta il file [CONFIGURAZIONE](./docs/Configurazione.md)
+
+### Risoluzione problemi
+
+Se dopo l'aggiornamento il programma non si avvia correttamente:
+
+1. Controlla che Python sia installato, disponibile nel PATH, e alla versione richiesta
+2. Verifica la presenza dei moduli richiesti (`pyyaml`, `requests`, `pillow`)
+3. Se usi uno schedulatore nel tuo sistema operativo:
+    - **Linux**, controlla la configurazione del servizio e riavvialo con:
+
+    ```bash
+    systemctl daemon-reload
+    systemctl restart axios-compiti.service
+    ```
+
+    - **Windows**, controlla in *Utilità di pianificazione* la correttezza del percorso dell'eseguibile, e i parametri aggiuntivi, poi riavvia l'attività pianificata manualmente.
+
 ## Convezione sulla rappresentazione di cambiamenti nelle notifiche
 
 Per release più recenti (`>= v1.0.7`) le notifiche supportano l'**evidenziazione delle modifiche** apportate al diario già notificato.
